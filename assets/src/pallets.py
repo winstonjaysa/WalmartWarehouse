@@ -106,7 +106,7 @@ def film(z0, z1):
     me = bpy.data.meshes.new_from_object(body.evaluated_get(dg)); body.modifiers.clear(); body.data = me
     _set_uv(body, lambda c: ((c.x + c.y + 1.2) * 0.4, min(0.845, max(0.0, (c.z - z0) / (z1 - z0) * 0.85))))
     # rolled lip: rounded-rectangle ring tube, wobbling radius (bunched film), sits on the top edge, overhangs ~12 mm
-    rnd = random.Random(11); bm = bmesh.new(); cr = 0.035; N = 192; M = 8
+    rnd = random.Random(11); bm = bmesh.new(); cr = 0.035; N = 120; M = 6
     ex, ey = hx + 0.002 - cr, hy + 0.002 - cr
     path = []
     L = 4 * (ex + ey) * 2 / 2 + 2 * math.pi * cr

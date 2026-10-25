@@ -53,6 +53,7 @@ function tourTick(dt) {
 function simStep(dt) {
   SIMT += dt;
   for (const v of VEH) { v.px = v.x; v.pz = v.z; v.pth = v.th; v.step(dt); v.obj.userData.update && v.obj.userData.update(dt, SIMT); }
+  try { popStep(dt); if (SIGNS && SIGNS.update) SIGNS.update(dt); if (WRAP0() && WRAP0().update) WRAP0().update(dt); } catch (e) { if (!simStep.err) { simStep.err = 1; console.warn("[gf] popStep", e && e.message); } }
   updateDoors(dt); updateCases(dt); uiTick(); tourTick(dt);
   for (const a of AMRS) { a.u = (a.u + 1.1 * dt / a.L) % 1; }
   if (ARR.gateOpen !== undefined) { const arm = world.userData.gate.userData.arm; arm.rotation.x = dampV(arm.rotation.x, ARR.gateOpen && ARR.state !== 'Docked' ? -1.4 : 0, 2, dt); }
@@ -69,8 +70,10 @@ function render(alpha, draw = true) {
   if (composer) composer.render(); else renderer.render(scene, camera);
 }
 function frame(now) {
-  const dt = Math.min(0.5, (now - last) / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21) last = now; acc += dt * speed;
-  let n = 0; while (acc >= STEP && n < 60 * 4) { simStep(STEP); acc -= STEP; n++; }
+  const dt = Math.min(0.5, (now - last) / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21)
+  last = now; acc += dt * speed;
+  let n = 0; while (acc >= STEP && n < 8) { simStep(STEP); acc -= STEP; n++; }
+  if (n >= 8) acc = 0;
   controls.update(); render(acc / STEP); if (!QS.has('capture')) requestAnimationFrame(frame);
 }
 // capture API: deterministic

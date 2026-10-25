@@ -205,3 +205,17 @@ Hand pallet jack / pump truck (ref imgref/20_hand_pallet_pump_truck.jpg)
   within 1 cm and inside the footprint, pull/push bend + lean, auto mode switching, forced mode, detach/reattach, face, zero errors).
   check.py TOTAL 103 FAIL 0 (SIZES regenerated: riderPalletTruck is 0.08 m longer from the bigger deck), check_qa 32/0, check_tj 14/0,
   check_b4b11 16/0, check_b31 1/0.
+
+== STEP B4 / B11 / B31 / B10 / B29-assert ==
+- B4 (stacker/forklift masts): makeMast is multi-stage (n = ceil(extension / (stageH - 0.4))); verified at max fork height on
+  autoStacker, walkieStacker, forklift and reachTruck (9.2 m): every stage overlap >= 0.35 m, carriage plate inside the top-stage rails,
+  backrest below the rail top. parts/check_b4b11.html -> check_b4b11_results.txt.
+- B11 (yard tractor / semi branding): cab livery is Walmart blue #0071CE (toneMapped false). Both cab doors now carry a spark
+  (0.5 m) and a door wordmark (0.96 x 0.24 m) at x = +/-1.232; sleeper wordmark kept. Close-up: closeup_semiTruckLivery.png.
+- B10 (brand washout): every PALETTE.blue/spark material and all brand decals use toneMapped:false (asserted in B11 checks).
+- B31 (rack loads): new export createRackLoadInstanced(count, {maxLayers=5, palletType, seed}) -> instanced pallets + case stacks
+  (instanceColor) + stretch-wrap tape; API setLoadAt(i, matrix, layers=4), hideLoad(i), commit(), casesPerLoad. 3 InstancedMeshes
+  for any number of rack positions. check_b31.html -> check_b31_results.txt (504 cases visible), closeup_rackLoads.png.
+- B29 assert helper: export isManned(vehicle) -> true when an operator is attached or the vehicle is driverless (no attachOperator),
+  so the app can assert that every moving manual truck has a driver.
+- Verify (re-run after the operator fixes): check_b4b11 TOTAL 16 FAIL 0, check_b31 1/0, zero console errors.

@@ -84,7 +84,7 @@ const DT = 1 / 30, SUB = 4;
 
 /* ================= SHOT A: forklift pick -> reverse turn -> rack stack (area origin 0,0) ================= */
 const A0 = V(0, 0, 0);
-const fl = createForklift({ autoLift: false, load: false }); scene.add(fl); fl.position.copy(A0);
+const fl = createForklift({ autoLift: false, load: false }); scene.add(fl); fl.userData.attachOperator(); fl.position.copy(A0);
 const ghostScene = new THREE.Scene(), gfl = createForklift({ autoLift: false, load: false }); ghostScene.add(gfl); gfl.position.copy(A0);
 // fork geometry: tine bottom offset vs commanded fork height, tine thickness
 function tineInfo(f) { f.userData.setForkHeight(0, true); f.userData.setMastTilt(0, true); f.updateMatrixWorld(true);
@@ -101,7 +101,7 @@ const hDep = DECK - TI.t + OPEN_HI - TI.off, hApproach = hDep + 0.1, hCarry = hA
 const L = fl.userData.kin.L, STEER = 0.6, ARC = (Math.PI / 2) * L / Math.tan(STEER);
 const scriptA = [
   { k: 'wait', dur: 0.22 },
-  { k: 'drive', d: 2.7, v: 2.4, a: 2.2 }, { k: 'mark', name: 'pick' },
+  { k: 'drive', d: 2.7, v: 2.6, a: 2.4 }, { k: 'mark', name: 'pick' },
   { k: 'fork', to: hAttach }, { k: 'mark', name: 'attach' }, { k: 'fork', to: hCarry }, { k: 'tilt', to: 0.05, dur: 0.22 },
   { k: 'steer', to: STEER, dur: 0.45 },
   { k: 'drive', d: ARC, v: 2.0, dir: -1, steer: STEER, a: 2.2, lift: hApproach, liftFrom: 0 },
@@ -109,8 +109,8 @@ const scriptA = [
   { k: 'drive', d: 3.0, v: 2.2, a: 2.0 }, { k: 'tilt', to: 0, dur: 0.22 }, { k: 'forkWait' },
   { k: 'drive', d: 1.3, v: 1.1, a: 1.6 }, { k: 'mark', name: 'deposit' },
   { k: 'fork', to: hDep }, { k: 'mark', name: 'detach' }, { k: 'fork', to: hDep - 0.05 },
-  { k: 'drive', d: 1.7, v: 1.2, dir: -1, a: 1.6, lift: 0.12, liftFrom: 0.5 },
-  { k: 'wait', dur: 0.5 },
+  { k: 'drive', d: 1.7, v: 1.6, dir: -1, a: 1.8, lift: 0.12, liftFrom: 0.5 },
+  { k: 'wait', dur: 0.2 },
 ];
 // ghost dry run: where must pallet A and the rack slot be?
 gfl.userData.setForkHeight(hEntry, true);
@@ -137,7 +137,7 @@ decor(rack, SLOT_X, 3.1 + 0.006, { variant: 'partial', height: 1.1, seed: 9 }); 
 for (const k of [-1, 1, 2]) { const b = createRackBay({ seed: 20 + k, frames: 'left' }); b.position.copy(rackPos).addScaledVector(rackX, k * 2.8 + (k > 0 ? 0 : 0)); b.rotation.y = rackYaw; if (k === -1) b.position.addScaledVector(rackX, 0); scene.add(b); }
 // aisle paint + background reach truck working the next bays
 lanePaint(...(() => { const c = rackPos.clone().addScaledVector(rackF, 0.75); return [c.x, c.z]; })(), 11.5, 0.08, -rackYaw);
-const rt = createReachTruck({ load: true, autoLift: true }); rt.position.copy(rackPos).addScaledVector(rackX, 5.6).addScaledVector(rackF, 3.6); rt.rotation.y = rackYaw + Math.PI; scene.add(rt);
+const rt = createReachTruck({ load: true, autoLift: true }); rt.position.copy(rackPos).addScaledVector(rackX, 5.6).addScaledVector(rackF, 3.6); rt.rotation.y = rackYaw + Math.PI; scene.add(rt); rt.userData.attachOperator();
 const flRun = (() => { fl.userData.setForkHeight(hEntry, true); return runner(fl, scriptA, {
   attach: () => { fl.updateMatrixWorld(true); fl.userData.parts.carriage.attach(palA); },
   detach: () => { fl.updateMatrixWorld(true); scene.attach(palA); window.__seatErr = palA.position.y - DECK; } }); })();
@@ -152,7 +152,7 @@ for (const k of [-2, 2]) { const s = createDockDoor({ label: 'D' + (12 + k) }); 
 const extraWall = new THREE.Mesh(new THREE.BoxGeometry(40 - 21, 5.4, 0.3), new THREE.MeshStandardMaterial({ color: 0xdcd6c8, roughness: 0.9 }));
 for (const s of [-1, 1]) { const w = extraWall.clone(); w.position.set(B0.x + s * (10.5 + 9.5), 2.7, B0.z); w.castShadow = w.receiveShadow = true; scene.add(w); }
 for (let k = -2; k <= 2; k++) lanePaint(B0.x + k * 4.2 + 2.1, B0.z + 9, 0.12, 18);
-const truck = createSemiTruck({ speed: 0 }); scene.add(truck); truck.updateMatrixWorld(true);
+const truck = createSemiTruck({ speed: 0 }); scene.add(truck); truck.userData.attachOperator(); truck.updateMatrixWorld(true);
 const tb = new THREE.Box3().setFromObject(truck); const DOCK_Z = B0.z + 0.32 - tb.min.z;
 const tk = truck.userData.kin, tWheels = [...tk.tractorWheels, ...tk.trailerWheels];
 const snapT = () => ({ x: truck.position.x, z: truck.position.z, yaw: truck.rotation.y, tr: truck.userData.trailerAngle, st: truck.userData.steer, w: tWheels.map((w) => w.rotation.x) });
@@ -172,10 +172,10 @@ function profile(D, vmax, acc) { const ta = vmax / acc, da = 0.5 * acc * ta * ta
   else { const tc = (D - 2 * da) / vmax; T = 2 * ta + tc; f = (t) => t < ta ? 0.5 * acc * t * t : t < ta + tc ? da + vmax * (t - ta) : D - 0.5 * acc * (T - t) ** 2; }
   return { T, s: (t) => f(Math.min(T, Math.max(0, t))), v: (t) => t <= 0 || t >= T ? 0 : Math.min(vmax, acc * t, acc * (T - t)) }; }
 const DA = recA[recA.length - 1].s, DB = recB[recB.length - 1].s;
-const pB = profile(DB, 5.2, 2.6), pA = profile(DA, 5.5, 2.4), PAUSE_B = 0.25;
-const durB = 0.3 + pB.T + PAUSE_B + pA.T + 0.6;
+const pB = profile(DB, 6.2, 3.0), pA = profile(DA, 6.0, 2.6), PAUSE_B = 0.25;
+const durB = 0.2 + pB.T + PAUSE_B + pA.T + 0.35;
 function truckAt(t) {   // shot-local time
-  const t1 = t - 0.3;
+  const t1 = t - 0.2;
   if (t1 < pB.T) { applyRec(recB, DB - pB.s(t1)); truck.userData.setSpeed(pB.v(t1)); return 'turn'; }
   const t2 = t1 - pB.T - PAUSE_B;
   if (t2 < 0) { applyRec(recA, DA); truck.userData.setSpeed(0); return 'shift'; }
@@ -191,14 +191,14 @@ const jload = createPalletLoad({ variant: 'half', height: 1.0, seed: 31 });
   jload.position.set(0, fb.max.y - OPEN_HI, (fb.min.z + fb.max.z) / 2 + 0.02); pj.userData.parts.liftFrame.add(jload); pj.userData.setLift(1); }
 const pjStart = { x: C0.x, z: C0.z + 4, yaw: 0 }, JST = 0.9, JL = pj.userData.kin.L, JARC = (Math.PI / 2) * JL / Math.tan(JST);
 const scriptC = [{ k: 'wait', dur: 0.3 }, { k: 'drive', d: 1.6, v: 1.88, dir: -1, a: 1.6 }, { k: 'drive', d: JARC, v: 1.50, dir: -1, steer: JST },
-  { k: 'drive', d: 1.7, v: 1.88, dir: -1 }, { k: 'wait', dur: 0.3 }];
+  { k: 'drive', d: 1.7, v: 1.88, dir: -1 }, { k: 'wait', dur: 0.2 }];
 // steer ramps for the tiller: insert smooth in/out (operator swings the handle while walking)
 scriptC.splice(2, 0, { k: 'drive', d: 0.4, v: 1.50, dir: -1, steer: JST * 0.5 }); scriptC.splice(4, 0, { k: 'drive', d: 0.4, v: 1.50, dir: -1, steer: JST * 0.5 });
 for (const m of [pj, gpj]) { m.position.set(pjStart.x, 0, pjStart.z); m.rotation.y = pjStart.yaw; }
 const gpath = []; { const r = runner(gpj, scriptC); let n = 0; while (!r.done && n++ < 5000) { for (let k = 0; k < SUB; k++) r.step(DT / SUB); gpath.push(gpj.position.clone()); } }
 const durC = gpath.length * DT;
 const pjRun = runner(pj, scriptC);
-const wk = createWorker({ walking: false, seed: 4 }); scene.add(wk); wk.position.set(C0.x, 0, C0.z + 5); // parked in shot C until it runs
+pj.userData.attachOperator(); pj.userData.setOperatorMode('pull');   // pallet jack is hauled by a walking operator (pull pose, lean, bent elbow)
 // inside-corner props: column + bollards + pallet stack at the turn's inside
 { const mid = gpath[Math.floor(gpath.length * 0.5)], st = gpath[0], en = gpath[gpath.length - 1];
   const corner = V(en.x, 0, st.z).lerp(mid, 0.0); const inside = V(st.x, 0, en.z); // the L's inner vertex
@@ -206,7 +206,7 @@ const wk = createWorker({ walking: false, seed: 4 }); scene.add(wk); wk.position
   for (const k of [0, 1]) { const b = createBollard({ color: 'yellow' }); b.position.set(inside.x + Math.sign(st.x - en.x) * (0.75 + k * 1.2), 0, inside.z + Math.sign(st.z - en.z) * 0.75); scene.add(b); }
   lanePaint((st.x + inside.x) / 2 - Math.sign(st.x - en.x) * 1.3, (st.z + inside.z) / 2, 0.1, Math.abs(st.z - inside.z) + 2);
   window.__corner = { st: st.toArray(), en: en.toArray(), inside: inside.toArray() }; }
-const tug = createTugTrain({ carts: 3 }); tug.position.set(C0.x + 7.5, 0, C0.z - 10); tug.rotation.y = 0; scene.add(tug);
+const tug = createTugTrain({ carts: 3 }); tug.position.set(C0.x + 7.5, 0, C0.z - 10); tug.rotation.y = 0; scene.add(tug); tug.userData.attachOperator();
 let tugS = 0;
 
 /* ================= timeline / cameras ================= */
@@ -244,12 +244,9 @@ function frame(dt) {
     setSun(V(B0.x + 6, 0, B0.z + 12), 26);
   } else {
     if (!pjRun.done) for (let k = 0; k < SUB; k++) pjRun.step(dt / SUB);
+    // operator rig (models.js installOperator): auto PULL mode while the jack travels tiller-first, hand on the grip via IK
+    const moving = Math.abs(pj.userData.speed) > 0.05; pj.userData.setHandleAngle?.(moving ? -0.75 : -0.35);
     pj.userData.update(dt, T);
-    // operator walks at the end of the tiller, facing travel (handle leads)
-    pj.updateMatrixWorld(true); const ts = pj.userData.parts.tillerSteer; const hp = ts.localToWorld(V(0, 0, -0.82)); hp.y = 0;
-    const tyaw = pj.rotation.y + ts.rotation.y + Math.PI; wk.position.copy(hp); wk.rotation.y = tyaw;
-    const moving = Math.abs(pj.userData.speed) > 0.05; wk.userData.setWalking(moving); wk.userData.walkSpeed = Math.max(0.6, Math.abs(pj.userData.speed)); wk.userData.update(dt, T);
-    pj.userData.setHandleAngle?.(moving ? -0.75 : -0.35);
     // tug train loops on an S-curve in the background
     const tv = Math.min(2.2, 0.6 + t * 0.9); tugS += tv * dt; const steer = tugS < 3 ? 0 : tugS < 9 ? -0.42 : tugS < 13 ? 0.0 : 0.42;
     drive(tug, dt, tv, steer); tug.userData.update(dt, T);

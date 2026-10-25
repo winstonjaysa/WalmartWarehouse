@@ -152,21 +152,23 @@ function xformOffset(off, fr, extraYaw, out) {
 function solveFraming(camera, target, lookOff, offsets, orbitAmp, signBoxes, wallBoxes, range = [10, 25], blockers = null, skip = null, vel = null, current = null) {
   const P = new THREE.Vector3(), L = new THREE.Vector3(), lo = V(lookOff);
   // moving target: also probe where it will be / was ~2.5 s away (ping-pong motion), so the framing survives its travel
-  // working equipment shuttles around its stage: score the framing for the target at its spot and +-3 m in X and Z
-  const tps = [target.clone(), ...[[3, 0], [-3, 0], [0, 3], [0, -3]].map(([x, z]) => target.clone().add(new THREE.Vector3(x, 0, z)))];
+  // moving equipment: also score where the target will be / was ~2.5 s away along its current velocity (shuttle motion)
+  const tps = [target.clone()]; if (vel && vel.lengthSq() > 0.09) { const dv = vel.clone().setY(0).multiplyScalar(2.5); tps.push(target.clone().add(dv), target.clone().sub(dv)); }
+  const tw = 1 + 0.5 * (tps.length - 1);
   const authored = offsets.map((o) => Math.hypot(...o)).reduce((a, b) => a + b, 0) / offsets.length;
   const probesFor = (am) => { const A = orbitAmp * am; return A ? [-A, 0, A] : [0]; };
     const score = (fr, cap = Infinity) => {
     let pen = 0; const bias = Math.abs(fr.yaw) * 0.02 + Math.abs(fr.h - 1) * 0.05 + Math.abs(fr.d - 1) * 0.05 + (1 - fr.amp) * 0.3;
-    for (const tp of tps) for (const off of offsets) for (const py of probesFor(fr.amp)) {
-      if (pen / tps.length + bias > cap) return Infinity; // pruned
+    for (let ti = 0; ti < tps.length; ti++) for (const off of offsets) for (const py of probesFor(fr.amp)) {
+      const tp = tps[ti], wt = ti ? 0.5 : 1;
+      if (pen / tw + bias > cap) return Infinity; // pruned
       xformOffset(off, fr, py, P).add(tp); L.copy(lo).add(tp);
       const elev = Math.atan2(P.y - L.y, Math.hypot(P.x - L.x, P.z - L.z));
-      if (elev < 16 * DEG) { pen += 3; continue; }
+      if (elev < 16 * DEG) { pen += 3 * wt; continue; }
       const r = checkFraming(camera, P, L, tp, signBoxes, wallBoxes);
-      pen += (r.occluded ? 10 : 0) + (r.inside ? 20 : 0) + (r.centred ? 0 : 5) + (r.signDist > 5 ? 0 : 3) + ((r.signCover < 0.1 || (r.signCentral < 0.02 && r.signCover < 0.17)) ? 0 : 2 + r.signCover * 10);
+      pen += wt * ((r.occluded ? 10 : 0) + (r.inside ? 20 : 0) + (r.centred ? 0 : 5) + (r.signDist > 5 ? 0 : 3) + ((r.signCover < 0.1 || (r.signCentral < 0.02 && r.signCover < 0.17)) ? 0 : 2 + r.signCover * 10));
     }
-    return pen / tps.length + bias; // bias: prefer the authored shot + full orbit
+    return pen / tw + bias; // bias: prefer the authored shot + full orbit
   };
   const blockPen = (fr) => { // line-of-sight vs scene meshes at orbit centre + extremes (look point and target both hidden = blocked)
     if (!blockers || !blockers.length) return 0; let pen = 0; const pr = probesFor(fr.amp), use = pr.length > 1 ? [pr[0], 0, pr[pr.length - 1]] : pr;
@@ -200,7 +202,7 @@ export const DEFAULT_STOPS = [
   { id: 'receiving', title: 'Receiving', sign: 'RECEIVING',
     what: 'The dock restraint locks the trailer before the door opens and the leveler drops. A receiver pulls the pallets to the stage lane with an electric pallet jack and scans each pallet against the supplier\u2019s advance ship notice, checking quantity and damage.',
     watch: 'Receiver unloading with an electric pallet jack',
-    shot: { offset: [8, 11, 15], lookOffset: [0, 1, 0] } },
+    shot: { offset: [-12.5, 6.2, -3.4], lookOffset: [0, 1, 0], orbit: 0.5 } },
   { id: 'reserve', title: 'Reserve storage', sign: 'RESERVE STORAGE',
     what: 'The warehouse system picks a rack slot by sales velocity and zone. A power equipment operator on a reach truck carries the pallet into the narrow aisle (one truck per aisle), lifts it into the slot and scans the location to confirm the putaway.',
     watch: 'Reach truck putting a pallet away',
@@ -208,7 +210,7 @@ export const DEFAULT_STOPS = [
   { id: 'crossdock', title: 'Cross-dock', sign: 'CROSS-DOCK',
     what: 'Pallets already allocated to stores skip storage. A driver takes them straight across the one-way, northbound cross-dock lane from the receiving docks to the outbound lanes on the opposite side.',
     watch: 'Forklift carrying a cross-dock pallet',
-    shot: { offset: [10, 9, 15], lookOffset: [0, 1, 0] } },
+    shot: { offset: [-10.6, 6.6, 0], lookOffset: [0, 1, 0], orbit: 0.5 } },
   { id: 'replen', title: 'Replenishment', sign: 'RESERVE STORAGE',
     what: 'When a pick face falls to its minimum, the system raises a replenishment task. A reach truck operator lets a full pallet down from reserve and loads the flow lane from the replen aisle behind the pick face; upper tiers are refilled with an order picker.',
     watch: 'Reach truck on a replenishment run',
@@ -216,19 +218,19 @@ export const DEFAULT_STOPS = [
   { id: 'pick', title: 'Pick module', sign: 'PICK MODULE',
     what: 'Order fillers working by voice or RF scanner pick full cases from the flow-rack faces on three tiers. Each case gets a store label, is scanned, and goes onto the takeaway conveyor.',
     watch: 'Order filler picking cases at a pick face',
-    shot: { offset: [10, 9, 13], lookOffset: [0, 1.5, 0] } },
+    shot: { offset: [-3.9, 11.6, -14.4], lookOffset: [0, 1.5, 0], orbit: 0.5 } },
   { id: 'sorter', title: 'Sorter', sign: 'SORTER',
     what: 'Conveyors merge cases from the pick module and the receiving conveyor. Each case is inducted, spaced and scanned, then the sliding-shoe sorter diverts it to its store\u2019s lane: one door per store. Unreadable cases go round again or to rework.',
     watch: 'Cases on sorter SRT1 diverting to store lanes',
-    shot: { offset: [10, 8, 15], lookOffset: [0, 0.5, 0] } },
+    shot: { offset: [0, 7.9, -9.5], lookOffset: [0, 0.5, 0], orbit: 0.5 } },
   { id: 'wrap', title: 'Pallet build & wrap', sign: 'PALLET BUILD',
     what: 'Non-conveyable and full-pallet freight is built into store pallets here. The operator starts the turntable stretch-wrapper; film spirals up and back down the load, then is cut and wiped flat so the pallet travels safely.',
     watch: 'Stretch-wrapper and its operator',
-    shot: { offset: [9, 6, 9], lookOffset: [0, 1, 0] } },
+    shot: { offset: [-20.7, 7.8, 2.9], lookOffset: [0, 1, 0], orbit: 0.4 } },
   { id: 'shipping', title: 'Shipping', sign: 'SHIPPING',
     what: 'Each outbound door serves one store. Loaders stack cases from the lane wall by wall into the trailer and load mixed pallets, last stop first. The trailer stays at the door until it is full by space (cubed out) or by weight.',
     watch: 'Loader filling a store trailer',
-    shot: { offset: [10, 9, 11], lookOffset: [0, 1.2, 0] } },
+    shot: { offset: [-10.5, 6.3, -2.8], lookOffset: [0, 1.2, 0], orbit: 0.5 } },
   { id: 'depart', title: 'Departure', sign: 'GATE',
     what: 'The full trailer is sealed, the restraint is released and the yard driver pulls it to a staged slot. A road driver hooks up and leaves through the gate, where the seal is checked on the way out.',
     watch: 'Loaded store trailer heading out through the gate',
@@ -390,7 +392,7 @@ class ExploreMode {
     this.from.pos.copy(this.rig.pos); this.from.look.copy(this.rig.look); this.from.fov = this.rig.fov;
     this.index = i; this._orbitT = 0;
     resolveTarget(this.opts.getTarget, s.id, this._raw); this._tS.copy(this._raw); this._tV.set(0, 0, 0);
-    this._fr = this._solve(s); this._frS = { ...this._fr }; this._reT = 0; this._bad = 0;
+    this._fr = this._solve(s); this._frS = { ...this._fr }; this._reT = 0; this._bad = 0; this._parkT = 0;
     this.trans = { t: 0, D: this.D * Math.min(2, Math.max(1, this.from.pos.distanceTo(xformOffset(s.shot.offset, this._fr, 0, new THREE.Vector3()).add(this._raw)) / 60)) };
     this._fillPanel(s); this._setPanelVisible(true); this._renderRail(); this._factT = 0; this._refreshFacts();
     try { this.opts.ui?.setCaption?.(`${s.title} \u2014 ${s.watch}`); } catch (e) { /* ignore */ }
@@ -399,7 +401,7 @@ class ExploreMode {
   _solve(s, current = null) {
     if (this.opts.autoFrame === false) return { yaw: 0, h: 1, d: 1, amp: 1, report: null };
     const signs = collectSignBoxes(this.opts.signs, this.opts.occluders), walls = this.opts.walls === false ? [] : (this.opts.walls || DEFAULT_WALLS);
-    return solveFraming(this.camera, this._raw, s.shot.lookOffset || [0, 1, 0], [s.shot.offset], this.orbitAmp, signs, walls, s.range || (WIDE_STAGES.has(s.id) ? [20, 50] : [10, 25]), asList(this.opts.blockers), targetObject(this.opts.getTarget, s.id), this._tV, current);
+    return solveFraming(this.camera, this._raw, s.shot.lookOffset || [0, 1, 0], [s.shot.offset], this.orbitAmp * (s.shot.orbit ?? 1), signs, walls, s.range || (WIDE_STAGES.has(s.id) ? [20, 50] : [10, 25]), asList(this.opts.blockers), targetObject(this.opts.getTarget, s.id), this._tV, current);
   }
   /** framing check of the CURRENT camera pose vs the current stop target (for QA) */
   checkFraming() {
@@ -429,12 +431,14 @@ class ExploreMode {
     this._orbitT += dt;
     // moving targets: re-check the live framing every 0.5 s while parked; if a sign/wall gets in the way, re-solve and glide (never jump) to the new framing
     if (!this.trans && this.opts.autoFrame !== false && (this._reT += dt) >= 0.5) {
-      this._reT = 0; const f = this.checkFraming(); this._bad = f && !f.ok ? (this._bad || 0) + 1 : 0;
+      this._reT = 0; this._parkT = (this._parkT || 0) + 0.5;
+      if (this._parkT === 1 && this._tV.lengthSq() > 0.09) { const prev = this._raw.clone(); this._raw.copy(this._tS); this._fr = this._solve(s, this._fr); this._raw.copy(prev); } // moving target: account for its travel
+      const f = this.checkFraming(); this._bad = f && !f.ok ? (this._bad || 0) + 1 : 0;
       if (this._bad >= 6) { this._bad = -12; const prev = this._raw.clone(); this._raw.copy(this._tS); this._fr = this._solve(s, this._fr); this._raw.copy(prev); } // 3 s bad -> re-solve (then 6 s grace)
     }
     const fs = this._frS || (this._frS = { ...this._fr }), fk = 1 - Math.exp(-dt * 1.2), dy = Math.atan2(Math.sin(this._fr.yaw - fs.yaw), Math.cos(this._fr.yaw - fs.yaw));
     fs.yaw += Math.sign(dy) * Math.min(Math.abs(dy) * fk, 30 * DEG * dt); fs.h += (this._fr.h - fs.h) * fk; fs.d += (this._fr.d - fs.d) * fk; fs.amp += (this._fr.amp - fs.amp) * fk;
-    const amp = this.orbitAmp * fs.amp, w = this.orbitAmp > 0 ? (this.orbitDeg * DEG) / this.orbitAmp : 0, ang = amp * Math.sin(this._orbitT * w);
+    const amp = this.orbitAmp * (s.shot.orbit ?? 1) * fs.amp, w = this.orbitAmp > 0 ? (this.orbitDeg * DEG) / this.orbitAmp : 0, ang = amp * Math.sin(this._orbitT * w);
     const P = xformOffset(s.shot.offset, fs, ang, new THREE.Vector3()).add(this._tS), L = V(s.shot.lookOffset || [0, 1, 0]).add(this._tS), F = s.shot.fov ?? this._fov0;
     if (this.trans) {
       this.trans.t += dt; const k = clamp01(this.trans.t / this.trans.D);

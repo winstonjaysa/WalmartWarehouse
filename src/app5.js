@@ -58,8 +58,8 @@ function reachD(fk) { syncPose(fk); carriageOf(fk).getWorldPosition(_w); return 
 function palY(pal) { syncAll(); pal.getWorldPosition(_w); return _w.y; }
 function syncAll() { for (const v of VEH) if (!v.isSemi) syncPose(v); }
 function slotAssert(kind, fk, pal, loc) {
-  syncPose(fk); pal.updateMatrixWorld(true); pal.getWorldPosition(_w);
-  const seat = tineTopY(fk) - DECK_UNDER, dy = Math.abs(seat - loc.Y), dxz = Math.hypot(_w.x - loc.X, _w.z - loc.Z), dp = Math.abs(_w.y - loc.Y);
+  syncPose(fk); pal.updateMatrixWorld(true); const seat = tineTopY(fk) - DECK_UNDER; pal.getWorldPosition(_w); // B23/B24: read the pallet AFTER tineTopY (shared temp vector)
+  const dy = Math.abs(seat - loc.Y), dxz = Math.hypot(_w.x - loc.X, _w.z - loc.Z), dp = Math.abs(_w.y - loc.Y);
   if (dy > 0.02 || dxz > 0.02 || dp > 0.02) { ASSERT.fail++; console.warn(`[ASSERT] fork-to-slot FAIL ${kind} ${fk.id} @ ${loc.id}: fork-seat dy=${(dy * 100).toFixed(1)}cm pallet dxz=${(dxz * 100).toFixed(1)}cm dy=${(dp * 100).toFixed(1)}cm`); }
   else { ASSERT.ok++; console.info(`[ASSERT] fork-to-slot ok ${kind} ${fk.id} @ ${loc.id}: seat err ${(dy * 100).toFixed(2)} cm, xz err ${(dxz * 100).toFixed(2)} cm`); }
 }

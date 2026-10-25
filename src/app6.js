@@ -1,3 +1,5 @@
+let popStep = () => {}; let __WRAP = null; const WRAP0 = () => __WRAP;
+try {
 // ====================================================================== POPULATION (app6)
 // Every machine has an operator (raptor B29 operators via ud.attachOperator), every worker has a job.
 // Jobs are queues of bicycle-model drive legs + fork actions; pallets move only while attached to forks.
@@ -52,7 +54,7 @@ function placePal(p, loc, yaw = 0) { p.position.set(loc.X, loc.Y, loc.Z); p.rota
 // ---------------------------------------------------------------- generic fork moves (floor/rack/trailer locations {id,X,Y,Z})
 const hEntry = (v, Y) => v.isJack || v.kind === 'rider' ? 0 : hFor(v, Y + ENTRY);
 const hClear = (v) => v.isJack || v.kind === 'rider' ? 0.12 : v.obj.userData.getForkHeight() + CLEAR;
-const hTravel = (v) => v.isJack || v.kind === 'rider' ? (v.carry ? 0.12 : 0) : hFor(v, FLOOR + TRAVEL);
+const hTravel = (v) => v.isJack || v.kind === 'rider' ? (v.carry ? 0.12 : 0) : Math.max(0, hFor(v, FLOOR + TRAVEL));
 function refFor(v, loc, th) { const RD = reachD(v), [fx, fz] = fwdOf(th); return { x: loc.X - fx * RD, z: loc.Z - fz * RD }; }
 // pick: assumes v is at (or will drive to) the approach pose 'AP' metres behind the engage pose
 function pickAt(v, pal, loc, th, o = {}) {
@@ -235,7 +237,7 @@ FK11.do(() => shipJob(FK11, T3, OL3)); FK12.wait(2).do(() => shipJob(FK12, T5, O
 // ================================================================= PALLET BUILD + STRETCH WRAP + HAND PALLET JACKS
 const WR = { x: 66, y: 56.5 };
 let WRAP = null; try { WRAP = COOKER_WRAPPER.create(world, { position: [sx(WR.x), FLOOR, sz(WR.y)], rotationY: 0, duration: 22, caseStack: true }); } catch (e) { console.warn('[gf] wrapper', e); }
-const TT = WRAP ? WRAP.getTurntableWorld(new THREE.Vector3()) : V3(sx(WR.x), FLOOR + 0.12, sz(WR.y));
+__WRAP = WRAP; const TT = WRAP ? WRAP.getTurntableWorld(new THREE.Vector3()) : V3(sx(WR.x), FLOOR + 0.12, sz(WR.y));
 const TTLOC = { id: 'WRAP-01', X: TT.x, Y: TT.y, Z: TT.z };
 // build spots: pallets are built case by case by two builders, then pulled to the wrapper
 const BS = [{ id: 'BLD-01', x: 56, y: 53.0 }, { id: 'BLD-02', x: 59.5, y: 53.0 }].map((b) => ({ ...b, X: sx(b.x), Y: FLOOR, Z: sz(b.y), pal: null, n: 0, state: 'building' }));
@@ -441,7 +443,7 @@ function walkBehindPose(v) {
   if (ud.setTiller) ud.setTiller(Math.abs(v.sv || 0) > 0.05 ? -0.95 : -0.7);
 }
 // ================================================================= per-step update
-function popStep(dt) {
+popStep = function (dt) {
   proximityHolds();
   tugStep(dt); for (const m of YT) purePursuit(m, dt, 3.2, 4.5);
   for (const m of POP.movers) m.obj.userData.update && m.obj.userData.update(dt, SIMT);
@@ -457,3 +459,6 @@ function popStep(dt) {
 const ENTITIES = () => [...VEH.map((v) => ({ id: v.id, type: v.type, state: v.state, task: v.task, obj: v.obj })), ...POP.movers.map((m) => ({ id: m.id, type: m.type, state: m.state, task: m.task, obj: m.obj })), ...POP.peds.map((p) => ({ id: p.id, type: p.role, state: p.state, task: p.task, obj: p.o }))];
 window.__ents = ENTITIES;
 console.info('[gf] population', { vehicles: VEH.length, movers: POP.movers.length, workers: POP.peds.length });
+
+} catch (e) { console.warn('[gf] population layer disabled:', e && e.message); }
+let SIGNS = null; try { SIGNS = COOKER_SIGNS.create(world, { floorY: FLOOR, ceiling: 12.6 }); world.traverse((m) => { if (m.isMesh && m.parent && /sign/i.test(m.parent.name + m.name) && m.material && !Array.isArray(m.material)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = -1; m.material.polygonOffsetUnits = -1; } }); } catch (e) { console.warn('[gf] signs', e && e.message); }

@@ -1488,7 +1488,10 @@ const M = {
   get navy() { return mat(PALETTE.navy); },
   get blue() { return mat(PALETTE.blue); },
   get yellow() { return mat(PALETTE.spark); },
+  get glassClear() { return (_glassClear ??= Object.assign(new THREE.MeshStandardMaterial({ color: 0xa8cce8, roughness: 0.08, metalness: 0.1, transparent: true, opacity: 0.3, depthWrite: false }), { name: 'glassClear' })); },
 };
+let _glassClear = null;
+const clearGlass = (m) => { m.castShadow = false; return m; };
 
 function add(parent, geo, material, x = 0, y = 0, z = 0, rx = 0, ry = 0, rz = 0, name) {
   const m = new THREE.Mesh(geo, material);
@@ -1512,7 +1515,39 @@ function finish(g, parts, update, extra = {}) {
   for (const k in g.userData) if (!(k in extra)) extra[k] = g.userData[k];
   extra.parts = parts; extra.update = update || (() => {}); g.userData = extra;
   if (typeof extra.setSteer === 'function' && !extra.setSteerNow) addSteerApi(extra, parts);
+  if (extra.operatorCfg) installOperator(g, extra);
   return g;
+}
+function isManned(v) { const ud = v?.userData || {}; return !!ud.operator || !ud.attachOperator; }
+function installOperator(g, ud) {
+  const cfg = ud.operatorCfg, base = ud.update;
+  ud.anchors = { ...(ud.anchors || {}), ...cfg.anchors }; ud.operatorPose = cfg.pose; ud.operator = null;
+  ud.attachOperator = (op) => {
+    op = op || createOperator({ pose: cfg.pose, hardHat: cfg.hardHat ?? true, vest: cfg.vest, seed: cfg.seed });
+    if (ud.operator && ud.operator !== op) ud.detachOperator();
+    cfg.anchor.add(op); op.position.set(0, 0, 0); op.rotation.set(0, 0, 0);
+    if (op.userData.setPose) op.userData.setPose(cfg.pose, { lean: cfg.lean });
+    if (op.userData.attachHandsTo) op.userData.attachHandsTo(cfg.grip, cfg.spread ?? 0.08, cfg.one ?? null);
+    ud.operator = op; op.userData.update(0, 0); return op;
+  };
+  ud.detachOperator = () => { const op = ud.operator; if (op) { if (op.parent) op.parent.remove(op); if (op.userData.detachHands) op.userData.detachHands(); } ud.operator = null; return op; };
+  if (cfg.pose === 'walking-tiller') {   // tiller trucks: auto PULL when travelling tiller-first (-Z), PUSH when forks-first (+Z)
+    const par = cfg.anchor.parent, gp = new THREE.Vector3(); g.updateMatrixWorld(true); cfg.grip.getWorldPosition(gp); par.worldToLocal(gp);
+    const pullA = grp(par, 'anchorPull', gp.x + 0.235, cfg.anchor.position.y, gp.z - (cfg.pullReach ?? 0.32)); pullA.rotation.y = Math.PI; ud.anchors.pull = pullA;
+    let mode = null, vz = 0; const prev = new THREE.Vector3(), cur = new THREE.Vector3(), fz = new THREE.Vector3(); let has = false;
+    ud.operatorMode = cfg.mode || 'auto';
+    ud.setOperatorMode = (m) => { ud.operatorMode = m; if (m !== 'auto') applyMode(m); };
+    const applyMode = (m) => { const op = ud.operator; if (!op || m === mode) return; mode = m;
+      const A = m === 'pull' ? pullA : cfg.anchor; A.add(op); op.position.set(0, 0, 0); op.rotation.set(0, 0, 0);
+      op.userData.setPose(m === 'pull' ? 'walking-tiller' : 'pushing-tiller'); op.userData.attachHandsTo(cfg.grip, cfg.spread ?? 0.08, m === 'pull' ? 1 : null); };
+    const att = ud.attachOperator; ud.attachOperator = (op) => { op = att(op); mode = null; applyMode(ud.operatorMode === 'auto' ? 'push' : ud.operatorMode); return op; };
+    ud.getOperatorMode = () => mode;
+    ud.update = (dt, t) => { base(dt, t); g.updateWorldMatrix(true, false); cur.setFromMatrixPosition(g.matrixWorld);
+      if (has && dt > 0) { fz.set(0, 0, 1).transformDirection(g.matrixWorld); vz = damp(vz, cur.clone().sub(prev).dot(fz) / dt, 6, dt); } prev.copy(cur); has = has || dt > 0;
+      if (ud.operatorMode === 'auto') { if (vz < -0.08) applyMode('pull'); else if (vz > 0.08) applyMode('push'); }
+      if (ud.operator) ud.operator.userData.update(dt, t); };
+  } else ud.update = (dt, t) => { base(dt, t); if (ud.operator) ud.operator.userData.update(dt, t); };
+  if (cfg.auto) ud.attachOperator();
 }
 function addSteerApi(ud, parts) {
   const raw = ud.setSteer, max = ud.kin?.maxSteer ?? Infinity;
@@ -1916,6 +1951,27 @@ function createPalletLoad(opts = {}) {
   const out = finish(g, P, null, { variant, palletType: onPallet ? pt : null });
   out.userData.height = new THREE.Box3().setFromObject(out, true).max.y; return out;
 }
+function createRackLoadInstanced(count, opts = {}) {
+  const maxL = opts.maxLayers ?? 5, per = 6 * maxL, r = rng(opts.seed ?? 11), cw = 0.488, ch = 0.256, cd = 0.388;
+  const pal = getPalletGeometry(opts.palletType || 'pine');
+  const boxG = rbox(cw, ch, cd, 0.02, 2), tapeG = rbox(0.07, 0.006, cd + 0.004, 0.002, 1);
+  const g = instancedFrom([{ geometry: pal.geometry, material: pal.material }], count, 'rackLoads'), ud = g.userData, palIM = ud.meshes[0];
+  const cases = new THREE.InstancedMesh(boxG, mat(0xffffff), count * per), tape = new THREE.InstancedMesh(tapeG, mat(PALETTE.tape, { roughness: 0.6 }), count * per);
+  for (const im of [cases, tape]) { im.castShadow = im.receiveShadow = true; g.add(im); } cases.name = 'rackLoadCases'; tape.name = 'rackLoadTape';
+  const tones = [0xc0915a, 0xb3834d, 0xd0a56e, 0xc89c66, 0xe6d5b8].map((h) => new THREE.Color(h)), Z = new THREE.Matrix4().makeScale(0, 0, 0), m = new THREE.Matrix4(), l = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
+  for (let i = 0; i < count * per; i++) { cases.setMatrixAt(i, Z); tape.setMatrixAt(i, Z); cases.setColorAt(i, tones[Math.floor(r() * 4)]); }
+  for (let i = 0; i < count; i++) palIM.setMatrixAt(i, Z);
+  ud.meshes.push(cases, tape); ud.casesPerLoad = (layers) => 6 * Math.min(layers, maxL);
+  ud.setLoadAt = (i, M, layers = 4) => { palIM.setMatrixAt(i, M); const L = Math.min(maxL, layers), tone = Math.floor(r() * 4);
+    for (let k = 0; k < per; k++) { const j = i * per + k, lay = Math.floor(k / 6), c = k % 6, ix = c % 2, iz = Math.floor(c / 2);
+      if (lay >= L || (lay === L - 1 && r() < 0.3)) { cases.setMatrixAt(j, Z); tape.setMatrixAt(j, Z); continue; }
+      v.set(-0.25 + ix * 0.5 + (r() - 0.5) * 0.02, PALLET.h + lay * 0.26 + ch / 2, -0.4 + iz * 0.4 + (r() - 0.5) * 0.02); q.setFromEuler(e.set(0, (r() - 0.5) * 0.06, 0));
+      l.compose(v, q, one); m.multiplyMatrices(M, l); cases.setMatrixAt(j, m); m.multiply(l.makeTranslation(0, ch / 2 + 0.001, 0)); tape.setMatrixAt(j, m);
+      cases.setColorAt(j, tones[r() < 0.85 ? tone : 4]); } };
+  ud.hideLoad = (i) => { palIM.setMatrixAt(i, Z); for (let k = 0; k < per; k++) { cases.setMatrixAt(i * per + k, Z); tape.setMatrixAt(i * per + k, Z); } };
+  const baseCommit = ud.commit; ud.commit = () => { baseCommit(); if (cases.instanceColor) cases.instanceColor.needsUpdate = true; };
+  return g;
+}
 function createPalletInstanced(count, variant = 'pine') { const { geometry, material } = getPalletGeometry(variant); return instancedFrom([{ geometry, material }], count, 'pallets_' + variant); }
 
 /* ------------------------------------------------------------------ helpers for wheels */
@@ -2009,6 +2065,9 @@ function createReachTruck(opts = {}) {
   add(og, rbox(1.24, 0.06, 1.3, 0.03), K, 0, 2.36, 0.35, 0, 0, 0, 'guardFrame');
   for (let i = 0; i < 5; i++) add(og, rbox(0.04, 0.04, 1.22, 0.012), K, -0.5 + i * 0.25, 2.4, 0.35);
   const bc = makeBeacon(PALETTE.amber, 1.0); bc.position.set(0.45, 2.39, -0.15); og.add(bc); P.beacon = bc;
+  add(cp, cyl(0.02, 0.02, 0.94, 8), K, 0.2, 0.77, -0.1, 0, 0, 0, 'steerColumn');
+  const knobA = grp(cp, 'anchorSteerKnob', 0.2, 1.24, -0.1); add(knobA, roundCyl(0.05, 0.03, 0.008, 16), M.dark, 0, 0, 0, 0, 0, 0, 'steerKnob');
+  const standA = grp(cp, 'anchorStand', -0.05, 0.27, 0.02); standA.rotation.y = Math.PI / 2; const mtA = grp(cp, 'anchorMultiTask', 0.26, 1.32, 0.17);
   const mast = makeMast({ H0: 4.0, half: 0.36, maxH: opts.maxForkHeight ?? 9.2, backrest: 1.2, forkSpread: 0.25, drop: 0.012 }); // B19: triplex, 9.2 m lift (RES beams 7.00 / 8.75)
   mast.root.position.set(0, 0.12, 0.3); ch.add(mast.root);
   P.mast = P.outerMast = mast.root; P.innerMast = mast.inner; P.innerStages = mast.inners;
@@ -2035,6 +2094,7 @@ function createReachTruck(opts = {}) {
   P.wheels = [...P.loadWheels, dw];
   ud.rearSteer = true; ud.steerRate = 1.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -1.3, 1.3); applyAckermann(P.steer, ud.steer, WB, 1.2, -1); cs.rotation.y = -ud.steer * 0.6; };
   ud.kin = { refZ: 1.2, L: WB, maxSteer: 1.3, tractorWheels: kinWheels(g, P.wheels) };
+  ud.operatorCfg = { anchor: standA, grip: [knobA, mtA], pose: 'standing', auto: opts.operator, anchors: { stand: standA, steerKnob: knobA, multiTask: mtA } };
   addForkApi(g, ud, mast); if (!ud.getForkHeight) ud.getForkHeight = () => mast.st.h; if (ud.setLoad) ud.setLoad(!!opts.load);
   return finish(g, P, (dt, t) => {
     if (ud.autoLift) autoCycle(ud, mast, 5.0, dt, (top) => { ud.reachT = top ? 1 : 0; });
@@ -2086,6 +2146,8 @@ function createTugTrain(opts = {}) {
   }
   const ud = { speed: opts.speed ?? 0, steer: 0 };
   ud.rearSteer = false; ud.steerRate = 1.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -0.6, 0.6); applyAckermann(P.steer, ud.steer, 1.15, -0.55); sw.rotation.z = ud.steer * 3; };
+  const seatT = grp(tug, 'anchorSeat', 0, 0.92, -0.34), swA = grp(tug, 'anchorSteerGrip', 0, 1.22, 0.3); swA.rotation.x = -0.9;   // B29 seated driver
+  ud.operatorCfg = { anchor: seatT, grip: swA, spread: 0.13, pose: 'seated', lean: 0.4, auto: opts.operator, anchors: { seat: seatT, steerGrip: swA } };
   ud.setSpeed = (v) => { ud.speed = v; };
   ud.kin = { refZ: -0.55, L: 1.15, maxSteer: 0.6, tractorWheels: kinWheels(g, P.wheels), chain: P.carts.map((c, i) => ({ ...c, L: HZ - AX, rear: HZ - RZ, first: i === 0 })), hitchZ: -1.05 };
   const _p = new THREE.Vector3(), _q = new THREE.Vector3(), _m = new THREE.Matrix4();
@@ -2115,14 +2177,25 @@ function createSemiTruck(opts = {}) {
   for (const s of [-1, 1]) { P.headlights.push(add(cab, rbox(0.34, 0.2, 0.08, 0.05), hl, s * 0.86, 1.22, 10.96, 0, 0, 0, 'headlight'));
     add(cab, rbox(0.12, 0.08, 0.05, 0.03), glowMat(PALETTE.amber, 0.7), s * 1.0, 0.9, 11.15); }
   decal(cab, sparkTex(), 0.32, 0.32, 0, 2.07, 10.72, 0, 'hoodSpark').rotation.x = -0.55;
-  add(cab, rbox(2.45, 2.0, 2.0, 0.22), blue, 0, 2.2, 7.95, 0, 0, 0, 'cabBody');
-  add(cab, rbox(2.1, 0.78, 0.06, 0.06), M.glass, 0, 2.72, 8.95, -0.06, 0, 0, 'windshield');
+  add(cab, rbox(2.45, 0.42, 2.0, 0.2), blue, 0, 1.41, 7.95, 0, 0, 0, 'cabBody');
+  add(cab, rbox(2.45, 0.78, 0.14, 0.06), blue, 0, 1.98, 8.88, 0, 0, 0, 'cabFront');
+  for (const s of [-1, 1]) { add(cab, rbox(0.1, 1.42, 2.0, 0.05), blue, s * 1.175, 2.3, 7.95, 0, 0, 0, 'cabSide'); add(cab, rbox(0.14, 0.82, 0.12, 0.04), blue, s * 1.12, 2.72, 8.9, -0.06, 0, 0, 'aPillar'); }
+  add(cab, rbox(2.45, 0.22, 2.0, 0.12), blue, 0, 3.09, 7.95, 0, 0, 0, 'cabRoof');
+  add(cab, rbox(2.25, 0.05, 1.9, 0.02), M.dark, 0, 1.63, 7.95, 0, 0, 0, 'cabFloor');
+  add(cab, rbox(2.2, 0.22, 0.4, 0.08), M.dark, 0, 2.3, 8.66, 0, 0, 0, 'dash');
+  for (const x of [0.55, -0.55]) { const st = grp(cab, x > 0 ? 'driverSeat' : 'passengerSeat', x, 0, 7.9);
+    add(st, rbox(0.5, 0.12, 0.5, 0.05), M.dark, 0, 1.89, 0); add(st, rbox(0.5, 0.7, 0.12, 0.05), M.dark, 0, 2.3, -0.3, -0.12); add(st, rbox(0.16, 0.24, 0.14, 0.05), M.dark, 0, 1.75, 0); }
+  const swS = P.steeringWheel = grp(cab, 'steeringWheel', 0.55, 2.42, 8.45); swS.rotation.x = -1.2;
+  add(swS, torus(0.21, 0.025, 8, 28), M.dark, 0, 0, 0, 0, 0, 0, 'wheelRim'); add(cab, cyl(0.03, 0.03, 0.4, 8), M.dark, 0.55, 2.33, 8.6, 0.35, 0, 0, 'steerColumn');
+  const seatS = grp(cab, 'anchorSeat', 0.55, 1.95, 7.88), swSA = grp(cab, 'anchorSteerGrip', 0.55, 2.42, 8.45); swSA.rotation.x = -1.2;
+  clearGlass(add(cab, rbox(2.1, 0.78, 0.06, 0.06), M.glassClear, 0, 2.72, 8.95, -0.06, 0, 0, 'windshield'));
   add(cab, rbox(0.06, 0.82, 0.06, 0.02), blue, 0, 2.72, 8.98, -0.06);
   for (const s of [-1, 1]) {
-    add(cab, rbox(0.06, 0.66, 0.95, 0.06), M.glass, s * 1.225, 2.7, 8.35, 0, 0, 0, 'sideWindow');
+    clearGlass(add(cab, rbox(0.06, 0.66, 0.95, 0.06), M.glassClear, s * 1.225, 2.7, 8.35, 0, 0, 0, 'sideWindow'));
     add(cab, rbox(0.03, 1.55, 0.03, 0.01), navy, s * 1.235, 2.05, 7.72);                    // door seam
     add(cab, rbox(0.05, 0.05, 0.2, 0.02), chrome, s * 1.25, 2.0, 7.95, 0, 0, 0, 'doorHandle');
-    decal(cab, sparkTex(), 0.6, 0.6, s * 1.232, 1.7, 8.3, s * Math.PI / 2, 'doorSpark');
+    decal(cab, sparkTex(), 0.5, 0.5, s * 1.232, 1.62, 8.32, s * Math.PI / 2, 'doorSpark');                 // B11: spark + wordmark on both doors
+    decal(cab, cabWordmarkTex(), 0.96, 0.24, s * 1.232, 2.1, 8.32, s * Math.PI / 2, 'doorWordmark');
     decal(cab, cabWordmarkTex(), 1.36, 0.34, s * 1.232, 2.95, 6.2, s * Math.PI / 2, 'cabWordmark');       // Walmart livery on sleeper side
     add(cab, rbox(0.012, 0.05, 3.1, 0.006), M.yellow, s * 1.229, 2.22, 7.15, 0, 0, 0, 'sparkPinstripe');
     add(cab, rbox(0.34, 0.04, 0.04, 0.015), chrome, s * 1.38, 2.55, 8.92);
@@ -2204,6 +2277,7 @@ function createSemiTruck(opts = {}) {
   ud.setLandingGear = (v) => { ud.gear = THREE.MathUtils.clamp(v, 0, 1); };       // 0 raised (travel), 1 lowered to ground
   ud.kin = { refZ: 4.95, L: WB, maxSteer: 0.6, hitchZ: KP.z, trailerL: KP.z - (-8.925), maxArt: 1.4, trailer: tlPivot,
     tractorWheels: kinWheels(g, [...P.frontWheels, ...P.driveWheels]), trailerWheels: P.trailerWheels, axle: null };
+  ud.operatorCfg = { anchor: seatS, grip: swSA, spread: 0.19, pose: 'seated', lean: 0.12, hardHat: false, vest: 'blue', auto: opts.operator, anchors: { seat: seatS, steerGrip: swSA } };
   return finish(g, P, (dt, t) => {
     if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false;
     const pg = ud.gearCur; ud.gearCur = damp(ud.gearCur, ud.gear, 1.6, dt); lg.position.y = -0.3 * ease(ud.gearCur); crank.rotation.x += (ud.gearCur - pg) * 60;
@@ -2224,10 +2298,19 @@ function createYardTractor(opts = {}) {
   for (const s of [-1, 1]) add(g, rbox(0.55, 0.16, 1.25, 0.07), blue, s * 1.02, 1.12, 1.95);
   const hl = glowMat(0xfff4d6, 0.9); for (const x of [-0.95, 0.95]) add(g, rbox(0.26, 0.16, 0.06, 0.04), hl, x, 0.95, 2.98, 0, 0, 0, 'headlight');
   const cab = P.cab = grp(g, 'cab', -0.55, 0, 1.65);
-  add(cab, rbox(1.25, 1.95, 1.6, 0.2), white, 0, 2.02, 0, 0, 0, 0, 'cabBody');
-  add(cab, rbox(1.05, 0.85, 0.06, 0.05), M.glass, 0, 2.38, 0.8);
-  add(cab, rbox(1.05, 0.7, 0.06, 0.05), M.glass, 0, 2.45, -0.8);
-  for (const s of [-1, 1]) add(cab, rbox(0.06, 0.85, 1.3, 0.05), M.glass, s * 0.625, 2.38, 0.0);
+  add(cab, rbox(1.25, 0.6, 1.6, 0.2), white, 0, 1.345, 0, 0, 0, 0, 'cabBody');                       // B29: open cab, driver visible
+  add(cab, rbox(1.25, 0.36, 0.1, 0.05), white, 0, 1.79, 0.75, 0, 0, 0, 'cabFront'); add(cab, rbox(1.25, 0.5, 0.1, 0.05), white, 0, 1.86, -0.75, 0, 0, 0, 'cabRear');
+  for (const s of [-1, 1]) add(cab, rbox(0.1, 0.36, 1.6, 0.05), white, s * 0.575, 1.79, 0, 0, 0, 0, 'cabSide');
+  for (const [x, z] of [[-0.585, -0.765], [0.585, -0.765], [-0.585, 0.765], [0.585, 0.765]]) add(cab, rbox(0.08, 1.1, 0.08, 0.03), white, x, 2.42, z, 0, 0, 0, 'cabPillar');
+  add(cab, rbox(1.25, 0.2, 1.6, 0.08), white, 0, 2.87, 0, 0, 0, 0, 'cabRoof');
+  add(cab, rbox(1.0, 0.18, 0.3, 0.06), M.dark, 0, 1.97, 0.55, 0, 0, 0, 'dash');
+  { const st = grp(cab, 'driverSeat', 0, 0, -0.25); add(st, rbox(0.48, 0.12, 0.46, 0.05), M.dark, 0, 1.59, 0); add(st, rbox(0.48, 0.66, 0.12, 0.05), M.dark, 0, 1.98, -0.28, -0.12); }
+  const swY = P.steeringWheel = grp(cab, 'steeringWheel', 0, 2.06, 0.36); swY.rotation.x = -1.1; add(swY, torus(0.18, 0.022, 8, 26), M.dark, 0, 0, 0, 0, 0, 0, 'wheelRim');
+  add(cab, cyl(0.025, 0.025, 0.3, 8), M.dark, 0, 1.98, 0.48, 0.45, 0, 0, 'steerColumn');
+  const seatY = grp(cab, 'anchorSeat', 0, 1.65, -0.22), swYA = grp(cab, 'anchorSteerGrip', 0, 2.06, 0.36); swYA.rotation.x = -1.1;
+  clearGlass(add(cab, rbox(1.05, 0.85, 0.06, 0.05), M.glassClear, 0, 2.38, 0.8, 0, 0, 0, 'windshield'));
+  clearGlass(add(cab, rbox(1.05, 0.7, 0.06, 0.05), M.glassClear, 0, 2.45, -0.8, 0, 0, 0, 'rearWindow'));
+  for (const s of [-1, 1]) clearGlass(add(cab, rbox(0.06, 0.85, 1.3, 0.05), M.glassClear, s * 0.625, 2.38, 0.0, 0, 0, 0, 'sideWindow'));
   add(cab, rbox(1.3, 0.1, 1.66, 0.05), navy, 0, 3.02, 0);
   add(cab, rbox(1.27, 0.22, 1.62, 0.08), blue, 0, 1.18, 0);
   add(cab, rbox(0.04, 0.05, 0.18, 0.02), steel, -0.65, 1.9, 0.2, 0, 0, 0, 'doorHandle');
@@ -2250,6 +2333,7 @@ function createYardTractor(opts = {}) {
   ud.rearSteer = false; ud.steerRate = 0.6; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -0.65, 0.65); applyAckermann(P.steer, ud.steer, 3.3, -1.35); };
   ud.kin = { refZ: -1.35, L: 3.3, maxSteer: 0.65, tractorWheels: kinWheels(g, P.wheels) };
   ud.setSpeed = (v) => { ud.speed = v; }; ud.setFifthWheelLift = (v) => { ud.liftTarget = THREE.MathUtils.clamp(v, 0, 1); };
+  ud.operatorCfg = { anchor: seatY, grip: swYA, spread: 0.16, pose: 'seated', lean: 0.15, auto: opts.operator, anchors: { seat: seatY, steerGrip: swYA } };
   return finish(g, P, (dt, t) => {
     if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false; bc.userData.mat.emissiveIntensity = flash(t, 1.6);
     ud.lift = damp(ud.lift, ud.liftTarget, 4, dt); fw.position.y = 1.2 + ud.lift * 0.35; fw.rotation.x = -ud.lift * 0.08;
@@ -2373,6 +2457,8 @@ function createForklift(opts = {}) {
   const WB = 0.48 - -0.78;                                                         // drive axle -> steer axle (m)
   ud.rearSteer = true; ud.steerRate = 1.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -0.75, 0.75); applyAckermann(P.steer, ud.steer, WB, 0.03, -1); }; // rear wheels turn opposite
   ud.kin = { refZ: 0.03, L: WB, maxSteer: 0.75, tractorWheels: kinWheels(g, P.wheels) };
+  const seatF = grp(b, 'anchorSeat', 0, 1.16, -0.33), swF = grp(b, 'anchorSteerGrip', 0, 1.43, 0.33); swF.rotation.x = -1.97;   // B29 seated, hands on the wheel
+  ud.operatorCfg = { anchor: seatF, grip: swF, spread: 0.14, pose: 'seated', lean: 0.44, auto: opts.operator, anchors: { seat: seatF, steerGrip: swF } };
   addForkApi(g, ud, mast); if (!ud.getForkHeight) ud.getForkHeight = () => mast.st.h; if (ud.setLoad) ud.setLoad(!!opts.load);
   return finish(g, P, (dt, t) => {
     if (ud.autoLift) { autoCycle(ud, mast, 2.6, dt); ud.tiltTarget = ud._al.up ? 0.06 : 0.0; }
@@ -2491,6 +2577,8 @@ function createHandPalletJack(opts = {}) {
   ud.kin = { refZ: rollerZ, L: rollerZ - steerZ, maxSteer: 1.2, tractorWheels: kinWheels(g, P.wheels) };
   const apply = () => { lift.position.y = ud.lift; ph.position.y = 0.42 + ud.lift; P.rollerLinks.forEach((l) => { const yb = rollerR, yt = lowTop - forkT + ud.lift + 0.004; l.scale.y = Math.max(0.004, yt - yb); l.position.y = (yt + yb) / 2; }); hd.rotation.x = ud.ang; };
   if (opts.lift) { ud.lift = ud.liftT = THREE.MathUtils.clamp(opts.lift, 0, HPJ.maxLift); }
+  const standJ = grp(ts, 'anchorStand', 0, -0.08, -0.72);   // B29 walking operator behind the tiller (child of the steer pivot, so it follows steer)
+  ud.operatorCfg = { anchor: standJ, grip: anchor, spread: 0.07, pose: 'walking-tiller', auto: opts.operator, anchors: { stand: standJ, tillerGrip: anchor } };
   apply();
   return finish(g, P, (dt, t) => {
     if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false;
@@ -2523,7 +2611,12 @@ function createRiderPalletTruck(opts = {}) {
   add(rst, roundCyl(0.2, 0.06, 0.02, 24), C, 0, 0.78, 0, 0, 0, 0, 'steerHousingTop');
   const til = P.tiller = grp(rst, 'tiller', 0, 0.82, 0.08); add(til, cyl(0.03, 0.03, 0.35, 10), C, 0, 0.17, 0, 0.2);
   add(til, torus(0.1, 0.02), K, 0, 0.36, 0.04, -1.3);
-  add(pu, rbox(0.5, 0.05, 0.35, 0.02), C, 0, 0.12, -0.6, 0, 0, 0, 'riderPlatform');
+  add(pu, rbox(0.62, 0.05, 0.44, 0.02), C, 0, 0.12, -0.64, 0, 0, 0, 'riderPlatform');                   // deck top y 0.145, z -0.86..-0.42
+  add(pu, rbox(0.58, 0.006, 0.4, 0.003), mat(0x2b2f36, { roughness: 1 }), 0, 0.148, -0.64, 0, 0, 0, 'antiSlipMat');
+  for (const s of [-1, 1]) { add(pu, rbox(0.035, 0.95, 0.035, 0.012), K, s * 0.3, 0.62, -0.84, 0, 0, 0, 'guardPost');        // side guards + backrest
+    add(pu, rbox(0.035, 0.035, 0.4, 0.012), K, s * 0.3, 1.08, -0.65, 0, 0, 0, 'sideGuardRail'); add(pu, rbox(0.035, 0.035, 0.4, 0.012), K, s * 0.3, 0.6, -0.65, 0, 0, 0, 'sideGuardRail'); }
+  add(pu, rbox(0.4, 0.3, 0.07, 0.03), mat(0x1c2028, { roughness: 0.9 }), 0, 1.0, -0.82, 0, 0, 0, 'backrestPad');
+  add(pu, rbox(0.635, 0.035, 0.035, 0.012), K, 0, 1.0, -0.86, 0, 0, 0, 'backrestBar'); add(pu, rbox(0.635, 0.035, 0.035, 0.012), K, 0, 0.6, -0.86, 0, 0, 0, 'guardBar');
   add(pu, rbox(0.5, 0.06, 0.04, 0.02), Y, 0, 0.16, -0.78);
   const bc = P.beacon = makeBeacon(0xff7a1a, 0.9); bc.position.set(-0.3, 0.95, -0.35); pu.add(bc);
   decal(pu, sparkTex(), 0.25, 0.25, 0.392, 0.6, 0.1, Math.PI / 2); decal(pu, sparkTex(), 0.25, 0.25, -0.392, 0.6, 0.1, -Math.PI / 2);
@@ -2534,6 +2627,10 @@ function createRiderPalletTruck(opts = {}) {
   ud.rearSteer = true; ud.steerRate = 2.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -1.2, 1.2); applyAckermann(P.steer, ud.steer, 1.25, 0.9, -1); };
   ud.kin = { refZ: 0.9, L: 1.25, maxSteer: 1.2, tractorWheels: kinWheels(g, P.wheels) };
   ud.setLift = (v) => { ud.liftT = THREE.MathUtils.clamp(v, 0, 1); }; ud.setSpeed = (v) => { ud.speed = v; };
+  for (const s of [-1, 1]) add(pu, rbox(0.04, 0.2, 0.04, 0.015), C, s * 0.2, 1.025, -0.44, 0, 0, 0, 'grabPost');
+  add(pu, rbox(0.46, 0.045, 0.045, 0.02), K, 0, 1.12, -0.44, 0, 0, 0, 'grabBar');
+  const platA = grp(pu, 'anchorPlatform', 0, 0.151, -0.63), gripR = grp(pu, 'anchorGrabBar', 0, 1.12, -0.44);   // B29 operator stands on the platform
+  ud.operatorCfg = { anchor: platA, grip: gripR, spread: 0.16, pose: 'standing', auto: opts.operator, anchors: { platform: platA, stand: platA, grabBar: gripR } };
   return finish(g, P, (dt, t) => { ud.lift = damp(ud.lift, ud.liftT, 4, dt); lift.position.y = ud.lift * 0.12; if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false; bc.userData.mat.emissiveIntensity = flash(t, 1.5); }, ud);
 }
 
@@ -2559,6 +2656,8 @@ function createWalkieStacker(opts = {}) {
   ud.setForkHeight = (h, snap = false) => { ud.autoLift = false; mast.set(h); if (snap) mast.snap(); }; ud.setTiller = (r) => { ud.tiller = r; };
   ud.rearSteer = true; ud.steerRate = 2.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -1.2, 1.2); applyAckermann(P.steer, ud.steer, 1.48, 0.63, -1); }; ud.setSpeed = (v) => { ud.speed = v; };
   ud.kin = { refZ: 0.63, L: 1.48, maxSteer: 1.2, tractorWheels: kinWheels(g, P.wheels) };
+  const gripW = grp(til, 'tillerGrip', 0, 0.78, 0); gripW.rotation.y = Math.PI; const standW = grp(wst, 'anchorStand', 0, -0.12, -1.0);   // B29 walking operator, follows steer
+  ud.operatorCfg = { anchor: standW, grip: gripW, spread: 0.22, pose: 'walking-tiller', auto: opts.operator, anchors: { stand: standW, tillerGrip: gripW } };
   addForkApi(g, ud, mast); if (!ud.getForkHeight) ud.getForkHeight = () => mast.st.h; if (ud.setLoad) ud.setLoad(!!opts.load);
   return finish(g, P, (dt, t) => { if (ud.autoLift) autoCycle(ud, mast, 1.4, dt); mast.step(dt);
     if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false; til.rotation.x = damp(til.rotation.x, ud.tiller, 3, dt); }, ud);
@@ -2661,6 +2760,7 @@ function createRobotArm(opts = {}) {
 }
 
 /* ------------------------------------------------------------------ worker */
+const UPPER = 0.27, FORE = 0.29;   // arm bones (shoulder->elbow, elbow->hand), total reach 0.56 m
 function createWorker(opts = {}) {
   const vestC = opts.vest === 'blue' ? PALETTE.blue : 0xd8ef1f, shirt = opts.vest === 'blue' ? 0xe4e8ee : 0x2a3f63, pants = 0x1f2f4f;
   const g = grp(null, 'worker'), P = {}, body = P.body = grp(g, 'body'), skin = mat(PALETTE.skin, { roughness: 0.8 });
@@ -2679,21 +2779,25 @@ function createWorker(opts = {}) {
   add(body, cyl(0.045, 0.05, 0.08, 12), sk, 0, 1.52, 0, 0, 0, 0, 'neck');
   const head = P.head = grp(body, 'head', 0, 1.66, 0);
   add(head, sph(0.12, 24, 18), sk, 0, 0, 0, 0, 0, 0, 'face');
-  for (const s of [-1, 1]) add(head, sph(0.016, 8, 6), mat(0x1c2028), s * 0.042, 0.015, 0.108, 0, 0, 0, 'eye');
+  for (const s of [-1, 1]) { add(head, sph(0.019, 12, 8), mat(0x1c2028, { roughness: 0.5 }), s * 0.042, 0.012, 0.106, 0, 0, 0, 'eye').scale.set(1, 1.15, 0.6);
+    add(head, sph(0.0055, 6, 4), mat(0xffffff), s * 0.042 + 0.006, 0.019, 0.1175, 0, 0, 0, 'eyeGlint'); }
+  add(head, cached(_geo, 'smile', () => new THREE.TorusGeometry(0.03, 0.0065, 6, 14, Math.PI * 0.8)), mat(0x7a3b2e, { roughness: 0.7 }), 0, -0.028, 0.104, -0.28, 0, Math.PI * 1.1, 'smile');
   add(head, sph(0.03, 8, 6), sk, 0, -0.01, 0.115).scale.set(0.8, 0.7, 0.6);
   if (opts.hardHat !== false) { const hat = P.hardHat = grp(head, 'hardHat', 0, 0.035, 0); const hm = mat(opts.vest === 'blue' ? PALETTE.spark : 0xf4f5f7, { roughness: 0.6 });
     add(hat, dome(0.132), hm, 0, 0, 0); add(hat, roundCyl(0.15, 0.02, 0.008, 28), hm, 0, 0.005, 0.02); add(hat, rbox(0.03, 0.03, 0.22, 0.012), hm, 0, 0.125, 0, 0, 0, 0, 'ridge'); }
   else add(head, dome(0.125), mat(0x3a2a1e), 0, 0.02, -0.01, -0.25, 0, 0, 'hair');
   const arms = [-1, 1].map((s) => { const sp = grp(body, s < 0 ? 'armLeft' : 'armRight', s * 0.235, 1.44, 0); sp.rotation.z = s * 0.08;
     add(sp, cap(0.058, 0.22, 12), vm, 0, -0.13, 0, 0, 0, 0, 'sleeve');
-    add(sp, cap(0.05, 0.3, 12), mat(shirt), 0, -0.33, 0, 0, 0, 0, 'forearm');
-    add(sp, sph(0.055, 12, 10), sk, 0, -0.56, 0, 0, 0, 0, 'hand'); return sp; });
+    const el = grp(sp, 'elbow', 0, -UPPER, 0); sp.userData.elbow = el;                                  // two-bone arm: shoulder -> elbow -> hand
+    add(el, cap(0.05, 0.3, 12), mat(shirt), 0, -0.06, 0, 0, 0, 0, 'forearm');
+    sp.userData.hand = add(el, sph(0.055, 12, 10), sk, 0, -FORE, 0, 0, 0, 0, 'hand'); return sp; });
   P.armLeft = arms[0]; P.armRight = arms[1];
   const ud = { walking: !!opts.walking, walkSpeed: opts.walkSpeed ?? 1.3, phase: r() * 6, w: opts.walking ? 1 : 0, wave: false };
   ud.walkCycle = (ph, k = 1) => {
-    const s = Math.sin(ph); legs[0].rotation.x = s * 0.5 * k; legs[1].rotation.x = -s * 0.5 * k;
+    const s = Math.sin(ph), kl = k * (ud.stride ?? 1); legs[0].rotation.x = s * 0.5 * kl; legs[1].rotation.x = -s * 0.5 * kl;
     arms[0].rotation.x = -s * 0.45 * k; arms[1].rotation.x = s * 0.45 * k;
-    body.position.y = 0; body.rotation.y = s * 0.06 * k; head.rotation.y = -s * 0.04 * k; plant();
+    for (const a of arms) a.userData.elbow.rotation.set(-0.15 - 0.15 * k * (1 + Math.sin(ph)) * 0.5, 0, 0);
+    body.position.y = 0; body.rotation.x = ud.lean || 0; body.rotation.y = s * 0.06 * k; head.rotation.y = -s * 0.04 * k; plant();
   };
   const _inv = new THREE.Matrix4(), _mm = new THREE.Matrix4(), _p = new THREE.Vector3();
   function plant() { body.position.y = 0; g.updateMatrixWorld(true); _inv.copy(g.matrixWorld).invert(); let lo = Infinity;
@@ -2701,12 +2805,61 @@ function createWorker(opts = {}) {
       for (let i = 0; i < pos.count; i += 3) { _p.fromBufferAttribute(pos, i).applyMatrix4(_mm); if (_p.y < lo) lo = _p.y; } }
     body.position.y = -lo; }
   ud.setWalking = (b) => { ud.walking = !!b; }; ud.setWave = (b) => { ud.wave = !!b; };
+  const _hv = new THREE.Vector3(), _hs = [new THREE.Vector3(), new THREE.Vector3()], _bi = new THREE.Matrix4(), _q = new THREE.Quaternion(), _dn = new THREE.Vector3(0, -1, 0);
+  ud.hands = null;
+  ud.attachHandsTo = (obj, spread = 0.08, one = null) => { ud.hands = obj ? { objs: Array.isArray(obj) ? obj : [obj], spread, one } : null;
+    arms.forEach((a, i) => { a.scale.set(1, 1, 1); a.rotation.set(0, 0, i ? 0.08 : -0.08); a.userData.elbow.rotation.set(-0.15, 0, 0); }); return g; };
+  const _e = new THREE.Vector3(), _pl = new THREE.Vector3(), _f = new THREE.Vector3(), _qi = new THREE.Quaternion(); ud.armStretch = [1, 1];
+  const ik = (a, i, tgt) => { _hv.copy(tgt).sub(a.position); const d = _hv.length(), R = UPPER + FORE, dc = THREE.MathUtils.clamp(d, 0.12, R - 1e-4); ud.armStretch[i] = d / R;
+    const dir = _hv.normalize(); _pl.set((i ? 1 : -1) * 0.55, -1, -0.45); _pl.addScaledVector(dir, -_pl.dot(dir)); if (_pl.lengthSq() < 1e-6) _pl.set(0, 0, -1); _pl.normalize();
+    const cA = THREE.MathUtils.clamp((UPPER * UPPER + dc * dc - FORE * FORE) / (2 * UPPER * dc), -1, 1), sA = Math.sqrt(1 - cA * cA);
+    _e.copy(dir).multiplyScalar(cA * UPPER).addScaledVector(_pl, sA * UPPER);                                  // elbow in body space (rel. shoulder)
+    _q.setFromUnitVectors(_dn, _f.copy(_e).normalize()); a.quaternion.copy(_q); const st = Math.max(1, d / R); a.scale.set(1, st, 1);
+    _f.copy(dir).multiplyScalar(dc).sub(_e).normalize().applyQuaternion(_qi.copy(_q).invert()); a.userData.elbow.quaternion.setFromUnitVectors(_dn, _f); };
+  ud.detachHands = () => ud.attachHandsTo(null);
+  ud.aimHands = () => { const h = ud.hands; if (!h) return; const o = h.objs;
+    o.forEach((x) => x.updateWorldMatrix(true, false)); body.updateWorldMatrix(true, false); _bi.copy(body.matrixWorld).invert();
+    if (o.length === 1) { _hs[0].set(-h.spread, 0, 0).applyMatrix4(o[0].matrixWorld); _hs[1].set(h.spread, 0, 0).applyMatrix4(o[0].matrixWorld); }
+    else { _hs[0].setFromMatrixPosition(o[0].matrixWorld); _hs[1].setFromMatrixPosition(o[1].matrixWorld); }
+    _hs[0].applyMatrix4(_bi); _hs[1].applyMatrix4(_bi);
+    if (h.one != null) { _hs[0].add(_hs[1]).multiplyScalar(0.5); ik(arms[h.one], h.one, _hs[0]); return; }
+    const lo = _hs[0].x <= _hs[1].x ? 0 : 1; arms.forEach((a, i) => ik(a, i, _hs[i === 0 ? lo : 1 - lo]));
+  };
+  ud.getHandPositions = () => arms.map((a) => a.userData.hand.getWorldPosition(new THREE.Vector3()));
   return finish(g, P, (dt, t) => {
     ud.w = damp(ud.w, ud.walking ? 1 : 0, 6, dt); ud.phase += dt * (ud.walkSpeed / 0.75) * Math.PI * ud.w;
     ud.walkCycle(ud.phase, ud.w);
     if (ud.w < 0.99) { const k = 1 - ud.w; P.torso.scale.y = 1 + Math.sin(t * 1.8) * 0.01 * k; arms[0].rotation.x += Math.sin(t * 1.1) * 0.05 * k; }
     if (ud.wave) { arms[1].rotation.x = -2.6; arms[1].rotation.z = 0.3 + Math.sin(t * 8) * 0.3; } else arms[1].rotation.z = 0.08;
+    if (ud.hands) ud.aimHands();
   }, ud);
+}
+
+function createOperator(opts = {}) {
+  const w = createWorker({ vest: opts.vest ?? 'yellow', hardHat: opts.hardHat ?? true, seed: opts.seed ?? 7 });
+  w.name = 'operator'; const ud = w.userData, P = ud.parts, body = P.body, baseUpdate = ud.update, pm = mat(0x1f2f4f), hips = [P.legLeft, P.legRight];
+  const standKids = hips.map((h) => [...h.children]).flat();
+  const seatLegs = hips.map((hip) => { const sl = grp(hip, 'seatedLeg'); add(sl, cap(0.075, 0.36, 12), pm, 0, 0, 0.2, Math.PI / 2, 0, 0, 'thigh');
+    const knee = grp(sl, 'knee', 0, 0, 0.42); add(knee, cap(0.065, 0.34, 12), pm, 0, -0.22, 0, 0, 0, 0, 'shin'); add(knee, rbox(0.12, 0.08, 0.25, 0.035), mat(0x1c2028), 0, -0.44, 0.06, 0, 0, 0, 'shoe'); return sl; });
+  const HIP = 0.9, SEAT_H = 0.08; let lean = 0;
+  const sitPose = () => { body.rotation.set(lean, 0, 0); body.position.set(0, SEAT_H - HIP * Math.cos(lean), -HIP * Math.sin(lean)); hips.forEach((h) => h.rotation.set(-lean, 0, 0)); };
+  ud.setPose = (p, o = {}) => { ud.pose = p; const sit = p === 'seated'; lean = sit ? (o.lean ?? 0.15) : 0;
+    seatLegs.forEach((x) => { x.visible = sit; }); standKids.forEach((c) => { c.visible = !sit; });
+    if (sit) sitPose(); else { body.rotation.set(0, 0, 0); hips.forEach((h) => h.rotation.set(0, 0, 0)); } ud.stride = 1; return w; };
+  const prev = new THREE.Vector3(), cur = new THREE.Vector3(), fwd = new THREE.Vector3(); let has = false; ud.motionSpeed = 0;
+  ud.update = (dt, t) => {
+    if (ud.pose === 'seated') { sitPose(); P.torso.scale.y = 1 + Math.sin(t * 1.8) * 0.008; P.head.rotation.y = Math.sin(t * 0.4) * 0.2;
+      if (ud.hands) ud.aimHands(); else P.armLeft.rotation.x = P.armRight.rotation.x = -0.8; return; }
+    w.updateWorldMatrix(true, false); cur.setFromMatrixPosition(w.matrixWorld);
+    if (has && dt > 0) { fwd.set(0, 0, 1).transformDirection(w.matrixWorld); const v = prev.sub(cur).multiplyScalar(-1).dot(fwd) / dt; ud.motionSpeed = damp(ud.motionSpeed, v, 8, dt); }
+    prev.copy(cur); has = dt > 0 || has;
+    const a = Math.abs(ud.motionSpeed);
+    if (ud.pose === 'walking-tiller') { ud.walking = a > 0.05; ud.walkSpeed = Math.max(0.5, a); ud.stride = 1; ud.lean = damp(ud.lean || 0, Math.min(0.12, 0.1 * a), 4, dt); }        // pulling: lean away from the load
+    else if (ud.pose === 'pushing-tiller') { ud.walking = a > 0.05; ud.walkSpeed = Math.max(0.6, a) * 1.7; ud.stride = 0.5; ud.lean = damp(ud.lean || 0, Math.min(0.1, 0.08 * a), 4, dt); } // short shuffle steps, lean in
+    else { ud.walking = false; ud.lean = damp(ud.lean || 0, 0, 4, dt); }
+    baseUpdate(dt, t);
+  };
+  ud.setPose(opts.pose ?? 'standing'); return w;
 }
 
 /* ------------------------------------------------------------------ pallet rack bay */
@@ -3064,7 +3217,7 @@ const SIZES = {
   forklift: { x: 1.4912, y: 2.3065, z: 3.568 }, // incl. 1.07 m forks; overhead guard 2.2 m
   autoStacker: { x: 1.036, y: 2.5, z: 2.838 },
   palletJack: { x: 0.548, y: 1.2665, z: 1.5349 },
-  riderPalletTruck: { x: 0.8, y: 1.4183, z: 2.475 },
+  riderPalletTruck: { x: 0.8, y: 1.4183, z: 2.5525 },
   walkieStacker: { x: 0.94, y: 1.78, z: 2.2649 },
   amr: { x: 0.836, y: 0.3479, z: 0.9451 },
   amrPod: { x: 0.99, y: 2.0125, z: 0.99 },
@@ -3107,7 +3260,7 @@ const SIZES = {
   toteCrate: { x: 0.43, y: 0.303, z: 0.626 },
 };
 
-return { PALETTE, rbox, roundCyl, mat, drawSpark, bakeGroup, PALLET, getPalletGeometry, TOTE, getToteGeometry, createToteInstanced, createTote, createCrateTote, createPallet, createPalletLoad, createPalletInstanced, drive, createReachTruck, createTugTrain, createSemiTruck, createYardTractor, createForklift, createAutoStacker, createHandPalletJack, createPalletJack, createRiderPalletTruck, createWalkieStacker, createAMR, createRobotArm, createWorker, createRackBay, getRackBayParts, createRackBayInstanced, createConveyor, createDockDoor, createBollard, createTree, createMezzanine, createHVAC, createLightPole, createOilDrum, createWireCage, createSackStack, createFacade, MODELS, SIZES };
+return { PALETTE, rbox, roundCyl, mat, isManned, drawSpark, bakeGroup, PALLET, getPalletGeometry, TOTE, getToteGeometry, createToteInstanced, createTote, createCrateTote, createPallet, createPalletLoad, createRackLoadInstanced, createPalletInstanced, drive, createReachTruck, createTugTrain, createSemiTruck, createYardTractor, createForklift, createAutoStacker, createHandPalletJack, createPalletJack, createRiderPalletTruck, createWalkieStacker, createAMR, createRobotArm, createWorker, createOperator, createRackBay, getRackBayParts, createRackBayInstanced, createConveyor, createDockDoor, createBollard, createTree, createMezzanine, createHVAC, createLightPole, createOilDrum, createWireCage, createSackStack, createFacade, MODELS, SIZES };
 })();
 const COOKER_SIGNS = (() => {
 
@@ -3672,6 +3825,7 @@ const {
   createSemiTruck, createYardTractor, createForklift, createAutoStacker, createPalletJack, createRiderPalletTruck,
   createAMR, createRobotArm, createWorker, createRackBay, getRackBayParts, createConveyor,
   createPalletLoad, createReachTruck, createTugTrain, createWalkieStacker, createOilDrum, createWireCage, createSackStack, createBollard, drive: mdlDrive, PALLET,
+  createHandPalletJack, createOperator, isManned,
 } = MODELS;
 
 const QS = new URLSearchParams(location.search);
@@ -4128,8 +4282,8 @@ class Vehicle {
       const rem = a.tr.L - a.s, lag = Math.abs(dT - this.steer);
       if (a.pre) { if (lag < 0.01) a.pre = false; else { this.v = 0; this.sv = 0; return; } } // steer at standstill before moving off
       const vmax = a.vmax ?? this.vmax, vcurve = Math.sqrt(1.2 / Math.max(1e-3, Math.abs(Math.tan(this.steer) / wb)));
-      const vt = Math.min(vmax, vcurve, vmax * Math.max(0.15, 1 - lag / 0.4), Math.sqrt(2 * this.acc * Math.max(0, rem)));
-      const dv = clamp(vt - this.v, -this.acc * 1.4 * dt, this.acc * dt); this.v = Math.max(rem > 0.004 ? 0.04 : 0, this.v + dv); this.accel = dv / dt;
+      const vt = this.hold ? 0 : Math.min(vmax, vcurve, vmax * Math.max(0.15, 1 - lag / 0.4), Math.sqrt(2 * this.acc * Math.max(0, rem)));
+      const dv = clamp(vt - this.v, -this.acc * 1.4 * dt, this.acc * dt); this.v = Math.max(rem > 0.004 && !this.hold ? 0.04 : 0, this.v + dv); this.accel = dv / dt;
       const sd = g * Math.min(this.v * dt, rem + 0.002), kv = Math.tan(this.steer) / wb, dth = sd * kv, thm = this.th + dth / 2;
       this.x += Math.sin(thm) * sd; this.z += Math.cos(thm) * sd; this.th += dth;
       this.curv = kv; this.gear = g; this.sv = g * this.v; this.ds = sd; this.odo += Math.abs(sd);
@@ -4156,7 +4310,7 @@ class Vehicle {
 }
 const FK_WB = 1.26;
 function makeForklift(id, x, z, th, opts = {}) {
-  const obj = createForklift({ autoLift: false, ...opts }); shadowAll(obj);
+  const obj = createForklift({ autoLift: false, operator: true, ...opts }); shadowAll(obj);
   if (opts.reach) { obj.userData.reach = true; }
   const v = new Vehicle({ id, type: opts.reach ? 'Reach truck' : 'Counterbalance forklift', obj, R: 1.5, vmax: opts.vmax ?? 2.2, acc: 0.9, wb: FK_WB, x, z, th });
   { const k = obj.userData.kin; v.refZ = k ? k.refZ : 0; if (k) v.wb = k.L; v.dmax = k ? k.maxSteer : 0.75; } v.steerRate = 1.4; v.Lc = 0.9;
@@ -4173,7 +4327,7 @@ function makeForklift(id, x, z, th, opts = {}) {
 }
 const KP = 4.9, TR_WB = 4.85, TL_L = 13.8;
 function makeSemi(id, x, z, th, opts = {}) {
-  const obj = createSemiTruck(opts); shadowAll(obj);
+  const obj = createSemiTruck({ operator: true, ...opts }); shadowAll(obj);
   const v = new Vehicle({ id, type: 'Road tractor + 53\' trailer', obj, R: 12.5, vmax: opts.vmax ?? 6, acc: 0.7, wb: TR_WB, x, z, th });
   v.dmax = 0.6; v.steerRate = 0.5; v.Lc = 4;
   v.tth = th; // trailer heading
@@ -4244,6 +4398,8 @@ const DOCK_Z = BD / 2 + 0.4;   // trailer rear at dock bumper face
 const TRL_REAR = -10.8;
 function trailerPose(doorX, side = 1) { return { X: doorX, Z: side * (DOCK_Z - TRL_REAR), th: side > 0 ? 0 : Math.PI }; }
 const docked = {};
+const TRL_ROWS = 11; // 22 pallet positions, two wide
+function trlPos(k) { return new THREE.Vector3(k % 2 ? 0.56 : -0.56, 1.30, -9.95 + Math.floor(k / 2) * 1.3); }
 function dockedSemi(id, door, side, fill) {
   const d = (side > 0 ? IN_DOORS : OUT_DOORS).find((q) => q.id === door), X = sx(d.x);
   const p = trailerPose(X, side), kx = p.X + Math.sin(p.th) * (KP + 0) , kz = p.Z;
@@ -4251,12 +4407,15 @@ function dockedSemi(id, door, side, fill) {
   v.tth = p.th; v.door = door; v.pallets = []; docked[door] = v;
   const tl = v.P.trailer; if (v.P.rearDoors) { v.P.rearDoors.left.rotation.y = 3 * Math.PI / 2 * 0.98; v.P.rearDoors.right.rotation.y = -3 * Math.PI / 2 * 0.98; }
   doorPanels[door].userData.target = 1;
-  for (let k = 0; k < fill; k++) { const pal = makePalletObj(100 + k + door.length * 7); pal.position.set((k % 2 ? 0.56 : -0.56), 1.30 - 0.0, -9.95 + Math.floor(k / 2) * 1.3); tl.add(pal); trackPal(pal); pal.userData.loc = `${id}/P${String(k + 1).padStart(2, '0')}`; v.pallets.push(pal); }
+  for (let k0 = 0; k0 < fill; k0++) { const k = side > 0 ? k0 : TRL_ROWS * 2 - 1 - k0; const pal = makePalletObj(100 + k + door.length * 7); pal.position.set((k % 2 ? 0.56 : -0.56), 1.30 - 0.0, -9.95 + Math.floor(k / 2) * 1.3); pal.userData.k = k; tl.add(pal); trackPal(pal); pal.userData.loc = `${id}/P${String(k + 1).padStart(2, '0')}`; v.pallets.push(pal); }
+  placeVehicle(v, 1); v.obj.updateMatrixWorld(true);
   return v;
 }
 const T1 = dockedSemi('TRL-48213', 'DR-005', 1, 10);
 const T2 = dockedSemi('TRL-50177', 'DR-002', 1, 6);
 const T3 = dockedSemi('TRL-71540', 'DS-103', -1, 4);
+const T4 = dockedSemi('TRL-53390', 'DR-007', 1, 10);
+const T5 = dockedSemi('TRL-66102', 'DS-105', -1, 0);
 const ARR = makeSemi('TRL-50311', 100, 92, Math.PI, { vmax: 7 });
 ARR.state = 'Arriving'; ARR.task = 'Gate → DR-003';
 {
@@ -4282,8 +4441,8 @@ function reachD(fk) { syncPose(fk); carriageOf(fk).getWorldPosition(_w); return 
 function palY(pal) { syncAll(); pal.getWorldPosition(_w); return _w.y; }
 function syncAll() { for (const v of VEH) if (!v.isSemi) syncPose(v); }
 function slotAssert(kind, fk, pal, loc) {
-  syncPose(fk); pal.updateMatrixWorld(true); pal.getWorldPosition(_w);
-  const seat = tineTopY(fk) - DECK_UNDER, dy = Math.abs(seat - loc.Y), dxz = Math.hypot(_w.x - loc.X, _w.z - loc.Z), dp = Math.abs(_w.y - loc.Y);
+  syncPose(fk); pal.updateMatrixWorld(true); const seat = tineTopY(fk) - DECK_UNDER; pal.getWorldPosition(_w); // B23/B24: read the pallet AFTER tineTopY (shared temp vector)
+  const dy = Math.abs(seat - loc.Y), dxz = Math.hypot(_w.x - loc.X, _w.z - loc.Z), dp = Math.abs(_w.y - loc.Y);
   if (dy > 0.02 || dxz > 0.02 || dp > 0.02) { ASSERT.fail++; console.warn(`[ASSERT] fork-to-slot FAIL ${kind} ${fk.id} @ ${loc.id}: fork-seat dy=${(dy * 100).toFixed(1)}cm pallet dxz=${(dxz * 100).toFixed(1)}cm dy=${(dp * 100).toFixed(1)}cm`); }
   else { ASSERT.ok++; console.info(`[ASSERT] fork-to-slot ok ${kind} ${fk.id} @ ${loc.id}: seat err ${(dy * 100).toFixed(2)} cm, xz err ${(dxz * 100).toFixed(2)} cm`); }
 }
@@ -4294,35 +4453,41 @@ function checkJumps(simDt) {
     if (l && l.distanceTo(_w) > lim) { ASSERT.jumps++; console.warn(`[ASSERT] pallet jump ${p.userData.lpn} ${(l.distanceTo(_w) * 100).toFixed(1)}cm in one frame`); }
     (p.userData.lp ||= new THREE.Vector3()).copy(_w); }
 }
+const LOCKS = {};
+function lockQ(v, key) { return v.until(() => !LOCKS[key] || LOCKS[key] === v.id, 'Waiting for ' + key).do(() => { LOCKS[key] = v.id; }); }
+function unlockQ(v, key) { return v.do(() => { if (LOCKS[key] === v.id) delete LOCKS[key]; }); }
 function scheduleUnload(fk, trl, lane, doorX) {
   const next = trl.pallets.find((p) => !p.userData.taken);
   if (!next) { fk.state = 'Idle'; fk.task = 'Trailer empty'; return; }
-  const si = lane.slots.findIndex((s) => s.state === 'empty'); if (si < 0) { fk.wait(2).do(() => scheduleUnload(fk, trl, lane, doorX)); return; }
+  let si = -1; for (let k = lane.slots.length - 1; k >= 0 && lane.slots[k].state === 'empty'; k--) si = k; if (si < 0) { fk.wait(2).do(() => scheduleUnload(fk, trl, lane, doorX)); return; }
+  if (!lane.slots.some((s) => s.state !== 'empty') && false) {}
   const slot = lane.slots[si]; next.userData.taken = true; slot.state = 'reserved'; slot.res = fk.id;
-  const wp = new THREE.Vector3(); trl.obj.updateMatrixWorld(true); next.getWorldPosition(wp);
+  const wp = new THREE.Vector3(); if (trl.isSemi) placeVehicle(trl, 1); trl.obj.updateMatrixWorld(true); next.getWorldPosition(wp); // B23: trailer must be posed before reading its pallets
   const src = { id: next.userData.loc, X: wp.x, Y: wp.y, Z: wp.z }, lx = sx(lane.x), EZ = sz(2.2), diam = lx - wp.x, RD = reachD(fk);
   const dst = LOC.get(slot.id);
   fk.state = 'Unloading'; fk.task = `${src.id} → ${slot.id}`;
   if (Math.abs(fk.x - wp.x) > 0.01 || Math.abs(Math.sin(fk.th)) > 0.01 || Math.cos(fk.th) < 0) fk.drive(wp.x, EZ, 0, 1, { label: 'U-turn to trailer', vmax: 1.1, R: Math.max(1.5, diam / 2) });
   fk.liftTo((f) => hFor(f, src.Y + ENTRY, wp.z - RD))
+    .drive(wp.x, wp.z - RD - 1.0, 0, 1, { label: 'Into trailer', vmax: 1.3, lead: 0.6 })
     .drive(wp.x, wp.z - RD, 0, 1, { label: 'Creep into pallet pockets', vmax: 0.6 })
     .liftTo((f) => hFor(f, src.Y + DECK_UNDER))
     .do(() => { slotAssert('pickup', fk, next, src); carriageOf(fk).attach(next); fk.carry = next; fk.state = 'Picking'; next.userData.loc = fk.id; })
     .liftTo((f) => f.obj.userData.getForkHeight() + CLEAR).tilt(0.05)
     .drive(wp.x, EZ, 0, -1, { label: 'Reverse out of trailer', vmax: 0.9, lead: 0 })
     .liftTo((f) => hFor(f, FLOOR + TRAVEL, f.z))
-    .drive(lx, EZ, Math.PI, -1, { label: 'Reverse turn', vmax: 0.9, R: Math.max(1.5, diam / 2) })
-    .drive(lx, dst.Z + RD, Math.PI, 1, { label: 'To ' + slot.id, vmax: 1.4 })
+    .drive(lx, EZ, Math.PI, -1, { label: 'Reverse turn', vmax: 1.3, R: Math.max(1.5, diam / 2) });
+  lockQ(fk, lane.id).drive(lx, dst.Z + RD, Math.PI, 1, { label: 'To ' + slot.id, vmax: 1.4 })
     .tilt(0)
     .liftTo((f) => hFor(f, dst.Y + DECK_UNDER, f.z))
     .do(() => { slotAssert('drop', fk, next, dst); world.attach(next); slot.state = 'occupied'; slot.pal = next; slot.res = null; next.userData.loc = slot.id; COUNTS.received++; fk.carry = null; fk.state = 'Staged';
       flashScan(next); log('RCV', fk.id, `${next.userData.lpn} staged at ${slot.id}`, 'info'); })
     .liftTo((f) => hFor(f, dst.Y + ENTRY))
-    .drive(lx, dst.Z + RD + 1.4, Math.PI, -1, { label: 'Back out', vmax: 0.9, lead: 0 })
-    .liftTo((f) => hFor(f, FLOOR + TRAVEL - 0.08))
+    .drive(lx, EZ, Math.PI, -1, { label: 'Back out', vmax: 1.1, lead: 0 });
+  unlockQ(fk, lane.id).liftTo((f) => hFor(f, FLOOR + TRAVEL - 0.08))
     .do(() => scheduleUnload(fk, trl, lane, doorX));
 }
-const FK1 = makeForklift('FL-07', sx(LANE5.x), sz(2.2), Math.PI);
+function trailerMouth(trl) { const p = trl.pallets.find((q) => !q.userData.taken), w = new THREE.Vector3(); trl.obj.updateMatrixWorld(true); p.getWorldPosition(w); return w; }
+const FK1 = (() => { const w = trailerMouth(T1), f = makeForklift('FL-07', w.x, sz(2.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
 FK1.do(() => scheduleUnload(FK1, T1, LANE5, X5));
 const W1 = createWorker({}); shadowAll(W1); W1.position.set(sx(LANE5.x + 1.4), FLOOR, sz(6.5)); W1.rotation.y = -Math.PI / 2; world.add(W1);
 const scanBeam = new THREE.Mesh(new THREE.ConeGeometry(0.35, 1.6, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xff3b3b, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
@@ -4335,6 +4500,432 @@ for (let i = 0; i < (QS.get('amr') === '1' ? 4 : 0); i++) { const o = createAMR(
 function updateDoors(dt) { for (const id in doorPanels) { const d = doorPanels[id], u = d.userData; u.open = dampV(u.open, u.target, 1.6, dt); d.position.y = FLOOR + DOOR_H / 2 + u.open * (DOOR_H - 0.25); d.scale.y = 1 - u.open * 0.92; d.position.y = FLOOR + DOOR_H - (DOOR_H * d.scale.y) / 2; u.lamp.color.set(u.target ? 0xffb020 : 0x2ecc71); u.lamp.emissive.set(u.target ? 0xffb020 : 0x2ecc71); } }
 
 await __yield(60, "simulation");
+let popStep = () => {}; let __WRAP = null; const WRAP0 = () => __WRAP;
+try {
+const HD = { N: Math.PI, S: 0, E: Math.PI / 2, W: -Math.PI / 2 };
+const POP = { veh: [], peds: [], movers: [], conv: [] };
+const _p6 = new THREE.Vector3(), _p6b = new THREE.Vector3();
+const fwdOf = (th) => [Math.sin(th), Math.cos(th)];
+function fmtId(n) { return String(n).padStart(2, '0'); }
+function makeMHE(id, type, obj, X, Z, th, o = {}) {
+  shadowAll(obj); const ud = obj.userData, k = ud.kin, P = ud.parts;
+  const v = new Vehicle({ id, type, obj, R: o.R ?? 1.2, vmax: o.vmax ?? 1.6, acc: o.acc ?? 0.8, wb: k.L, x: X, z: Z, th });
+  v.refZ = k.refZ; v.dmax = k.maxSteer * 0.92; v.steerRate = o.steerRate ?? 1.6; v.Lc = o.Lc ?? Math.max(0.6, k.L * 0.7);
+  v.frontWheels = []; v.rearWheels = (P.wheels || []).slice(); v.rearWheels.forEach((w) => (w.rotation.order = 'YXZ'));
+  if (P.load) { P.load.removeFromParent(); P.load = null; }
+  v.lift = (h) => { v.q.push({ k: 'lift', h }); return v; };
+  v.tilt = (r) => { if (ud.setMastTilt) v.q.push({ k: 'tilt', r }); return v; };
+  v.liftTo = (fn) => { v.q.push({ k: 'liftTo', fn }); return v; };
+  v.carry = null; v.kind = o.kind || 'mast'; v.walkBehind = !!o.walkBehind;
+  if (ud.attachOperator && !ud.operator) ud.attachOperator();
+  if (o.baseY !== undefined) { ud.baseY = o.baseY; v.yAt = () => o.baseY; }
+  POP.veh.push(v); return v;
+}
+function measureForks(v, flat) {
+  const o = v.obj, P = o.userData.parts, c = carriageOf(v), sp = o.position.clone(), sr = o.rotation.clone();
+  o.position.set(0, 0, 0); o.rotation.set(0, 0, 0); o.updateMatrixWorld(true);
+  const cw = c.getWorldPosition(new THREE.Vector3()), b = new THREE.Box3();
+  if (flat) { for (const f of P.forks || []) b.expandByObject(f); v.tine = b.max.y - cw.y; v.heel = (b.min.z - cw.z) + 0.03; }
+  else { v.tine = 0.051; v.heel = 0; }
+  o.position.copy(sp); o.rotation.copy(sr); o.updateMatrixWorld(true);
+}
+function jackLiftAdapter(v) {
+  const ud = v.obj.userData; ud.maxForkHeight = 0.12;
+  ud.getForkHeight = () => ud.lift;
+  ud.setForkHeight = (h) => { if (h > ud.lift + 2e-4) ud.pump(Math.max(1, Math.ceil((h - ud.lift) / 0.03)), h - ud.lift); else if (h < ud.lift - 2e-4) ud.release(); };
+  v.isJack = true;
+}
+function riderLiftAdapter(v) {
+  const ud = v.obj.userData; let h = 0, tgt = 0; ud.maxForkHeight = 0.12;
+  ud.getForkHeight = () => h; ud.setForkHeight = (x) => { tgt = clamp(x, 0, 0.12); };
+  const up = ud.update; ud.update = (dt, t) => { h = Math.abs(tgt - h) < 0.08 * dt ? tgt : h + Math.sign(tgt - h) * 0.08 * dt; ud.lift = ud.liftT = h / 0.12; up(dt, t); };
+}
+let PSEED = 900;
+function newPallet(variant, wrapIt = true) {
+  const p = createPalletLoad({ variant: variant || pick(['full', 'full', 'half', 'cases']), seed: PSEED++, wrap: wrapIt }); shadowAll(p); trackPal(p); world.add(p); return p;
+}
+function placePal(p, loc, yaw = 0) { p.position.set(loc.X, loc.Y, loc.Z); p.rotation.set(0, yaw, 0); p.updateMatrixWorld(true); }
+const hEntry = (v, Y) => v.isJack || v.kind === 'rider' ? 0 : hFor(v, Y + ENTRY);
+const hClear = (v) => v.isJack || v.kind === 'rider' ? 0.12 : v.obj.userData.getForkHeight() + CLEAR;
+const hTravel = (v) => v.isJack || v.kind === 'rider' ? (v.carry ? 0.12 : 0) : Math.max(0, hFor(v, FLOOR + TRAVEL));
+function refFor(v, loc, th) { const RD = reachD(v), [fx, fz] = fwdOf(th); return { x: loc.X - fx * RD, z: loc.Z - fz * RD }; }
+function pickAt(v, pal, loc, th, o = {}) {
+  const AP = o.AP ?? 0.8, [fx, fz] = fwdOf(th); let r;
+  v.do(() => { r = refFor(v, loc, th); v.task = 'Approach ' + loc.id; });
+  v.do(() => { v.q.unshift({ k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: 1, vmax: o.vmax ?? 1.2, R: o.R, label: 'Approach ' + loc.id, lead: o.lead }); });
+  v.liftTo((f) => hEntry(f, loc.Y));
+  v.do(() => { v.q.unshift({ k: 'drive', X: r.x, Z: r.z, th, gear: 1, vmax: 0.5, label: 'Forks into pockets', lead: AP }); });
+  v.liftTo((f) => hFor(f, loc.Y + DECK_UNDER));
+  v.do(() => { slotAssert('pickup', v, pal, loc); carriageOf(v).attach(pal); v.carry = pal; pal.userData.loc = v.id; v.state = 'Picking'; o.onPick && o.onPick(); });
+  v.liftTo((f) => hClear(f));
+  if (!o.stay) v.do(() => { v.q.unshift({ k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: -1, vmax: 0.7, label: 'Back out', lead: 0 }); });
+  return v;
+}
+function dropAt(v, loc, th, o = {}) {
+  const AP = o.AP ?? 0.8, [fx, fz] = fwdOf(th); let r, pal;
+  v.do(() => { r = refFor(v, loc, th); pal = v.carry; });
+  if (!o.noApproach) v.do(() => { v.q.unshift({ k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: 1, vmax: o.vmax ?? 1.2, R: o.R, label: 'To ' + loc.id, lead: o.lead }); });
+  if (!v.isJack && v.kind !== 'rider') v.liftTo((f) => hFor(f, loc.Y + DECK_UNDER + CLEAR, r.z));   // B26: raise only at the destination
+  v.do(() => { v.q.unshift({ k: 'drive', X: r.x, Z: r.z, th, gear: 1, vmax: 0.5, label: 'Place ' + loc.id, lead: AP }); });
+  if (v.isJack) { // open the release valve; the pallet seats when the tines pass the deck underside
+    v.do((f) => { f.obj.userData.release(); v.task = 'Lowering'; })
+      .until((f) => tineTopY(f) <= loc.Y + DECK_UNDER + 0.0005 || !f.obj.userData.isPumping())
+      .do(() => { slotAssert('drop', v, pal, loc); (o.parent || world).attach(pal); v.carry = null; pal.userData.loc = loc.id; o.onDrop && o.onDrop(pal); })
+      .until((f) => !f.obj.userData.isPumping());
+  } else {
+    v.liftTo((f) => hFor(f, loc.Y + DECK_UNDER));
+    v.do(() => { slotAssert('drop', v, pal, loc); (o.parent || world).attach(pal); v.carry = null; pal.userData.loc = loc.id; o.onDrop && o.onDrop(pal); });
+    v.liftTo((f) => Math.max(0, hEntry(f, loc.Y)));
+  }
+  if (!o.stay) v.do(() => { v.q.unshift({ k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: -1, vmax: 0.7, label: 'Back out', lead: 0 }); });
+  return v;
+}
+const go = (v, X, Z, th, gear, o = {}) => v.do(() => { v.q.unshift({ k: 'drive', X, Z, th, gear, vmax: o.vmax, R: o.R, label: o.label, lead: o.lead }); });
+const LANE2 = LANES['DR-002'], LANE7 = LANES['DR-007'];
+const FK3 = (() => { const w = trailerMouth(T2), f = makeForklift('FL-03', w.x, sz(2.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
+FK3.wait(1.5).do(() => scheduleUnload(FK3, T2, LANE2, sx(IN_DOORS[1].x)));
+const FK9 = (() => { const w = trailerMouth(T4), f = makeForklift('FL-09', w.x, sz(2.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
+FK9.wait(3).do(() => scheduleUnload(FK9, T4, LANE7, sx(IN_DOORS[6].x)));
+function seedLane(lane, ks) { for (const k of ks) { const sl = lane.slots[k], p = newPallet(); placePal(p, LOC.get(sl.id)); sl.state = 'occupied'; sl.pal = p; p.userData.loc = sl.id; } }
+seedLane(LANE2, [0]); seedLane(LANE5, [0]); seedLane(LANE7, [0, 1]);
+const PD = {}; for (const i of [3, 4, 5]) { const a = AISLES[i], id = 'PD-' + a.id; PD[a.id] = { id, a, X: sx(a.x), Y: FLOOR, Z: sz(15.6), state: 'empty', pal: null }; LOC.set(id, PD[a.id]); }
+{ const m = new THREE.MeshBasicMaterial({ color: 0xffc220, transparent: true, opacity: 0.85, depthWrite: false }); // floor marking around each P&D
+  for (const k in PD) { const p = PD[k]; for (const [w, d, dx, dz] of [[1.5, 0.06, 0, -0.85], [1.5, 0.06, 0, 0.85], [0.06, 1.7, -0.75, 0], [0.06, 1.7, 0.75, 0]]) { const s = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m); s.rotation.x = -Math.PI / 2; s.position.set(p.X + dx, FLOOR + 0.006, p.Z + dz); world.add(s); } } }
+function makeRider(id, X, Z, th) {
+  const v = makeMHE(id, 'Rider pallet truck', createRiderPalletTruck({}), X, Z, th, { R: 0.8, vmax: 1.7, kind: 'rider', steerRate: 2.0, Lc: 0.7 });
+  riderLiftAdapter(v); measureForks(v, true); return v;
+}
+const Y_H = 12.2; // cross-aisle turning line (MXA)
+function rpJob(v, lanes, pds) {
+  let lane = null, k = -1;
+  for (const L of lanes) { const kk = L.slots.findIndex((s) => s.state !== 'empty'); if (kk >= 0 && L.slots[kk].state === 'occupied' && !LOCKS[L.id]) { lane = L; k = kk; break; } }
+  const pd = pds.find((p) => p.state === 'empty');
+  if (!lane || !pd) { v.state = 'Waiting'; v.task = !pd ? 'P&D full · waiting for reach truck' : 'Waiting for staged pallet'; v.wait(1.2).do(() => rpJob(v, lanes, pds)); return; }
+  const sl = lane.slots[k], pal = sl.pal, loc = LOC.get(sl.id), lx = sx(lane.x), dir = Math.sign(pd.X - lx) || 1;
+  sl.state = 'reserved'; pd.state = 'reserved'; v.state = 'Moving'; v.task = `${sl.id} → ${pd.id}`;
+  const RD = reachD(v), yAp = sl.y + RD + 0.5;
+  lockQ(v, lane.id);
+  go(v, lx, sz(yAp), HD.S, 1, { R: 0.8, lead: 0.3, label: 'To ' + sl.id, vmax: 1.5 });
+  pickAt(v, pal, loc, HD.S, { AP: 0.5, onPick: () => { sl.state = 'empty'; sl.pal = null; } });
+  go(v, lx - dir * 0.8, sz(Y_H), dir > 0 ? HD.E : HD.W, -1, { R: 0.8, lead: 0, label: 'Reverse turn' });
+  unlockQ(v, lane.id);
+  go(v, pd.X, sz(15.6 - RD - 0.5), HD.N, 1, { R: 0.8, lead: 0.4, label: 'To ' + pd.id, vmax: 1.6 });
+  dropAt(v, pd, HD.N, { AP: 0.5, noApproach: true, onDrop: (p) => { pd.state = 'occupied'; pd.pal = p; log('MOVE', v.id, `${p.userData.lpn} staged at ${pd.id}`); } });
+  v.do(() => { const nl = lanes[0], d2 = Math.sign(sx(nl.x) - pd.X) || -1; v.q.unshift({ k: 'drive', X: pd.X - d2 * 0.8, Z: sz(Y_H), th: d2 > 0 ? HD.E : HD.W, gear: -1, R: 0.8, lead: 0, label: 'Reverse turn' }); });
+  v.do(() => rpJob(v, lanes, pds));
+}
+const RP1 = makeRider('RP-01', sx(22), sz(Y_H), HD.W), RP2 = makeRider('RP-02', sx(33), sz(Y_H), HD.E);
+RP1.do(() => rpJob(RP1, [LANE2, LANE5], [PD['04'], PD['05']]));
+RP2.wait(2).do(() => rpJob(RP2, [LANE7, LANE5], [PD['06'], PD['05']]));
+for (const id of ['04', '06']) { const p = newPallet(); placePal(p, PD[id]); PD[id].state = 'occupied'; PD[id].pal = p; p.userData.loc = PD[id].id; }
+function makeReach(id, a) {
+  const o = createReachTruck({ autoLift: false }); o.userData.setReach(1, true);
+  const v = makeMHE(id, 'Reach truck', o, sx(a.x), sz(20), HD.S, { R: 0.6, vmax: 1.6, acc: 0.7, steerRate: 1.8, Lc: 0.7 });
+  o.userData.setForkHeight(0.1, true); measureForks(v, false); v.aisle = a; v.own = []; return v;
+}
+const RT_R = 0.6;
+function rtSlotPoses(v, sl) { const s = sl.face > 0 ? 1 : -1; // face>0: west row (truck faces west)
+  const th = s > 0 ? HD.W : HD.E, RD = reachD(v), xr = sl.x + s * RD, xa = xr + s * 1.3;
+  return { th, xa, P1: { x: xa + s * RT_R, y: sl.y - RT_R - 0.4 }, P2: { x: xa + s * RT_R, y: sl.y - RT_R } }; }
+function rtFreeSlot(v, minB = 3) {
+  const c = SLOTS.filter((s) => s.aisle === v.aisle && s.state === 'empty' && s.bay >= minB && s.lv <= 3);
+  return c.length ? c[Math.floor(rnd() * c.length)] : null;
+}
+function rtGoSlot(v, sl, p) { // from wherever in the aisle (facing S) to the slot approach (facing the rack)
+  const ys = sl.y; // P1 is north of the slot by R+0.4 (y larger)
+  v.do(() => { const yP = ys + RT_R + 0.4, g = sz(yP) < v.z - 0.3 ? -1 : 1; v.q.unshift({ k: 'drive', X: sx(p.P1.x), Z: sz(yP), th: HD.S, gear: g, R: RT_R, label: 'To ' + sl.id, vmax: 1.6 }); });
+  go(v, sx(p.xa), sl.Z, p.th, 1, { R: RT_R, lead: 0, label: 'Turn into ' + sl.id });
+}
+function rtLeaveSlot(v, sl, p) { go(v, sx(p.P2.x), sz(sl.y + RT_R), HD.S, -1, { R: RT_R, lead: 0, label: 'Reverse out' }); }
+function rtJob(v) {
+  const pd = PD[v.aisle.id];
+  if (pd.state === 'occupied' && pd.pal) { // ---- putaway
+    const sl = rtFreeSlot(v); if (!sl) { v.wait(2).do(() => rtJob(v)); return; }
+    pd.state = 'reserved'; sl.state = 'reserved'; const pal = pd.pal; v.state = 'Putaway'; v.task = `${pd.id} → ${sl.id}`;
+    const RD = reachD(v); go(v, pd.X, sz(15.6 + RD + 0.8), HD.S, 1, { R: RT_R, label: 'To ' + pd.id, vmax: 1.6 });
+    pickAt(v, pal, pd, HD.S, { AP: 0.8, lead: 0.8, onPick: () => { pd.state = 'empty'; pd.pal = null; } });
+    v.liftTo((f) => hTravel(f));
+    const p = rtSlotPoses(v, sl); rtGoSlot(v, sl, p);
+    v.liftTo((f) => hFor(f, sl.Y + DECK_UNDER + CLEAR));
+    v.do(() => { const s = sl.face > 0 ? 1 : -1; v.q.unshift({ k: 'drive', X: sx(p.xa - s * 1.3), Z: sl.Z, th: p.th, gear: 1, vmax: 0.4, label: 'Into ' + sl.id, lead: 1.3 }); });
+    v.liftTo((f) => hFor(f, sl.Y + DECK_UNDER));
+    v.do(() => { slotAssert('drop', v, pal, sl); world.attach(pal); v.carry = null; sl.state = 'occupied'; sl.dyn = pal; pal.userData.loc = sl.id; v.own.push(sl); COUNTS.putaway++; log('PUT', v.id, `${pal.userData.lpn} put away at ${sl.id}`, 'success'); });
+    v.liftTo((f) => hFor(f, sl.Y + ENTRY));
+    go(v, sx(p.xa), sl.Z, p.th, -1, { vmax: 0.4, lead: 0, label: 'Withdraw forks' });
+    v.liftTo((f) => hTravel(f)); rtLeaveSlot(v, sl, p);
+    v.do(() => rtJob(v)); return;
+  }
+  if (v.own.length && rnd() < 0.7) { // ---- replenishment: move one of this truck's pallets to a pick-level slot
+    const from = v.own[Math.floor(rnd() * v.own.length)], to = SLOTS.filter((s) => s.aisle === v.aisle && s.state === 'empty' && s.bay >= 3 && Math.abs(s.y - from.y) > 3 && s.lv !== from.lv && s.lv <= 2);
+    if (from.state === 'occupied' && from.dyn && to.length) {
+      const sl = to[Math.floor(rnd() * to.length)], pal = from.dyn; from.state = 'reserved'; sl.state = 'reserved'; v.state = 'Replenishment'; v.task = `${from.id} → ${sl.id}`;
+      const p0 = rtSlotPoses(v, from), s0 = from.face > 0 ? 1 : -1; rtGoSlot(v, from, p0);
+      v.liftTo((f) => hFor(f, from.Y + ENTRY));
+      v.do(() => { v.q.unshift({ k: 'drive', X: sx(p0.xa - s0 * 1.3), Z: from.Z, th: p0.th, gear: 1, vmax: 0.4, label: 'Forks into ' + from.id, lead: 1.3 }); });
+      v.liftTo((f) => hFor(f, from.Y + DECK_UNDER));
+      v.do(() => { slotAssert('pickup', v, pal, from); carriageOf(v).attach(pal); v.carry = pal; from.state = 'empty'; from.dyn = null; v.own.splice(v.own.indexOf(from), 1); pal.userData.loc = v.id; });
+      v.liftTo((f) => f.obj.userData.getForkHeight() + CLEAR);
+      go(v, sx(p0.xa), from.Z, p0.th, -1, { vmax: 0.4, lead: 0, label: 'Withdraw' });
+      v.liftTo((f) => hTravel(f)); rtLeaveSlot(v, from, p0);
+      const p = rtSlotPoses(v, sl), s = sl.face > 0 ? 1 : -1; rtGoSlot(v, sl, p);
+      v.liftTo((f) => hFor(f, sl.Y + DECK_UNDER + CLEAR));
+      v.do(() => { v.q.unshift({ k: 'drive', X: sx(p.xa - s * 1.3), Z: sl.Z, th: p.th, gear: 1, vmax: 0.4, label: 'Into ' + sl.id, lead: 1.3 }); });
+      v.liftTo((f) => hFor(f, sl.Y + DECK_UNDER));
+      v.do(() => { slotAssert('drop', v, pal, sl); world.attach(pal); v.carry = null; sl.state = 'occupied'; sl.dyn = pal; pal.userData.loc = sl.id; v.own.push(sl); COUNTS.putaway++; log('REPL', v.id, `${pal.userData.lpn} ${from.id} → ${sl.id}`); });
+      v.liftTo((f) => hFor(f, sl.Y + ENTRY));
+      go(v, sx(p.xa), sl.Z, p.th, -1, { vmax: 0.4, lead: 0, label: 'Withdraw' });
+      v.liftTo((f) => hTravel(f)); rtLeaveSlot(v, sl, p);
+      v.do(() => rtJob(v)); return;
+    }
+  }
+  v.state = 'Waiting'; v.task = 'Waiting at ' + pd.id; v.wait(1.5).do(() => rtJob(v));
+}
+const RT = [makeReach('RT-04', AISLES[3]), makeReach('RT-05', AISLES[4]), makeReach('RT-06', AISLES[5])];
+RT.forEach((v, i) => v.wait(0.5 + i).do(() => rtJob(v)));
+const OUTL = {}; for (const d of OUT_DOORS) { OUTL[d.id] = { id: 'OB-' + d.id, x: d.x + 2, slots: [58.6, 57.2, 55.8, 54.4].map((y, k) => ({ id: `OB-${d.id.replace('-', '')}:${k + 1}`, y, state: 'empty', pal: null })) };
+  for (const sl of OUTL[d.id].slots) LOC.set(sl.id, { id: sl.id, kind: 'stage', X: sx(d.x + 2), Y: FLOOR, Z: sz(sl.y), slot: sl }); }
+const OL3 = OUTL['DS-103'], OL5 = OUTL['DS-105'];
+function seedOut(L, ks) { for (const k of ks) { const sl = L.slots[k], p = newPallet(); placePal(p, LOC.get(sl.id)); sl.state = 'occupied'; sl.pal = p; p.userData.loc = sl.id; } }
+seedOut(OL3, [1, 2, 3]); seedOut(OL5, [2, 3]);
+const OZ = 52.0;
+function shipJob(v, trl, L) {
+  const used = new Set(trl.pallets.map((p) => p.userData.k)); let kt = -1; for (let k = TRL_ROWS * 2 - 1; k >= 0; k--) if (!used.has(k)) { kt = k; break; }
+  let k = -1; for (let i = 3; i >= 0; i--) { if (L.slots[i].state === 'occupied') { k = i; break; } if (L.slots[i].state !== 'empty') break; }
+  if (kt < 0) { v.state = 'Idle'; v.task = `${trl.id} loaded · awaiting yard swap`; v.wait(5).do(() => shipJob(v, trl, L)); return; }
+  if (k < 0 || LOCKS[L.id]) { v.state = 'Waiting'; v.task = 'Waiting for wrapped pallet'; v.wait(1.5).do(() => shipJob(v, trl, L)); return; }
+  const sl = L.slots[k], pal = sl.pal, loc = LOC.get(sl.id), lx = sx(L.x); sl.state = 'reserved'; v.state = 'Loading'; v.task = `${sl.id} → ${trl.id}`;
+  lockQ(v, L.id);
+  go(v, lx, sz(OZ), HD.N, 1, { R: 1.5, label: 'To ' + L.id, vmax: 1.6 });
+  v.liftTo((f) => hFor(f, FLOOR + ENTRY));
+  pickAt(v, pal, loc, HD.N, { AP: 0.8, stay: true, onPick: () => { sl.state = 'empty'; sl.pal = null; } });
+  v.tilt(0.05);
+  go(v, lx, sz(OZ), HD.N, -1, { lead: 0, label: 'Reverse out', vmax: 0.9 });
+  unlockQ(v, L.id);
+  v.liftTo((f) => hTravel(f));
+  let dst; v.do(() => { placeVehicle(trl, 1); trl.obj.updateMatrixWorld(true); const w = trl.P.trailer.localToWorld(trlPos(kt)); dst = { id: `${trl.id}/P${fmtId(kt + 1)}`, X: w.x, Y: w.y, Z: w.z }; });
+  v.do(() => { const RD = reachD(v); v.q.unshift({ k: 'drive', X: dst.X, Z: dst.Z + RD + 1.0, th: HD.N, gear: 1, R: 1.6, vmax: 1.6, label: 'Into ' + trl.id }); });
+  v.tilt(0);
+  v.liftTo((f) => hFor(f, dst.Y + DECK_UNDER + 0.05, f.z));
+  v.do(() => { const RD = reachD(v); v.q.unshift({ k: 'drive', X: dst.X, Z: dst.Z + RD, th: HD.N, gear: 1, vmax: 0.5, label: 'Place ' + dst.id, lead: 1.0 }); });
+  v.liftTo((f) => hFor(f, dst.Y + DECK_UNDER));
+  v.do(() => { slotAssert('drop', v, pal, dst); trl.P.trailer.attach(pal); pal.userData.k = kt; pal.userData.loc = dst.id; trl.pallets.push(pal); v.carry = null; COUNTS.shipped++; log('LOAD', v.id, `${pal.userData.lpn} loaded on ${trl.id} (${dst.id})`, 'success'); });
+  v.liftTo((f) => hFor(f, dst.Y + ENTRY));
+  v.do(() => { const RD = reachD(v); v.q.unshift({ k: 'drive', X: dst.X, Z: dst.Z + RD + 1.2, th: HD.N, gear: -1, vmax: 0.8, label: 'Back out', lead: 0 }); });
+  v.liftTo((f) => hFor(f, FLOOR + TRAVEL - 0.08, sz(OZ)));
+  go(v, lx, sz(OZ), HD.N, -1, { R: 1.6, label: 'Return to ' + L.id, vmax: 1.4 });
+  v.do(() => shipJob(v, trl, L));
+}
+const FK11 = makeForklift('FL-11', sx(OL3.x), sz(OZ), HD.N), FK12 = makeForklift('FL-12', sx(OL5.x), sz(OZ), HD.N);
+FK11.obj.userData.setForkHeight(0.08, true); FK12.obj.userData.setForkHeight(0.08, true);
+FK11.do(() => shipJob(FK11, T3, OL3)); FK12.wait(2).do(() => shipJob(FK12, T5, OL5));
+const WR = { x: 66, y: 56.5 };
+let WRAP = null; try { WRAP = COOKER_WRAPPER.create(world, { position: [sx(WR.x), FLOOR, sz(WR.y)], rotationY: 0, duration: 22, caseStack: true }); } catch (e) { console.warn('[gf] wrapper', e); }
+__WRAP = WRAP; const TT = WRAP ? WRAP.getTurntableWorld(new THREE.Vector3()) : V3(sx(WR.x), FLOOR + 0.12, sz(WR.y));
+const TTLOC = { id: 'WRAP-01', X: TT.x, Y: TT.y, Z: TT.z };
+const BS = [{ id: 'BLD-01', x: 56, y: 53.0 }, { id: 'BLD-02', x: 59.5, y: 53.0 }].map((b) => ({ ...b, X: sx(b.x), Y: FLOOR, Z: sz(b.y), pal: null, n: 0, state: 'building' }));
+BS.forEach((b) => LOC.set(b.id, b));
+const CASE_W = 0.5, CASE_D = 0.4, CASE_H = 0.26, CASES_PER = 18;
+function caseMesh() { const m = new THREE.Mesh(new THREE.BoxGeometry(CASE_D, CASE_H, CASE_W), cartonMat); m.castShadow = true; return m; }
+function casePos(i) { const l = Math.floor(i / 6), j = i % 6; return V3((j % 2 ? 0.25 : -0.25) * 0.98, PALLET.h + CASE_H / 2 + l * CASE_H, (Math.floor(j / 2) - 1) * 0.405); }
+function startBuild(b, n0 = 0) { const p = createPallet({ variant: 'pine', seed: PSEED++, wrap: false, maxHeight: 0.001 }); shadowAll(p); for (const c of [...p.children]) if (c.name && /load|case|wrap/i.test(c.name)) p.remove(c);
+  trackPal(p); world.add(p); placePal(p, b); b.pal = p; b.n = 0; b.state = 'building'; for (let i = 0; i < n0; i++) addCase(b); }
+function addCase(b, m) { m = m || caseMesh(); b.pal.attach(m); m.position.copy(casePos(b.n)); m.rotation.set(0, 0, 0); b.n++; if (b.n >= CASES_PER) { b.state = 'ready'; log('BUILD', b.id, `${b.pal.userData.lpn} built · ${CASES_PER} cases`); } }
+startBuild(BS[0], 18); startBuild(BS[1], 9);
+function makeJack(id, X, Z, th) {
+  const v = makeMHE(id, 'Hand pallet jack', createHandPalletJack({}), X, Z, th, { R: 0.9, vmax: 1.05, acc: 0.6, kind: 'jack', walkBehind: true, steerRate: 2.2, Lc: 0.6 });
+  jackLiftAdapter(v); measureForks(v, true); v.obj.userData.setHandleAngle(-0.28); return v;
+}
+function jackApproach(v, loc, th, AP = 0.9) {
+  let r; v.do(() => { r = refFor(v, loc, th); const [fx, fz] = fwdOf(th), Bx = r.x - fx * (AP + 2.6), Bz = r.z - fz * (AP + 2.6);
+    v.q.unshift({ k: 'drive', X: Bx, Z: Bz, th, gear: -1, vmax: 1.05, R: 0.9, label: 'Pulling to ' + loc.id, lead: 1.0 }, { k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: 1, vmax: 0.7, label: 'Pushing to ' + loc.id, lead: 1.2 }); });
+}
+function wrapRampY(v) { const d = Math.hypot(v.x - TT.x, v.z - TT.z); return FLOOR + clamp((1.75 - d) / 0.6, 0, 1) * (TT.y - FLOOR); }
+function jackJob(v, b, lane) {
+  if (b.state !== 'ready' || LOCKS.WRAP && LOCKS.WRAP !== v.id) { v.state = 'Waiting'; v.task = b.state === 'ready' ? 'Waiting for wrapper' : `${b.id} building (${b.n}/${CASES_PER})`; v.wait(1.5).do(() => jackJob(v, b, lane)); return; }
+  const pal = b.pal; b.state = 'moving'; v.state = 'Moving'; v.task = `${b.id} → WRAP-01`;
+  lockQ(v, 'WRAP');
+  jackApproach(v, b, HD.E); pickAt(v, pal, b, HD.E, { AP: 0.9, onPick: () => { b.pal = null; b.state = 'empty'; } });
+  jackApproach(v, TTLOC, HD.E, 1.0);
+  dropAt(v, TTLOC, HD.E, { AP: 1.0, noApproach: true });
+  v.do(() => { v.state = 'Wrapping'; v.task = 'Stretch wrap ' + pal.userData.lpn; pal.userData.wrapping = true;
+    const done = () => { pal.userData.wrapping = false; pal.userData.wrapped = true; log('WRAP', 'WRAP-01', `${pal.userData.lpn} wrapped`, 'success'); };
+    if (WRAP) WRAP.wrap(pal, { duration: 20 }).then(done, done); else setTimeout(done, 100); })
+    .until(() => !pal.userData.wrapping, 'Stretch wrapping');
+  v.do(() => { world.attach(pal); });
+  pickAt(v, pal, TTLOC, HD.E, { AP: 1.0, stay: true });
+  go(v, TTLOC.X - 2.9, TTLOC.Z, HD.E, -1, { vmax: 0.6, lead: 1.4, label: 'Pull off turntable' });
+  unlockQ(v, 'WRAP');
+  let sl; v.do(() => { let k = -1; for (let i = 3; i >= 0 && lane.slots[i].state === 'empty'; i--) k = i; if (k < 0) { v.q.unshift({ k: 'wait', t: 2 }); } sl = k >= 0 ? lane.slots[k] : null; if (sl) sl.state = 'reserved'; v.task = `${pal.userData.lpn} → ${sl ? sl.id : lane.id}`; });
+  v.until(() => sl || (() => { let k = -1; for (let i = 3; i >= 0 && lane.slots[i].state === 'empty'; i--) k = i; if (k >= 0) { sl = lane.slots[k]; sl.state = 'reserved'; } return !!sl; })(), 'Waiting for lane space');
+  lockQ(v, lane.id);
+  v.do(() => { const loc = LOC.get(sl.id); jackApproachNow(v, loc, HD.N, 0.9); });
+  v.do(() => { const loc = LOC.get(sl.id); dropNow(v, loc); });
+}
+function jackApproachNow(v, loc, th, AP) { const r = refFor(v, loc, th), [fx, fz] = fwdOf(th); const By = Math.max(sz(50.4), r.z - fz * (AP + 2.6));
+  v.q.unshift({ k: 'drive', X: r.x - fx * AP, Z: By, th, gear: -1, vmax: 1.05, R: 0.9, label: 'Pulling to ' + loc.id, lead: 1.0 }, { k: 'drive', X: r.x - fx * AP, Z: r.z - fz * AP, th, gear: 1, vmax: 0.7, label: 'Pushing to ' + loc.id, lead: 0.8 }); }
+function dropNow(v, loc) { // builds the drop sequence for the current carry and inserts it at the front of the queue
+  const q0 = v.q; v.q = []; const pal = v.carry, sl = loc.slot, lane = v.lane;
+  dropAt(v, loc, HD.N, { AP: 0.9, noApproach: true, onDrop: (p) => { sl.state = 'occupied'; sl.pal = p; log('STAGE', v.id, `${p.userData.lpn} staged at ${sl.id}`); } });
+  unlockQ(v, lane.id); jackPark(v); v.do(() => jackJob(v, v.bs, lane));
+  v.q.push(...q0); }
+function jackPark(v) {
+  const pk = v.park; go(v, pk.X, pk.Z, pk.th, -1, { vmax: 0.8, R: 0.9, label: 'Park' });
+  v.do(() => { v.state = 'Parked'; v.task = 'Parked · operator scanning labels'; v.obj.userData.setHandleAngle(0); const op = v.obj.userData.detachOperator(); if (op) { world.attach(op); v.offOp = op; op.userData.detachHands && op.userData.detachHands(); walkOff(op, v); } })
+    .until(() => !v.offOp, 'Operator away')
+    .do(() => { v.obj.userData.setHandleAngle(-0.28); v.state = 'Moving'; });
+}
+const HJ = [makeJack('HJ-01', sx(54), sz(51.2), HD.E), makeJack('HJ-02', sx(57.5), sz(51.2), HD.E)];
+HJ[0].bs = BS[0]; HJ[0].lane = OL5; HJ[0].park = { X: sx(54), Z: sz(50.9), th: HD.E };
+HJ[1].bs = BS[1]; HJ[1].lane = OL3; HJ[1].park = { X: sx(57.5), Z: sz(50.9), th: HD.E };
+HJ.forEach((v, i) => v.wait(0.5 + i * 3).do(() => jackJob(v, v.bs, v.lane)));
+const QA_A = { id: 'HOLD-01', X: sx(41.5), Y: FLOOR, Z: sz(4.6) }, QA_B = { id: 'HOLD-02', X: sx(41.5), Y: FLOOR, Z: sz(9.4) };
+LOC.set(QA_A.id, QA_A); LOC.set(QA_B.id, QA_B);
+const HJ3 = makeJack('HJ-03', sx(43.6), sz(7.0), HD.N); HJ3.park = { X: sx(43.6), Z: sz(7.0), th: HD.N };
+{ const p = newPallet('half'); placePal(p, QA_A); QA_A.pal = p; }
+function hj3Job(v) { const [A, B] = QA_A.pal ? [QA_A, QA_B] : [QA_B, QA_A], pal = A.pal; v.state = 'Moving'; v.task = `${A.id} → ${B.id}`;
+  const th = B.Z < A.Z ? HD.N : HD.S; // pull-first travel needs the pallet picked facing away from the target
+  const thPick = th === HD.N ? HD.S : HD.N;
+  jackApproach(v, A, thPick); pickAt(v, pal, A, thPick, { AP: 0.9, onPick: () => { A.pal = null; } });
+  v.do(() => { const r = refFor(v, B, thPick); const [fx, fz] = fwdOf(thPick); v.q.unshift({ k: 'drive', X: r.x - fx * 0.0, Z: r.z, th: thPick, gear: -1, vmax: 0.9, label: 'Pulling to ' + B.id, lead: 2 }); });
+  v.do((f) => { f.obj.userData.release(); }).until((f) => tineTopY(f) <= B.Y + DECK_UNDER + 0.0005 || !f.obj.userData.isPumping())
+    .do(() => { slotAssert('drop', v, pal, B); world.attach(pal); v.carry = null; B.pal = pal; pal.userData.loc = B.id; }).until((f) => !f.obj.userData.isPumping());
+  v.do(() => { const r = refFor(v, B, thPick), [fx, fz] = fwdOf(thPick); v.q.unshift({ k: 'drive', X: r.x - fx * 0.9, Z: r.z - fz * 0.9, th: thPick, gear: -1, vmax: 0.6, label: 'Back out', lead: 0 }); });
+  jackPark(v); v.do(() => hj3Job(v)); }
+HJ3.wait(2).do(() => hj3Job(HJ3));
+function makeWalkie(id, x, y0, y1) {
+  const v = makeMHE(id, 'Walkie stacker', createWalkieStacker({ autoLift: false }), sx(x), sz(y1 + 3.2), HD.S, { R: 0.9, vmax: 1.1, acc: 0.6, walkBehind: true, steerRate: 2.0, Lc: 0.6 });
+  v.obj.userData.setForkHeight(0.06, true); measureForks(v, false); v.obj.userData.setTiller && v.obj.userData.setTiller(-0.9);
+  v.A = { id: id + '-A', X: sx(x), Y: FLOOR, Z: sz(y0) }; v.B = { id: id + '-B', X: sx(x), Y: FLOOR, Z: sz(y1) }; LOC.set(v.A.id, v.A); LOC.set(v.B.id, v.B); return v;
+}
+function wsJob(v) { // forks face south; the operator pulls north (handle first) and pushes into position
+  const full = v.A.pal ? v.A : v.B, empty = full === v.A ? v.B : v.A, pal = full.pal; v.state = 'Replenishment'; v.task = `${full.id} → ${empty.id}`;
+  pickAt(v, pal, full, HD.S, { AP: 0.9, onPick: () => { full.pal = null; } }); v.liftTo((f) => hTravel(f));
+  v.do(() => { const r = refFor(v, empty, HD.S); v.q.unshift({ k: 'drive', X: r.x, Z: r.z - 0.9, th: HD.S, gear: Math.sign(v.z - (r.z - 0.9)) < 0 ? 1 : -1, vmax: 1.0, label: 'To ' + empty.id, lead: 3 }); });
+  dropAt(v, empty, HD.S, { AP: 0.9, noApproach: true, onDrop: (p) => { empty.pal = p; } }); v.liftTo((f) => hFor(f, FLOOR + 0.06));
+  v.wait(4).do(() => wsJob(v)); }
+const WS = [makeWalkie('WS-01', 60.25, 19.0, 41.0), makeWalkie('WS-02', 61.75, 41.0, 19.0)];
+WS.forEach((v, i) => { const p = newPallet(i ? 'half' : 'full'); placePal(p, v.B); v.B.pal = p; v.wait(i * 2).do(() => wsJob(v)); });
+const TUG = (() => { const o = createTugTrain({}); shadowAll(o); world.add(o); const ud = o.userData; if (ud.attachOperator && !ud.operator) ud.attachOperator();
+  const P = ud.parts; (P.carts || []).forEach((c, i) => { for (let j = 0; j < 4; j++) { const t = createTote({ color: j % 2 ? 0x2a6ab4 : 0x1f2833 }); t.scale.setScalar(0.9); t.position.set((j % 2 ? 0.22 : -0.22), 0.55 + Math.floor(j / 2) * 0.3, 0); (c.body || c.pivot).add(t); } });
+  const pts = []; const R = 1.9, xL = 45.6, xR = 49.4, y0 = 13.5 + R, y1 = 42.5 - R, cx = (xL + xR) / 2;
+  for (let y = y0; y <= y1; y += 0.5) pts.push([xR, y]); for (let a = 0; a <= Math.PI; a += 0.1) pts.push([cx + R * Math.cos(a), y1 + R * Math.sin(a)]);
+  for (let y = y1; y >= y0; y -= 0.5) pts.push([xL, y]); for (let a = Math.PI; a <= 2 * Math.PI; a += 0.1) pts.push([cx + R * Math.cos(a), y0 + R * Math.sin(a)]);
+  const path = pts.map(([x, y]) => V3(sx(x), 0, sz(y)));
+  o.position.set(sx(xR), FLOOR, sz(24) + 0.55); o.rotation.y = HD.N;
+  return { id: 'TUG-01', type: 'Tugger train', obj: o, path, i: 0, v: 0, stopT: 0, stops: [V3(sx(xR), 0, sz(20)), V3(sx(xL), 0, sz(36))], state: 'Tote run', task: 'XDK loop · 8 totes' }; })();
+POP.movers.push(TUG);
+function purePursuit(m, dt, vmax, look = 2.2) {
+  const o = m.obj, k = o.userData.kin, th = o.rotation.y, rx = o.position.x + Math.sin(th) * k.refZ, rz = o.position.z + Math.cos(th) * k.refZ;
+  let best = m.i, bd = 1e9; for (let j = 0; j < 30; j++) { const q = m.path[(m.i + j) % m.path.length], d = (q.x - rx) ** 2 + (q.z - rz) ** 2; if (d < bd) { bd = d; best = (m.i + j) % m.path.length; } } m.i = best;
+  let tj = best; for (let j = 0; j < m.path.length; j++) { const q = m.path[(best + j) % m.path.length]; if (Math.hypot(q.x - rx, q.z - rz) >= look) { tj = (best + j) % m.path.length; break; } }
+  const q = m.path[tj], ang = Math.atan2(q.x - rx, q.z - rz) - th, a = Math.atan2(Math.sin(ang), Math.cos(ang)), Ld = Math.hypot(q.x - rx, q.z - rz);
+  const steer = Math.atan(2 * k.L * Math.sin(a) / Math.max(0.5, Ld));
+  m.v = m.hold ? Math.max(0, m.v - 1.6 * dt) : m.v + clamp(vmax - m.v, -1.2 * dt, 0.6 * dt);
+  const p0x = o.position.x, p0z = o.position.z; mdlDrive(o, dt, m.v, steer); m.ds = Math.hypot(o.position.x - p0x, o.position.z - p0z);
+  m.x = rx; m.z = rz;
+}
+function tugStep(dt) { const m = TUG; let vmax = 1.5;
+  if (m.stopT > 0) { m.stopT -= dt; vmax = 0; m.state = 'Tote transfer'; } else { m.state = 'Tote run'; for (const s of m.stops) { const d = Math.hypot(m.obj.position.x - s.x, m.obj.position.z - s.z); if (d < 0.25 && !m.atStop) { m.stopT = 7; m.atStop = s; } if (m.atStop === s && d > 2) m.atStop = null; if (d < 3 && !m.atStop) vmax = Math.min(vmax, 0.3 + d * 0.35); } }
+  purePursuit(m, dt, vmax); }
+function makeYard(id, zA, zB) { const o = createYardTractor({}); shadowAll(o); world.add(o); const ud = o.userData; if (ud.attachOperator && !ud.operator) ud.attachOperator();
+  const R = (zB - zA) / 2, xa = -40, xb = 14, cz = (zA + zB) / 2, pts = [];
+  for (let x = xa; x <= xb; x += 1) pts.push([x, zA]); for (let a = -Math.PI / 2; a <= Math.PI / 2; a += 0.08) pts.push([xb + R * Math.cos(a), cz + R * Math.sin(a)]);
+  for (let x = xb; x >= xa; x -= 1) pts.push([x, zB]); for (let a = Math.PI / 2; a <= 1.5 * Math.PI; a += 0.08) pts.push([xa + R * Math.cos(a), cz + R * Math.sin(a)]);
+  const path = pts.map(([x, z]) => V3(x, 0, z)); o.position.set(-10, 0, zA); o.rotation.y = HD.E;
+  const m = { id, type: 'Yard tractor', obj: o, path, i: 0, v: 0, state: 'Yard move', task: 'Shunting · yard loop', yard: true }; POP.movers.push(m); return m; }
+const YT = [makeYard('YT-01', 57, 69), makeYard('YT-02', -69, -57)];
+function makePed(id, role, o = {}) { const w = createWorker({ vest: o.vest ?? 'yellow', hardHat: o.hardHat ?? true, seed: PSEED++ }); shadowAll(w); world.add(w);
+  const p = { id, role, o: w, route: o.route, i: 0, wait: 0, speed: o.speed ?? 1.15, task: o.task || role, state: 'Walking', carry: null, onArrive: o.onArrive };
+  const [x, y] = o.route[0]; w.position.set(sx(x), FLOOR, sz(y)); POP.peds.push(p); return p; }
+const PICK_FACES_W = [19.1, 22, 24.9, 27.8, 30.7, 33.6, 36.5, 39.4], PICK_FACES_E = PICK_FACES_W;
+function pickerRoute(xFace, xConv, ys) { const r = []; for (const y of ys) { r.push([xFace, y, 3.5, 'pick']); r.push([xConv, y + 0.4, 1.2, 'place']); } return r; }
+const PEDS = [
+  makePed('PK-11', 'Picker', { route: pickerRoute(53.9, 52.9, [19.1, 24.9, 30.7, 36.5]), task: 'Case pick · face 57W → takeaway C-52' }),
+  makePed('PK-12', 'Picker', { route: pickerRoute(53.9, 52.9, [39.4, 33.6, 27.8, 22.0]), task: 'Case pick · face 57W → takeaway C-52' }),
+  makePed('PK-21', 'Picker', { route: pickerRoute(68.0, 69.2, [20.0, 26.0, 32.0, 38.0]), vest: 'blue', task: 'Pick-to-tote · face 65E → C-70' }),
+  makePed('PK-22', 'Picker', { route: pickerRoute(68.0, 69.2, [41.0, 35.0, 29.0, 23.0]), vest: 'blue', task: 'Pick-to-tote · face 65E → C-70' }),
+  makePed('BL-01', 'Pallet builder', { route: [[56.6, 49.9, 2.5, 'take'], [56.0, 51.9, 1.6, 'stack:0']], task: 'Build BLD-01 from sorter chute 7' }),
+  makePed('BL-02', 'Pallet builder', { route: [[59.0, 49.9, 2.5, 'take'], [59.5, 51.9, 1.6, 'stack:1']], task: 'Build BLD-02 from sorter chute 8' }),
+  makePed('WR-01', 'Wrap operator', { route: [[63.4, 58.6, 6, ''], [64.2, 58.2, 4, '']], task: 'Stretch wrapper WRAP-01' }),
+  makePed('RF-02', 'Receiver (RF)', { route: [[17.3, 9.4, 4, 'scan'], [17.3, 5.0, 4, 'scan']], task: 'Receive & label STG-DR002' }),
+  makePed('RF-07', 'Receiver (RF)', { route: [[37.3, 5.0, 4, 'scan'], [37.3, 9.4, 4, 'scan']], task: 'Receive & label STG-DR007' }),
+  makePed('DC-01', 'Dock checker', { route: [[12.2, 1.2, 5, 'scan'], [20.5, 1.2, 5, 'scan']], task: 'Seal & temp check DR-002 / DR-005' }),
+  makePed('DC-02', 'Dock checker', { route: [[30.5, 60.6, 5, 'scan'], [39.5, 60.6, 5, 'scan']], task: 'Load audit DS-103 / DS-105' }),
+  makePed('IC-01', 'Inventory control', { route: [[22.1, 17, 3, 'scan'], [22.1, 30, 3, 'scan'], [22.1, 42, 3, 'scan']], vest: 'blue', task: 'Cycle count aisle 04/05 faces' }),
+  makePed('GU-01', 'Gate guard', { route: [[149.5, 38.5, 6, ''], [147.6, 38.0, 5, '']], vest: 'orange', hardHat: false, task: 'Gatehouse · seal checks' }),
+  makePed('SP-01', 'Shipping lead', { route: [[45.5, 53.0, 4, 'scan'], [47.5, 58.0, 4, 'scan'], [41.2, 52.4, 3, 'scan']], task: 'Wave 14 · DS-103/105 loads' }),
+];
+{ const g = PEDS.find((p) => p.id === 'GU-01'); g.route = [[100 + 50 - 1.5, 31 - 70 - 1.0 + 0.0, 6, ''], [100 + 50 + 1.0, 31 - 70 + 3.2, 5, '']]; const [x, y] = g.route[0]; g.o.position.set(sx(x), 0, sz(y)); g.floor = 0; }
+function convAdd(mesh, x, y) { mesh.position.set(sx(x), FLOOR + 0.85 + 0.17, sz(y)); world.add(mesh); POP.conv.push({ m: mesh, x }); }
+const TOTE_COLORS = [0x2a6ab4, 0x1f2833];
+function pedArrive(p, act) {
+  const w = p.o, ud = w.userData;
+  if (act === 'pick' || act === 'take') { if (!p.carry) { p.carry = caseMesh(); p.carry.position.set(0, 1.05, 0.34); w.add(p.carry); } }
+  else if (act === 'place' && p.carry) { const m = p.carry; p.carry = null; const xc = p.route[p.i][0] < 60 ? 52 : 70; world.attach(m); m.rotation.set(0, 0, 0); convAdd(m, xc, sz(m.position.z) === undefined ? 0 : 31 - m.position.z);
+    if (xc === 70 && rnd() < 0.5) { const t = createTote({ color: pick(TOTE_COLORS) }); shadowAll(t); t.scale.setScalar(0.9); convAdd(t, 70, 31 - m.position.z - 0.7); } }
+  else if (act && act.startsWith('stack') && p.carry) { const b = BS[+act.split(':')[1]]; if (b.pal && b.state === 'building') { const m = p.carry; p.carry = null; addCase(b, m); } }
+}
+function pedStep(p, dt) {
+  const w = p.o, ud = w.userData, r = p.route[p.i], tx = sx(r[0]), tz = sz(r[1]), dx = tx - w.position.x, dz = tz - w.position.z, d = Math.hypot(dx, dz);
+  if (p.wait > 0) { p.wait -= dt; ud.setWalking && ud.setWalking(false); p.state = r[3] === 'scan' ? 'Scanning' : r[3] === 'pick' ? 'Picking' : 'Working';
+    if (r[3] === 'scan' || r[3] === 'pick') { ud.parts.armRight.rotation.x = -1.1; }
+    if (p.wait <= 0) { p.i = (p.i + 1) % p.route.length; } return; }
+  if (d < 0.05) { p.wait = r[2]; pedArrive(p, r[3]); return; }
+  let yieldTo = null; for (const v of ALLMOVERS()) { const vx = v.obj.position.x, vz = v.obj.position.z, dd = Math.hypot(vx - w.position.x, vz - w.position.z); if (dd < 2.6 && Math.abs(v.v || 0) > 0.05) { const ahead = (vx - w.position.x) * dx + (vz - w.position.z) * dz; if (ahead > 0) { yieldTo = v; break; } } }
+  if (yieldTo) { ud.setWalking && ud.setWalking(false); p.state = 'Yielding to ' + yieldTo.id; return; }
+  const s = Math.min(d, p.speed * dt); w.position.x += dx / d * s; w.position.z += dz / d * s; p.state = 'Walking';
+  const yaw = Math.atan2(dx, dz); w.rotation.y += Math.atan2(Math.sin(yaw - w.rotation.y), Math.cos(yaw - w.rotation.y)) * Math.min(1, dt * 8);
+  if (ud.setWalking) ud.setWalking(true); ud.walkSpeed = p.speed;
+}
+function postPedPose(p) { const P = p.o.userData.parts; if (p.carry) { P.armLeft.rotation.x = P.armRight.rotation.x = -1.15; } }
+function walkOff(op, v) {
+  const home = op.position.clone(), away = home.clone().add(V3(Math.cos(v.th) * 3.5, 0, -Math.sin(v.th) * 3.5));
+  op.userData.setPose && op.userData.setPose('walking-tiller');
+  const p = { id: v.id + '-OP', role: 'Jack operator', o: op, phase: 0, t: 0, home, away, v };
+  p.step = (dt) => { const tgt = p.phase === 0 ? away : p.phase === 2 ? home : null;
+    if (p.phase === 1) { p.t += dt; if (p.t > 4) p.phase = 2; return; }
+    const d = tgt.clone().sub(op.position); d.y = 0; const L = d.length();
+    if (L < 0.05) { if (p.phase === 0) { p.phase = 1; p.t = 0; } else { // re-attach to the tiller
+        POP.walkers.splice(POP.walkers.indexOf(p), 1); v.obj.userData.attachOperator(op); v.offOp = null; } return; }
+    const s = Math.min(L, 1.1 * dt); op.position.addScaledVector(d.normalize(), s); const yaw = Math.atan2(d.x, d.z); op.rotation.y = yaw; };
+  (POP.walkers ||= []).push(p);
+}
+POP.walkers = POP.walkers || [];
+const ALLMOVERS = () => [...VEH.filter((v) => !v.isSemi), ...POP.movers];
+function proximityHolds() {
+  const L = ALLMOVERS();
+  for (const v of L) { v.hold = false; const sp = v.sv ?? v.v ?? 0; if (Math.abs(sp) < 0.02 && !(v.cur && v.cur.k === 'drive')) continue;
+    const th = v.obj.rotation.y + ((v.sv ?? 1) < 0 ? Math.PI : 0), fx = Math.sin(th), fz = Math.cos(th), px = v.obj.position.x, pz = v.obj.position.z;
+    for (const u of L) { if (u === v) continue; const dx = u.obj.position.x - px, dz = u.obj.position.z - pz, along = dx * fx + dz * fz, lat = Math.abs(dx * fz - dz * fx);
+      if (along > 0.5 && along < 3.2 && lat < 1.3 && (u.id > v.id || Math.abs(u.sv ?? u.v ?? 0) < 0.02)) { v.hold = true; break; } }
+    if (!v.hold) for (const p of POP.peds) { const dx = p.o.position.x - px, dz = p.o.position.z - pz, along = dx * fx + dz * fz, lat = Math.abs(dx * fz - dz * fx); if (along > 0.3 && along < 2.4 && lat < 0.9) { v.hold = true; break; } }
+    if (v.hold) { v.holdT = (v.holdT || 0) + STEP_POP; if (v.holdT > 5) { v.hold = false; v.holdT = 0; } } else v.holdT = 0; }
+}
+const STEP_POP = 1 / 60;
+function walkBehindPose(v) {
+  const op = v.obj.userData.operator; if (!op) return; const pulling = (v.sv || 0) < -0.05;
+  const tgt = pulling ? Math.PI : 0; op.rotation.y += Math.atan2(Math.sin(tgt - op.rotation.y), Math.cos(tgt - op.rotation.y)) * 0.12;
+  op.position.z += ((pulling ? -0.35 : 0) - op.position.z) * 0.12;
+  const ud = v.obj.userData; if (v.isJack && !ud.isPumping()) ud.setHandleAngle(Math.abs(v.sv || 0) > 0.05 ? -0.55 : -0.28);
+  if (ud.setTiller) ud.setTiller(Math.abs(v.sv || 0) > 0.05 ? -0.95 : -0.7);
+}
+popStep = function (dt) {
+  proximityHolds();
+  tugStep(dt); for (const m of YT) purePursuit(m, dt, 3.2, 4.5);
+  for (const m of POP.movers) m.obj.userData.update && m.obj.userData.update(dt, SIMT);
+  for (const v of POP.veh) if (v.walkBehind) walkBehindPose(v);
+  for (const p of POP.peds) { pedStep(p, dt); p.o.userData.update && p.o.userData.update(dt, SIMT); postPedPose(p); }
+  for (const p of POP.walkers.slice()) { p.step(dt); }
+  for (let i = POP.conv.length - 1; i >= 0; i--) { const c = POP.conv[i]; c.m.position.z -= 0.6 * dt; const y = 31 - c.m.position.z; if (y > 43.6) { c.m.position.y -= 0.6 * dt; if (y > 44.2) { world.remove(c.m); POP.conv.splice(i, 1); } } }
+  for (const m of POP.movers) if (m.ds > 1e-5 && !isManned(m.obj)) { ASSERT.unmanned = (ASSERT.unmanned || 0) + 1; console.warn('[ASSERT] unmanned-motion ' + m.id); }
+  for (const v of VEH) if (Math.abs(v.ds || 0) > 1e-5 && !isManned(v.obj)) { ASSERT.unmanned = (ASSERT.unmanned || 0) + 1; console.warn('[ASSERT] unmanned-motion ' + v.id); }
+}
+const ENTITIES = () => [...VEH.map((v) => ({ id: v.id, type: v.type, state: v.state, task: v.task, obj: v.obj })), ...POP.movers.map((m) => ({ id: m.id, type: m.type, state: m.state, task: m.task, obj: m.obj })), ...POP.peds.map((p) => ({ id: p.id, type: p.role, state: p.state, task: p.task, obj: p.o }))];
+window.__ents = ENTITIES;
+console.info('[gf] population', { vehicles: VEH.length, movers: POP.movers.length, workers: POP.peds.length });
+
+} catch (e) { console.warn('[gf] population layer disabled:', e && e.message); }
+let SIGNS = null; try { SIGNS = COOKER_SIGNS.create(world, { floorY: FLOOR, ceiling: 12.6 }); world.traverse((m) => { if (m.isMesh && m.parent && /sign/i.test(m.parent.name + m.name) && m.material && !Array.isArray(m.material)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = -1; m.material.polygonOffsetUnits = -1; } }); } catch (e) { console.warn('[gf] signs', e && e.message); }
 
 await __yield(72, "fleet & people");
 
@@ -4389,6 +4980,7 @@ function tourTick(dt) {
 function simStep(dt) {
   SIMT += dt;
   for (const v of VEH) { v.px = v.x; v.pz = v.z; v.pth = v.th; v.step(dt); v.obj.userData.update && v.obj.userData.update(dt, SIMT); }
+  try { popStep(dt); if (SIGNS && SIGNS.update) SIGNS.update(dt); if (WRAP0() && WRAP0().update) WRAP0().update(dt); } catch (e) { if (!simStep.err) { simStep.err = 1; console.warn("[gf] popStep", e && e.message); } }
   updateDoors(dt); updateCases(dt); uiTick(); tourTick(dt);
   for (const a of AMRS) { a.u = (a.u + 1.1 * dt / a.L) % 1; }
   if (ARR.gateOpen !== undefined) { const arm = world.userData.gate.userData.arm; arm.rotation.x = dampV(arm.rotation.x, ARR.gateOpen && ARR.state !== 'Docked' ? -1.4 : 0, 2, dt); }
@@ -4404,8 +4996,10 @@ function render(alpha, draw = true) {
   if (composer) composer.render(); else renderer.render(scene, camera);
 }
 function frame(now) {
-  const dt = Math.min(0.5, (now - last) / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21) last = now; acc += dt * speed;
-  let n = 0; while (acc >= STEP && n < 60 * 4) { simStep(STEP); acc -= STEP; n++; }
+  const dt = Math.min(0.5, (now - last) / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21)
+  last = now; acc += dt * speed;
+  let n = 0; while (acc >= STEP && n < 8) { simStep(STEP); acc -= STEP; n++; }
+  if (n >= 8) acc = 0;
   controls.update(); render(acc / STEP); if (!QS.has('capture')) requestAnimationFrame(frame);
 }
 window.__step = (dt) => { let k = Math.round(dt / STEP); while (k-- > 0) simStep(STEP); };
