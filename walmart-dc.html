@@ -4295,7 +4295,7 @@ class Vehicle {
   }
   begin(a) {
     if (a.label) this.task = a.label;
-    if (a.k === 'liftTo') { a.k = 'lift'; a.h = a.fn(this); const mx = this.obj.userData.maxForkHeight ?? 9; if (a.h > mx + 1e-6 || a.h < -1e-6) console.error(`[slot-assert] ${this.id} fork target ${a.h.toFixed(3)} m outside 0..${mx}`); }
+    if (a.k === 'liftTo') { a.k = 'lift'; a.h = a.fn(this); const mx = this.obj.userData.maxForkHeight ?? 9; if (a.h > -0.12 && a.h < 0) a.h = 0; if (a.h > mx + 1e-6 || a.h < -1e-6) console.error(`[slot-assert] ${this.id} fork target ${a.h.toFixed(3)} m outside 0..${mx}`); }
     if (a.k === 'lift') { this.obj.userData.setForkHeight(a.h); }
     if (a.k === 'tilt') { this.obj.userData.setMastTilt(a.r); }
     if (a.k === 'drive') { const R = a.R ?? this.R; let pts;

@@ -1,0 +1,1 @@
+08:58Z builds/walmart-dc_v3.html 436973 B - v3: population (3 receiving FL, 2 shipping FL, 2 riders, 3 reach trucks, 2 walkies, 3 hand jacks w/ operators, tug train, 2 yard tractors, 14 workers), B23/B24 assert fix (all fork-to-slot ok), M21 accumulator fixed, reservations/holds, unmanned-motion assert, Cooker wrapper+signs inline

@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-25T04:39:29",
+ "generated": "2026-10-25T04:58:59",
  "units": "metres (1 unit = 1 m), real-world scale",
  "up": "+Y",
  "facing": "+Z = vehicle/asset front",
@@ -26,15 +26,61 @@
   "amr": "autonomous mobile robot, no operator position",
   "robot_arm": "stationary, not a vehicle"
  },
- "total_bytes": 1625616,
+ "material_merge": {
+  "applied_to": [
+   "amr",
+   "forklift_counterbalance",
+   "pallet_stacker_auto",
+   "reach_truck",
+   "tug_cart_train",
+   "walmart_truck"
+  ],
+  "rule": "per animatable node (pivot Empty), all static sub-meshes merged by material: opaque untextured colours -> one clay_palette material (base-colour + metallic-roughness palette PNG/WebP, per-face UVs collapsed to texel centres, NEAREST sampling: do not change the sampler/filters); livery decals + brand solids + lamps -> one brand_atlas material (decal atlas + emissive-mask atlas, emissiveStrength = brightest lamp). Transparent materials kept separate. Result: 1-2 draws per animatable node."
+ },
+ "checks": {
+  "r170": {
+   "page": "/workspace/tools/verify/web/check.html",
+   "three_revision": "170",
+   "all_pass": true
+  },
+  "r160": {
+   "page": "/workspace/tools/verify/web/check160.html (three@0.160.0 npm GLTFLoader + examples/jsm/libs/meshopt_decoder.module.js)",
+   "three_revision": "160",
+   "all_pass": true,
+   "console": []
+  },
+  "r160_data_uri": {
+   "page": "src/qa/datauri_check_r160.html (single self-contained page, every GLB inlined as data:model/gltf-binary;base64, three@0.160.0 from unpkg)",
+   "three_revision": "160",
+   "all_pass": true,
+   "modes": [
+    "GLTFLoader.loadAsync(dataURI)",
+    "GLTFLoader.parse(ArrayBuffer)"
+   ],
+   "network_requests": [
+    "(page)",
+    "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
+    "https://unpkg.com/three@0.160.0/examples/jsm/libs/meshopt_decoder.module.js",
+    "https://unpkg.com/three@0.160.0/examples/jsm/utils/BufferGeometryUtils.js"
+   ],
+   "foreign_requests": [],
+   "console": [],
+   "page_bytes": 2117533
+  }
+ },
+ "total_bytes": 1583528,
+ "total_bytes_base64": 2111392,
  "count": 21,
  "assets": [
   {
    "file": "amr.glb",
-   "bytes": 59704,
-   "bytes_raw": 367920,
+   "bytes": 53084,
+   "bytes_base64": 70780,
+   "data_uri_chars": 70810,
+   "bytes_raw": 189176,
    "tris": 6180,
-   "draw_calls": 30,
+   "draw_calls": 15,
    "size_m": [
     0.792,
     0.364,
@@ -139,14 +185,12 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "amr_led_cyan",
-    "amr_led_red",
-    "brand_blue",
-    "brand_yellow"
+    "brand_atlas"
    ],
-   "textures": 0,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_materials_emissive_strength",
     "KHR_mesh_quantization"
    ],
@@ -160,9 +204,47 @@
     "ground_shift": 0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 15,
+     "tris": 6180
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "amr_charcoal",
+     "amr_body",
+     "tread_black",
+     "amr_grey"
+    ],
+    "atlas_textures": [],
+    "atlas_solid": [
+     "brand_blue",
+     "brand_yellow",
+     "amr_led_cyan",
+     "amr_led_red"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     16
+    ],
+    "atlas_px": [
+     512,
+     64
+    ],
+    "emissive_strength": 5.0,
+    "uv_warnings": []
    },
    "imgref": [
     "14_iso_cutaway_orange_base.jpg",
@@ -173,6 +255,8 @@
   {
    "file": "cage.glb",
    "bytes": 32716,
+   "bytes_base64": 43624,
+   "data_uri_chars": 43654,
    "bytes_raw": 228148,
    "tris": 3656,
    "draw_calls": 6,
@@ -238,10 +322,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 6,
+     "tris": 3656
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg",
     "03_interior_orange_racks_mezzanine.jpg"
@@ -251,6 +348,8 @@
   {
    "file": "case_stack_loose.glb",
    "bytes": 15408,
+   "bytes_base64": 20544,
+   "data_uri_chars": 20574,
    "bytes_raw": 68268,
    "tris": 1008,
    "draw_calls": 6,
@@ -305,10 +404,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 6,
+     "tris": 1008
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg"
    ],
@@ -317,6 +429,8 @@
   {
    "file": "dock_door.glb",
    "bytes": 36292,
+   "bytes_base64": 48392,
+   "data_uri_chars": 48422,
    "bytes_raw": 213088,
    "tris": 3480,
    "draw_calls": 14,
@@ -392,10 +506,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 14,
+     "tris": 3480
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "02_exterior_docks_walmartcom_trailers.png",
     "01_interior_dock_forklifts.jpg",
@@ -406,6 +533,8 @@
   {
    "file": "drums.glb",
    "bytes": 73852,
+   "bytes_base64": 98472,
+   "data_uri_chars": 98502,
    "bytes_raw": 750112,
    "tris": 11040,
    "draw_calls": 9,
@@ -471,10 +600,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 9,
+     "tris": 11040
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg",
     "15_iso_dock_cutaway_trucks.jpg"
@@ -483,10 +625,12 @@
   },
   {
    "file": "forklift_counterbalance.glb",
-   "bytes": 203148,
-   "bytes_raw": 1577476,
+   "bytes": 188772,
+   "bytes_base64": 251696,
+   "data_uri_chars": 251726,
+   "bytes_raw": 919704,
    "tris": 24528,
-   "draw_calls": 37,
+   "draw_calls": 13,
    "size_m": [
     1.34,
     2.318,
@@ -617,11 +761,12 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "beacon_orange"
+    "brand_atlas"
    ],
-   "textures": 0,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_materials_emissive_strength",
     "KHR_mesh_quantization"
    ],
@@ -635,9 +780,59 @@
     "ground_shift": 0.00807
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 13,
+     "tris": 24528
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "fl_yellow",
+     "fl_charcoal",
+     "fl_black",
+     "knob_red",
+     "fl_guard",
+     "mirror_glass",
+     "lpg_red",
+     "steel_light",
+     "valve_red",
+     "sticker_yellow",
+     "tyre",
+     "fl_rim",
+     "hub_dark",
+     "fl_mast",
+     "chain",
+     "fl_fork"
+    ],
+    "atlas_textures": [],
+    "atlas_solid": [
+     "lamp_red",
+     "lamp_amber",
+     "lamp_white",
+     "beacon_orange"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     32
+    ],
+    "atlas_px": [
+     512,
+     64
+    ],
+    "emissive_strength": 6.0,
+    "uv_warnings": []
    },
    "imgref": [
     "13_forklift_detail.jpg",
@@ -649,6 +844,8 @@
   {
    "file": "pallet_bluewood.glb",
    "bytes": 31064,
+   "bytes_base64": 41420,
+   "data_uri_chars": 41450,
    "bytes_raw": 214772,
    "tris": 3552,
    "draw_calls": 5,
@@ -704,10 +901,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 5,
+     "tris": 3552
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "11_pallet_blue_wood.jpg"
    ],
@@ -716,6 +926,8 @@
   {
    "file": "pallet_jack.glb",
    "bytes": 42380,
+   "bytes_base64": 56508,
+   "data_uri_chars": 56538,
    "bytes_raw": 221736,
    "tris": 3560,
    "draw_calls": 18,
@@ -829,10 +1041,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 18,
+     "tris": 3560
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "20_hand_pallet_pump_truck.jpg",
     "01_interior_dock_forklifts.jpg",
@@ -842,24 +1067,26 @@
   },
   {
    "file": "pallet_load_half.glb",
-   "bytes": 52672,
-   "bytes_raw": 346644,
-   "tris": 5612,
+   "bytes": 68744,
+   "bytes_base64": 91660,
+   "data_uri_chars": 91690,
+   "bytes_raw": 398204,
+   "tris": 7052,
    "draw_calls": 12,
    "size_m": [
-    1.216,
-    0.825,
-    1.016
+    1.268,
+    0.829,
+    1.068
    ],
    "bbox_min": [
-    -0.608,
+    -0.634,
     0,
-    -0.508
+    -0.534
    ],
    "bbox_max": [
-    0.608,
-    0.825,
-    0.508
+    0.634,
+    0.829,
+    0.534
    ],
    "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
    "sides": null,
@@ -891,13 +1118,16 @@
    "node_notes": {
     "pallet": "pallet (merged), origin ground centre",
     "load": "cartons + tape + labels (merged); hide/show to load/unload",
-    "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+    "film": "stretch film: glossy translucent shell (material stretch_film: roughness 0.12, alpha 0.36-0.62 from the banded RGBA webp film_bands, blue-white tint, specular streaks) 10 mm off the cartons + bunched rolled lip overhanging the top edge; alphaMode BLEND, double-sided"
    },
    "animations": [],
-   "materials_toneMapped_false": [],
-   "textures": 0,
+   "materials_toneMapped_false": [
+    "brand_blue"
+   ],
+   "textures": 1,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_mesh_quantization"
    ],
    "qa_blender": {
@@ -906,13 +1136,27 @@
     "zfight_samples": [],
     "open_edges": 0,
     "open_by_node": {},
+    "open_samples": [],
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 12,
+     "tris": 7052
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg"
    ],
@@ -921,6 +1165,8 @@
   {
    "file": "pallet_load_partial.glb",
    "bytes": 53928,
+   "bytes_base64": 71904,
+   "data_uri_chars": 71934,
    "bytes_raw": 365228,
    "tris": 5904,
    "draw_calls": 11,
@@ -981,10 +1227,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 11,
+     "tris": 5904
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg",
     "06_aisle_blue_racks.jpg"
@@ -993,24 +1252,26 @@
   },
   {
    "file": "pallet_load_wrapped.glb",
-   "bytes": 66696,
-   "bytes_raw": 461916,
-   "tris": 7484,
+   "bytes": 81624,
+   "bytes_base64": 108832,
+   "data_uri_chars": 108862,
+   "bytes_raw": 513468,
+   "tris": 8924,
    "draw_calls": 12,
    "size_m": [
-    1.216,
-    1.503,
-    1.016
+    1.268,
+    1.507,
+    1.068
    ],
    "bbox_min": [
-    -0.608,
+    -0.634,
     0,
-    -0.508
+    -0.534
    ],
    "bbox_max": [
-    0.608,
-    1.503,
-    0.508
+    0.634,
+    1.507,
+    0.534
    ],
    "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
    "sides": null,
@@ -1042,13 +1303,16 @@
    "node_notes": {
     "pallet": "pallet (merged), origin ground centre",
     "load": "cartons + tape + labels (merged); hide/show to load/unload",
-    "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+    "film": "stretch film: glossy translucent shell (material stretch_film: roughness 0.12, alpha 0.36-0.62 from the banded RGBA webp film_bands, blue-white tint, specular streaks) 10 mm off the cartons + bunched rolled lip overhanging the top edge; alphaMode BLEND, double-sided"
    },
    "animations": [],
-   "materials_toneMapped_false": [],
-   "textures": 0,
+   "materials_toneMapped_false": [
+    "brand_blue"
+   ],
+   "textures": 1,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_mesh_quantization"
    ],
    "qa_blender": {
@@ -1057,13 +1321,27 @@
     "zfight_samples": [],
     "open_edges": 0,
     "open_by_node": {},
+    "open_samples": [],
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 12,
+     "tris": 8924
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "01_interior_dock_forklifts.jpg",
     "14_iso_cutaway_orange_base.jpg",
@@ -1074,6 +1352,8 @@
   {
    "file": "pallet_pine.glb",
    "bytes": 31056,
+   "bytes_base64": 41408,
+   "data_uri_chars": 41438,
    "bytes_raw": 214760,
    "tris": 3552,
    "draw_calls": 5,
@@ -1129,10 +1409,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 5,
+     "tris": 3552
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "09_pallet_wood_euro.jpg",
     "10_pallet_wood_stacked.jpg"
@@ -1141,10 +1434,12 @@
   },
   {
    "file": "pallet_stacker_auto.glb",
-   "bytes": 108268,
-   "bytes_raw": 697608,
+   "bytes": 91292,
+   "bytes_base64": 121724,
+   "data_uri_chars": 121754,
+   "bytes_raw": 372524,
    "tris": 11280,
-   "draw_calls": 36,
+   "draw_calls": 13,
    "size_m": [
     1.112,
     2.303,
@@ -1264,13 +1559,12 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "beacon_blue",
-    "brand_blue",
-    "brand_yellow"
+    "brand_atlas"
    ],
-   "textures": 0,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_materials_emissive_strength",
     "KHR_mesh_quantization"
    ],
@@ -1284,9 +1578,53 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 13,
+     "tris": 11280
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "stacker_charcoal",
+     "stacker_black",
+     "stacker_orange",
+     "decal_white",
+     "sensor_glass",
+     "estop_red",
+     "pu_wheel",
+     "stacker_grey",
+     "fork_steel",
+     "chrome_soft"
+    ],
+    "atlas_textures": [],
+    "atlas_solid": [
+     "brand_blue",
+     "brand_yellow",
+     "beacon_blue",
+     "strip_cyan"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     32
+    ],
+    "atlas_px": [
+     512,
+     64
+    ],
+    "emissive_strength": 6.0,
+    "uv_warnings": []
    },
    "imgref": [
     "01_interior_dock_forklifts.jpg",
@@ -1297,6 +1635,8 @@
   {
    "file": "pallet_steel.glb",
    "bytes": 27352,
+   "bytes_base64": 36472,
+   "data_uri_chars": 36502,
    "bytes_raw": 222872,
    "tris": 3852,
    "draw_calls": 2,
@@ -1352,10 +1692,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 2,
+     "tris": 3852
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "12_pallet_blue_steel.jpg"
    ],
@@ -1364,6 +1717,8 @@
   {
    "file": "rack_bay.glb",
    "bytes": 39500,
+   "bytes_base64": 52668,
+   "data_uri_chars": 52698,
    "bytes_raw": 346024,
    "tris": 5688,
    "draw_calls": 12,
@@ -1445,10 +1800,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 12,
+     "tris": 5688
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "06_aisle_blue_racks.jpg",
     "07_overhead_aisle_wire_decks.jpg",
@@ -1458,10 +1826,12 @@
   },
   {
    "file": "reach_truck.glb",
-   "bytes": 89944,
-   "bytes_raw": 538752,
+   "bytes": 77328,
+   "bytes_base64": 103104,
+   "data_uri_chars": 103134,
+   "bytes_raw": 298072,
    "tris": 8620,
-   "draw_calls": 36,
+   "draw_calls": 13,
    "size_m": [
     1.254,
     2.5,
@@ -1589,11 +1959,12 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "beacon_orange"
+    "brand_atlas"
    ],
-   "textures": 0,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_materials_emissive_strength",
     "KHR_mesh_quantization"
    ],
@@ -1607,9 +1978,55 @@
     "ground_shift": 0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 13,
+     "tris": 8620
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "rt_white",
+     "rt_charcoal",
+     "rt_red",
+     "mat_grey",
+     "rt_black",
+     "seat_black",
+     "fork_steel",
+     "pu_tread",
+     "rt_grey",
+     "tyre",
+     "rt_lip",
+     "chrome_soft"
+    ],
+    "atlas_textures": [],
+    "atlas_solid": [
+     "screen",
+     "lamp_white",
+     "safety_blue",
+     "beacon_orange"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     32
+    ],
+    "atlas_px": [
+     512,
+     64
+    ],
+    "emissive_strength": 6.0,
+    "uv_warnings": []
    },
    "imgref": [
     "06_aisle_blue_racks.jpg",
@@ -1621,6 +2038,8 @@
   {
    "file": "robot_arm.glb",
    "bytes": 66812,
+   "bytes_base64": 89084,
+   "data_uri_chars": 89114,
    "bytes_raw": 499420,
    "tris": 8352,
    "draw_calls": 18,
@@ -1720,10 +2139,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 18,
+     "tris": 8352
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "14_iso_cutaway_orange_base.jpg"
    ],
@@ -1731,10 +2163,12 @@
   },
   {
    "file": "tug_cart_train.glb",
-   "bytes": 186328,
-   "bytes_raw": 1587992,
+   "bytes": 169452,
+   "bytes_base64": 225936,
+   "data_uri_chars": 225966,
+   "bytes_raw": 858336,
    "tris": 23992,
-   "draw_calls": 84,
+   "draw_calls": 28,
    "size_m": [
     1.16,
     2.076,
@@ -1981,13 +2415,12 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "beacon_orange",
-    "brand_blue",
-    "brand_yellow"
+    "brand_atlas"
    ],
-   "textures": 0,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
+    "EXT_texture_webp",
     "KHR_materials_emissive_strength",
     "KHR_mesh_quantization"
    ],
@@ -2001,9 +2434,54 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 28,
+     "tris": 23992
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "tug_charcoal",
+     "tug_black",
+     "seat_black",
+     "hitch_steel",
+     "tyre",
+     "tug_rim",
+     "hub_dark",
+     "cart_deck",
+     "cart_frame",
+     "tug_grey"
+    ],
+    "atlas_textures": [],
+    "atlas_solid": [
+     "brand_blue",
+     "lamp_white",
+     "brand_yellow",
+     "lamp_red",
+     "beacon_orange"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     32
+    ],
+    "atlas_px": [
+     512,
+     64
+    ],
+    "emissive_strength": 6.0,
+    "uv_warnings": []
    },
    "imgref": [
     "01_interior_dock_forklifts.jpg",
@@ -2015,6 +2493,8 @@
   {
    "file": "walmart_facade.glb",
    "bytes": 65408,
+   "bytes_base64": 87212,
+   "data_uri_chars": 87242,
    "bytes_raw": 358944,
    "tris": 5206,
    "draw_calls": 13,
@@ -2125,10 +2605,23 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": -0.0001,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": -0.0001,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": -0.0001,
+     "draws": 13,
+     "tris": 5206
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
    },
+   "material_pass": null,
    "imgref": [
     "05_facade_logo_parking.jpg",
     "16_supercentre_facade.webp",
@@ -2138,10 +2631,12 @@
   },
   {
    "file": "walmart_truck.glb",
-   "bytes": 255992,
-   "bytes_raw": 1729332,
+   "bytes": 250368,
+   "bytes_base64": 333824,
+   "data_uri_chars": 333854,
+   "bytes_raw": 1143472,
    "tris": 24482,
-   "draw_calls": 62,
+   "draw_calls": 18,
    "size_m": [
     3.08,
     4.15,
@@ -2291,14 +2786,9 @@
    },
    "animations": [],
    "materials_toneMapped_false": [
-    "brand_blue",
-    "brand_cab_logo",
-    "brand_cab_spark",
-    "mark53",
-    "trailer_rear",
-    "trailer_side"
+    "brand_atlas"
    ],
-   "textures": 5,
+   "textures": 4,
    "extensions": [
     "EXT_meshopt_compression",
     "EXT_texture_webp",
@@ -2361,9 +2851,61 @@
     "ground_shift": -0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": null
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": null
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 18,
+     "tris": 24482
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
+    }
+   },
+   "material_pass": {
+    "palette": [
+     "bumper_grey",
+     "cab_white",
+     "truck_charcoal",
+     "glass_dark",
+     "alu",
+     "mirror_glass",
+     "deckplate",
+     "truck_black",
+     "tyre",
+     "hub_grey",
+     "trailer_white",
+     "trailer_trim"
+    ],
+    "atlas_textures": [
+     "brand_cab_logo",
+     "brand_cab_spark",
+     "trailer_side",
+     "mark53",
+     "trailer_rear"
+    ],
+    "atlas_solid": [
+     "brand_blue",
+     "lamp_white",
+     "lamp_amber",
+     "lamp_red"
+    ],
+    "kept": [],
+    "palette_px": [
+     128,
+     32
+    ],
+    "atlas_px": [
+     2064,
+     1760
+    ],
+    "emissive_strength": 4.0,
+    "uv_warnings": []
    },
    "imgref": [
     "02_exterior_docks_walmartcom_trailers.png",
@@ -2374,6 +2916,8 @@
   {
    "file": "worker.glb",
    "bytes": 87096,
+   "bytes_base64": 116128,
+   "data_uri_chars": 116158,
    "bytes_raw": 1022320,
    "tris": 9576,
    "draw_calls": 10,
@@ -2564,19 +3108,32 @@
     "ground_shift": 0.0
    },
    "check_threejs": {
-    "pass": true,
-    "minY": 0,
-    "animMinY": {
-     "Walk": [
-      -0.0011,
-      0.0038
-     ],
-     "Idle": [
-      0.0002,
-      0.0002
-     ]
+    "r170": {
+     "pass": true,
+     "minY": 0,
+     "animMinY": {
+      "Walk": [
+       -0.0011,
+       0.0038
+      ],
+      "Idle": [
+       0.0002,
+       0.0002
+      ]
+     }
+    },
+    "r160": {
+     "pass": true,
+     "minY": 0,
+     "draws": 10,
+     "tris": 9576
+    },
+    "r160_data_uri": {
+     "loadAsync_dataURI": true,
+     "parse_ArrayBuffer": true
     }
    },
+   "material_pass": null,
    "imgref": [
     "01_interior_dock_forklifts.jpg",
     "14_iso_cutaway_orange_base.jpg"

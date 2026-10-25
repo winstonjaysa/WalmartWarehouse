@@ -1,0 +1,712 @@
+{
+ "when": "2026-10-25T08:58:41.695Z",
+ "three_revision": "160",
+ "page": "src/qa/datauri_check_r160.html",
+ "page_bytes": 2117533,
+ "network_requests": [
+  "(page)",
+  "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js",
+  "https://unpkg.com/three@0.160.0/examples/jsm/libs/meshopt_decoder.module.js",
+  "https://unpkg.com/three@0.160.0/examples/jsm/utils/BufferGeometryUtils.js"
+ ],
+ "foreign_requests": [],
+ "console": [],
+ "sizes": {
+  "amr.glb": {
+   "bytes": 53084,
+   "base64_chars": 70780,
+   "data_uri_chars": 70810
+  },
+  "cage.glb": {
+   "bytes": 32716,
+   "base64_chars": 43624,
+   "data_uri_chars": 43654
+  },
+  "case_stack_loose.glb": {
+   "bytes": 15408,
+   "base64_chars": 20544,
+   "data_uri_chars": 20574
+  },
+  "dock_door.glb": {
+   "bytes": 36292,
+   "base64_chars": 48392,
+   "data_uri_chars": 48422
+  },
+  "drums.glb": {
+   "bytes": 73852,
+   "base64_chars": 98472,
+   "data_uri_chars": 98502
+  },
+  "forklift_counterbalance.glb": {
+   "bytes": 188772,
+   "base64_chars": 251696,
+   "data_uri_chars": 251726
+  },
+  "pallet_bluewood.glb": {
+   "bytes": 31064,
+   "base64_chars": 41420,
+   "data_uri_chars": 41450
+  },
+  "pallet_jack.glb": {
+   "bytes": 42380,
+   "base64_chars": 56508,
+   "data_uri_chars": 56538
+  },
+  "pallet_load_half.glb": {
+   "bytes": 68744,
+   "base64_chars": 91660,
+   "data_uri_chars": 91690
+  },
+  "pallet_load_partial.glb": {
+   "bytes": 53928,
+   "base64_chars": 71904,
+   "data_uri_chars": 71934
+  },
+  "pallet_load_wrapped.glb": {
+   "bytes": 81624,
+   "base64_chars": 108832,
+   "data_uri_chars": 108862
+  },
+  "pallet_pine.glb": {
+   "bytes": 31056,
+   "base64_chars": 41408,
+   "data_uri_chars": 41438
+  },
+  "pallet_stacker_auto.glb": {
+   "bytes": 91292,
+   "base64_chars": 121724,
+   "data_uri_chars": 121754
+  },
+  "pallet_steel.glb": {
+   "bytes": 27352,
+   "base64_chars": 36472,
+   "data_uri_chars": 36502
+  },
+  "rack_bay.glb": {
+   "bytes": 39500,
+   "base64_chars": 52668,
+   "data_uri_chars": 52698
+  },
+  "reach_truck.glb": {
+   "bytes": 77328,
+   "base64_chars": 103104,
+   "data_uri_chars": 103134
+  },
+  "robot_arm.glb": {
+   "bytes": 66812,
+   "base64_chars": 89084,
+   "data_uri_chars": 89114
+  },
+  "tug_cart_train.glb": {
+   "bytes": 169452,
+   "base64_chars": 225936,
+   "data_uri_chars": 225966
+  },
+  "walmart_facade.glb": {
+   "bytes": 65408,
+   "base64_chars": 87212,
+   "data_uri_chars": 87242
+  },
+  "walmart_truck.glb": {
+   "bytes": 250368,
+   "base64_chars": 333824,
+   "data_uri_chars": 333854
+  },
+  "worker.glb": {
+   "bytes": 87096,
+   "base64_chars": 116128,
+   "data_uri_chars": 116158
+  }
+ },
+ "results": {
+  "amr": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 6180,
+    "draws": 15,
+    "tex_slots": 42,
+    "minY": 0,
+    "size": [
+     0.792,
+     0.364,
+     1.02
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 6180,
+    "draws": 15,
+    "tex_slots": 42,
+    "minY": 0,
+    "size": [
+     0.792,
+     0.364,
+     1.02
+    ],
+    "missing": []
+   }
+  },
+  "cage": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3656,
+    "draws": 6,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.22,
+     0.93,
+     1.03
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3656,
+    "draws": 6,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.22,
+     0.93,
+     1.03
+    ],
+    "missing": []
+   }
+  },
+  "case_stack_loose": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 1008,
+    "draws": 6,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.249,
+     0.874,
+     0.588
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 1008,
+    "draws": 6,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.249,
+     0.874,
+     0.588
+    ],
+    "missing": []
+   }
+  },
+  "dock_door": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3480,
+    "draws": 14,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     4.2,
+     5.17,
+     3.01
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3480,
+    "draws": 14,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     4.2,
+     5.17,
+     3.01
+    ],
+    "missing": []
+   }
+  },
+  "drums": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 11040,
+    "draws": 9,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.92,
+     0.88,
+     0.6
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 11040,
+    "draws": 9,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.92,
+     0.88,
+     0.6
+    ],
+    "missing": []
+   }
+  },
+  "forklift_counterbalance": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 24528,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.34,
+     2.318,
+     3.32
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 24528,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.34,
+     2.318,
+     3.32
+    ],
+    "missing": []
+   }
+  },
+  "pallet_bluewood": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3552,
+    "draws": 5,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.145,
+     1
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3552,
+    "draws": 5,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.145,
+     1
+    ],
+    "missing": []
+   }
+  },
+  "pallet_jack": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3560,
+    "draws": 18,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.54,
+     1.346,
+     1.699
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3560,
+    "draws": 18,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.54,
+     1.346,
+     1.699
+    ],
+    "missing": []
+   }
+  },
+  "pallet_load_half": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 7052,
+    "draws": 12,
+    "tex_slots": 1,
+    "minY": 0,
+    "size": [
+     1.268,
+     0.829,
+     1.068
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 7052,
+    "draws": 12,
+    "tex_slots": 1,
+    "minY": 0,
+    "size": [
+     1.268,
+     0.829,
+     1.068
+    ],
+    "missing": []
+   }
+  },
+  "pallet_load_partial": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 5904,
+    "draws": 11,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.202,
+     1.162,
+     1.001
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 5904,
+    "draws": 11,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.202,
+     1.162,
+     1.001
+    ],
+    "missing": []
+   }
+  },
+  "pallet_load_wrapped": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 8924,
+    "draws": 12,
+    "tex_slots": 1,
+    "minY": 0,
+    "size": [
+     1.268,
+     1.507,
+     1.068
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 8924,
+    "draws": 12,
+    "tex_slots": 1,
+    "minY": 0,
+    "size": [
+     1.268,
+     1.507,
+     1.068
+    ],
+    "missing": []
+   }
+  },
+  "pallet_pine": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3552,
+    "draws": 5,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.145,
+     1
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3552,
+    "draws": 5,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.145,
+     1
+    ],
+    "missing": []
+   }
+  },
+  "pallet_stacker_auto": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 11280,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.112,
+     2.303,
+     2.732
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 11280,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.112,
+     2.303,
+     2.732
+    ],
+    "missing": []
+   }
+  },
+  "pallet_steel": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 3852,
+    "draws": 2,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.144,
+     1
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 3852,
+    "draws": 2,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     1.2,
+     0.144,
+     1
+    ],
+    "missing": []
+   }
+  },
+  "rack_bay": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 5688,
+    "draws": 12,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     2.94,
+     6,
+     1.145
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 5688,
+    "draws": 12,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     2.94,
+     6,
+     1.145
+    ],
+    "missing": []
+   }
+  },
+  "reach_truck": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 8620,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.254,
+     2.5,
+     2.65
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 8620,
+    "draws": 13,
+    "tex_slots": 37,
+    "minY": 0,
+    "size": [
+     1.254,
+     2.5,
+     2.65
+    ],
+    "missing": []
+   }
+  },
+  "robot_arm": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 8352,
+    "draws": 18,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.6,
+     1.54,
+     1.135
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 8352,
+    "draws": 18,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.6,
+     1.54,
+     1.135
+    ],
+    "missing": []
+   }
+  },
+  "tug_cart_train": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 23992,
+    "draws": 28,
+    "tex_slots": 82,
+    "minY": 0,
+    "size": [
+     1.16,
+     2.076,
+     10.09
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 23992,
+    "draws": 28,
+    "tex_slots": 82,
+    "minY": 0,
+    "size": [
+     1.16,
+     2.076,
+     10.09
+    ],
+    "missing": []
+   }
+  },
+  "walmart_facade": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 5206,
+    "draws": 13,
+    "tex_slots": 3,
+    "minY": -0.0001,
+    "size": [
+     32.04,
+     13.499,
+     4.331
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 5206,
+    "draws": 13,
+    "tex_slots": 3,
+    "minY": -0.0001,
+    "size": [
+     32.04,
+     13.499,
+     4.331
+    ],
+    "missing": []
+   }
+  },
+  "walmart_truck": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 24482,
+    "draws": 18,
+    "tex_slots": 51,
+    "minY": 0,
+    "size": [
+     3.08,
+     4.15,
+     22.125
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 24482,
+    "draws": 18,
+    "tex_slots": 51,
+    "minY": 0,
+    "size": [
+     3.08,
+     4.15,
+     22.125
+    ],
+    "missing": []
+   }
+  },
+  "worker": {
+   "loadAsync_dataURI": {
+    "ok": true,
+    "tris": 9576,
+    "draws": 10,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.539,
+     1.745,
+     0.342
+    ],
+    "missing": []
+   },
+   "parse_ArrayBuffer": {
+    "ok": true,
+    "tris": 9576,
+    "draws": 10,
+    "tex_slots": 0,
+    "minY": 0,
+    "size": [
+     0.539,
+     1.745,
+     0.342
+    ],
+    "missing": []
+   }
+  }
+ }
+}

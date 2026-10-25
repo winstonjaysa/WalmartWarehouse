@@ -1,7 +1,7 @@
 import asyncio, sys, json, time
 from playwright.async_api import async_playwright
 SECS=float(sys.argv[1]) if len(sys.argv)>1 else 120
-URL='http://localhost:8799/walmart-dc.html?capture&demo=0&toast=0&inspect=0&q=low&nopost'
+URL='http://localhost:8799/builds/walmart-dc_v3.html?capture&demo=0&toast=0&inspect=0&q=low&nopost'
 JS='''(secs)=>{ const S=window.__sim, out={slip:0,slipN:0,frames:0,steerErr:[],yawJump:0,palJump:0,events:[]}; const n=Math.round(secs*60); const prev=new Map(); const pp=new Map();
  for(let f=0;f<n;f++){ window.__step(1/60); out.frames++;
   for(const v of S.VEH){ if(v.isSemi) continue; const p=prev.get(v);

@@ -74,7 +74,7 @@ export function build(scene) {
   const rp = reachTruck(); rp.position.set(-1.2, 1.2, 4); rp.rotation.y = Math.PI / 2; scene.add(rp); T.replen = rp;
   movers.push((t) => { rp.position.z = 4 + 3 * Math.sin(t * 0.3); rp.userData.carriage.position.y = 2.2 + 1.2 * (0.5 + 0.5 * Math.sin(t * 0.5)); });
   // pick: order filler in pick aisle X 8 walking + takeaway case
-  const pk = person(); pk.position.set(8, 1.2, 4); scene.add(pk); T.pick = pk; movers.push((t) => { pk.position.z = 4 + 3 * Math.sin(t * 0.35); pk.rotation.y = Math.cos(t * 0.35) > 0 ? 0 : Math.PI; });
+  const pk = person(); pk.position.set(7.2, 1.2, 4); scene.add(pk); T.pick = pk; movers.push((t) => { pk.position.z = 4 + 3 * Math.sin(t * 0.35); pk.rotation.y = Math.cos(t * 0.35) > 0 ? 0 : Math.PI; });
   // wrap: wrapper.js station + stand-in operator at the control panel
   const w = Wrapper.create(sceneAdd, { position: [32, 1.2, -24], rotationY: 0 });
   const op = person(); w.root.add(op); op.position.set(1.62, 0, 0.66); op.rotation.y = Math.PI;
