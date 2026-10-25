@@ -104,7 +104,7 @@ def film(z0, z1):
     bpy.context.view_layer.update()
     dg = bpy.context.evaluated_depsgraph_get()
     me = bpy.data.meshes.new_from_object(body.evaluated_get(dg)); body.modifiers.clear(); body.data = me
-    _set_uv(body, lambda c: ((c.x + c.y) * 0.8, min(0.845, max(0.0, (c.z - z0) / (z1 - z0) * 0.85))))
+    _set_uv(body, lambda c: ((c.x + c.y + 1.2) * 0.4, min(0.845, max(0.0, (c.z - z0) / (z1 - z0) * 0.85))))
     # rolled lip: rounded-rectangle ring tube, wobbling radius (bunched film), sits on the top edge, overhangs ~12 mm
     rnd = random.Random(11); bm = bmesh.new(); cr = 0.035; N = 192; M = 8
     ex, ey = hx + 0.002 - cr, hy + 0.002 - cr
@@ -141,7 +141,7 @@ def film(z0, z1):
             bm.faces.new((A[j], A[(j + 1) % M], B[(j + 1) % M], B[j]))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     lip = mk('film_lip', bm, F)
-    _set_uv(lip, lambda c: ((c.x - c.y) * 3.0, 0.86 + 0.13 * min(1.0, max(0.0, (c.z - (z1 - 0.03)) / 0.03))))
+    _set_uv(lip, lambda c: ((c.x - c.y + 1.2) * 0.4, 0.86 + 0.13 * min(1.0, max(0.0, (c.z - (z1 - 0.03)) / 0.03))))
     return [body, lip]
 
 PINE = ['#E6C690', '#DDB87E', '#D2AC70']; PINE_BLK = '#C99C62'

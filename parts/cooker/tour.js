@@ -77,7 +77,9 @@ export function collectSignBoxes(signs, extra) {
   const out = [];
   for (const r of roots) {
     if (!r || !r.isObject3D) continue; r.updateWorldMatrix(true, true); const b = new THREE.Box3();
-    r.traverse((o) => { if (o.isMesh && o.visible !== false && !/cable/i.test(o.name) && o.geometry) {
+    let named = false; r.traverse((o) => { if (o.isMesh && /^(board|face)/i.test(o.name)) named = true; });
+    // signs.js boards: use the board + faces only (ceiling plates / cables would stretch the box up to the roof)
+    r.traverse((o) => { if (o.isMesh && o.visible !== false && !/cable/i.test(o.name) && (!named || /^(board|face)/i.test(o.name)) && o.geometry) {
       if (!o.geometry.boundingBox) o.geometry.computeBoundingBox(); _bx.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld); b.union(_bx); } });
     if (!b.isEmpty()) out.push(b);
   }
@@ -147,41 +149,42 @@ function xformOffset(off, fr, extraYaw, out) {
  * line-of-sight raycasts the best 30 against `blockers` meshes (racks, mezzanines...). Penalised: occlusion, camera in/near
  * (< 5 m) a sign, target off-centre, signs big and central, distance outside [minD,maxD], elevation < 16 deg (OrbitControls limit).
  */
-function solveFraming(camera, target, lookOff, offsets, orbitAmp, signBoxes, wallBoxes, range = [10, 25], blockers = null, skip = null) {
-  const L = V(lookOff).add(target), P = new THREE.Vector3(), cands = [];
+function solveFraming(camera, target, lookOff, offsets, orbitAmp, signBoxes, wallBoxes, range = [10, 25], blockers = null, skip = null, vel = null, current = null) {
+  const P = new THREE.Vector3(), L = new THREE.Vector3(), lo = V(lookOff);
+  // moving target: also probe where it will be / was ~2.5 s away (ping-pong motion), so the framing survives its travel
+  // working equipment shuttles around its stage: score the framing for the target at its spot and +-3 m in X and Z
+  const tps = [target.clone(), ...[[3, 0], [-3, 0], [0, 3], [0, -3]].map(([x, z]) => target.clone().add(new THREE.Vector3(x, 0, z)))];
   const authored = offsets.map((o) => Math.hypot(...o)).reduce((a, b) => a + b, 0) / offsets.length;
-  const probesFor = (am) => { const A = orbitAmp * am; return A ? [-A, -A / 2, 0, A / 2, A] : [0]; };
-  for (const am of orbitAmp > 0 ? AMPS : [0]) {
-    const probes = probesFor(am);
-    for (const d of DS) {
-      const dist = authored * d;
-      if (dist < range[0] * 0.9 || dist > range[1] * 1.1) continue;
-      for (const h of HS) for (const yaw of YAWS) {
-        let pen = 0; const fr = { yaw, h, d, amp: am };
-        for (const off of offsets) for (const py of probes) {
-          xformOffset(off, fr, py, P).add(target);
-          const elev = Math.atan2(P.y - L.y, Math.hypot(P.x - L.x, P.z - L.z));
-          if (elev < 16 * DEG) { pen += 3; continue; }
-          const r = checkFraming(camera, P, L, target, signBoxes, wallBoxes);
-          pen += (r.occluded ? 10 : 0) + (r.inside ? 20 : 0) + (r.centred ? 0 : 5) + (r.signDist > 5 ? 0 : 3) + ((r.signCover < 0.1 || (r.signCentral < 0.02 && r.signCover < 0.17)) ? 0 : 2 + r.signCover * 10);
-        }
-        pen += Math.abs(yaw) * 0.02 + Math.abs(h - 1) * 0.05 + Math.abs(d - 1) * 0.05 + (1 - am) * 0.3; // prefer the authored shot + full orbit
-        cands.push({ yaw, h, d, amp: am, pen });
-      }
+  const probesFor = (am) => { const A = orbitAmp * am; return A ? [-A, 0, A] : [0]; };
+    const score = (fr, cap = Infinity) => {
+    let pen = 0; const bias = Math.abs(fr.yaw) * 0.02 + Math.abs(fr.h - 1) * 0.05 + Math.abs(fr.d - 1) * 0.05 + (1 - fr.amp) * 0.3;
+    for (const tp of tps) for (const off of offsets) for (const py of probesFor(fr.amp)) {
+      if (pen / tps.length + bias > cap) return Infinity; // pruned
+      xformOffset(off, fr, py, P).add(tp); L.copy(lo).add(tp);
+      const elev = Math.atan2(P.y - L.y, Math.hypot(P.x - L.x, P.z - L.z));
+      if (elev < 16 * DEG) { pen += 3; continue; }
+      const r = checkFraming(camera, P, L, tp, signBoxes, wallBoxes);
+      pen += (r.occluded ? 10 : 0) + (r.inside ? 20 : 0) + (r.centred ? 0 : 5) + (r.signDist > 5 ? 0 : 3) + ((r.signCover < 0.1 || (r.signCentral < 0.02 && r.signCover < 0.17)) ? 0 : 2 + r.signCover * 10);
     }
+    return pen / tps.length + bias; // bias: prefer the authored shot + full orbit
+  };
+  const blockPen = (fr) => { // line-of-sight vs scene meshes at orbit centre + extremes (look point and target both hidden = blocked)
+    if (!blockers || !blockers.length) return 0; let pen = 0; const pr = probesFor(fr.amp), use = pr.length > 1 ? [pr[0], 0, pr[pr.length - 1]] : pr;
+    for (const off of offsets) for (const py of use) { xformOffset(off, fr, py, P).add(target); L.copy(lo).add(target); if (lineBlocked(P, L, blockers, skip) && lineBlocked(P, target, blockers, skip)) pen += 8; }
+    return pen;
+  };
+  const cands = [];
+  for (const amp of orbitAmp > 0 ? AMPS : [0]) for (const d of DS) {
+    const dist = authored * d; if (dist < range[0] * 0.9 || dist > range[1] * 1.1) continue;
+    for (const h of HS) for (const yaw of YAWS) { const fr = { yaw, h, d, amp }; fr.pen = score(fr, cands.length >= 12 ? cands[11].pen : Infinity); if (fr.pen < Infinity) { cands.push(fr); cands.sort((a, b) => a.pen - b.pen); if (cands.length > 12) cands.length = 12; } }
   }
-  if (!cands.length) return { yaw: 0, h: 1, d: 1, amp: 1, pen: 0 };
+  if (!cands.length) return current || { yaw: 0, h: 1, d: 1, amp: 1, pen: 0 };
   cands.sort((a, b) => a.pen - b.pen);
-  if (!blockers || !blockers.length) return cands[0];
   let best = null;
-  for (const c of cands.slice(0, 30)) {
-    let pen = c.pen;
-    for (const off of offsets) for (const py of probesFor(c.amp).filter((_, i, a) => i === 0 || i === a.length - 1 || i === (a.length >> 1))) {
-      xformOffset(off, c, py, P).add(target); if (lineBlocked(P, L, blockers, skip) && lineBlocked(P, target, blockers, skip)) pen += 8;
-    }
-    if (!best || pen < best.pen) best = { ...c, pen };
-    if (pen < 1) break;
+  for (const c of cands.slice(0, blockers && blockers.length ? 12 : 1)) {
+    const pen = c.pen + blockPen(c); if (!best || pen < best.pen) best = { ...c, pen }; if (pen < 1) break;
   }
+  if (current) { const cp = score(current) + blockPen(current); if (cp <= best.pen + 1) return { ...current, pen: cp }; } // hysteresis: keep a framing that is still about as good
   return best;
 }
 /* ------------------------------------------------------------------ Explore stops (process order) */
@@ -387,16 +390,16 @@ class ExploreMode {
     this.from.pos.copy(this.rig.pos); this.from.look.copy(this.rig.look); this.from.fov = this.rig.fov;
     this.index = i; this._orbitT = 0;
     resolveTarget(this.opts.getTarget, s.id, this._raw); this._tS.copy(this._raw); this._tV.set(0, 0, 0);
-    this._fr = this._solve(s); this._frS = { ...this._fr }; this._reT = 0;
+    this._fr = this._solve(s); this._frS = { ...this._fr }; this._reT = 0; this._bad = 0;
     this.trans = { t: 0, D: this.D * Math.min(2, Math.max(1, this.from.pos.distanceTo(xformOffset(s.shot.offset, this._fr, 0, new THREE.Vector3()).add(this._raw)) / 60)) };
     this._fillPanel(s); this._setPanelVisible(true); this._renderRail(); this._factT = 0; this._refreshFacts();
     try { this.opts.ui?.setCaption?.(`${s.title} \u2014 ${s.watch}`); } catch (e) { /* ignore */ }
     this._emit({ id: s.id, index: i, stop: s });
   }
-  _solve(s) {
+  _solve(s, current = null) {
     if (this.opts.autoFrame === false) return { yaw: 0, h: 1, d: 1, amp: 1, report: null };
     const signs = collectSignBoxes(this.opts.signs, this.opts.occluders), walls = this.opts.walls === false ? [] : (this.opts.walls || DEFAULT_WALLS);
-    return solveFraming(this.camera, this._raw, s.shot.lookOffset || [0, 1, 0], [s.shot.offset], this.orbitAmp, signs, walls, s.range || (WIDE_STAGES.has(s.id) ? [20, 50] : [10, 25]), asList(this.opts.blockers), targetObject(this.opts.getTarget, s.id));
+    return solveFraming(this.camera, this._raw, s.shot.lookOffset || [0, 1, 0], [s.shot.offset], this.orbitAmp, signs, walls, s.range || (WIDE_STAGES.has(s.id) ? [20, 50] : [10, 25]), asList(this.opts.blockers), targetObject(this.opts.getTarget, s.id), this._tV, current);
   }
   /** framing check of the CURRENT camera pose vs the current stop target (for QA) */
   checkFraming() {
@@ -426,8 +429,8 @@ class ExploreMode {
     this._orbitT += dt;
     // moving targets: re-check the live framing every 0.5 s while parked; if a sign/wall gets in the way, re-solve and glide (never jump) to the new framing
     if (!this.trans && this.opts.autoFrame !== false && (this._reT += dt) >= 0.5) {
-      this._reT = 0; const f = this.checkFraming();
-      if (f && !f.ok) { const prev = this._raw.clone(); this._raw.copy(this._tS); this._fr = this._solve(s); this._raw.copy(prev); }
+      this._reT = 0; const f = this.checkFraming(); this._bad = f && !f.ok ? (this._bad || 0) + 1 : 0;
+      if (this._bad >= 6) { this._bad = -12; const prev = this._raw.clone(); this._raw.copy(this._tS); this._fr = this._solve(s, this._fr); this._raw.copy(prev); } // 3 s bad -> re-solve (then 6 s grace)
     }
     const fs = this._frS || (this._frS = { ...this._fr }), fk = 1 - Math.exp(-dt * 1.2), dy = Math.atan2(Math.sin(this._fr.yaw - fs.yaw), Math.cos(this._fr.yaw - fs.yaw));
     fs.yaw += Math.sign(dy) * Math.min(Math.abs(dy) * fk, 30 * DEG * dt); fs.h += (this._fr.h - fs.h) * fk; fs.d += (this._fr.d - fs.d) * fk; fs.amp += (this._fr.amp - fs.amp) * fk;

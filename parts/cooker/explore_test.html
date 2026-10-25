@@ -55,5 +55,6 @@ window.__framing = () => { const f = Tour.explore.checkFraming();
   const rc = new THREE.Raycaster(cam.position.clone(), dir, 0.1, dist - 0.3); const hits = rc.intersectObject(signs.root, true).filter((h) => h.object.name !== 'cable');
   const all = rc.intersectObjects(SC.blockers, true).filter((h) => { let own = false; for (let q = h.object; q; q = q.parent) if (q === T[f.id]) own = true; const m = h.object.material; return !own && h.object.isMesh && !(m.transparent && m.opacity < 0.6) && h.object.name !== 'cable'; });
   return { ...f, rayHits: hits.length, sceneHits: all.length, camDist: +cam.position.distanceTo(tgt).toFixed(1) }; };
+window.__T3 = THREE; window.__Tour = Tour; window.__Signs = Signs; window.__cam = cam; window.__getT = (id) => { const o = getTarget(id); const v = new THREE.Vector3(); return o.isObject3D ? o.getWorldPosition(v) : v.copy(o); };
 window.__ready = true;
 </script></body></html>

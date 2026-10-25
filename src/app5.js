@@ -108,7 +108,7 @@ function scheduleUnload(fk, trl, lane, doorX) {
     .do(() => scheduleUnload(fk, trl, lane, doorX));
 }
 function trailerMouth(trl) { const p = trl.pallets.find((q) => !q.userData.taken), w = new THREE.Vector3(); trl.obj.updateMatrixWorld(true); p.getWorldPosition(w); return w; }
-const FK1 = (() => { const w = trailerMouth(T1), f = makeForklift('FL-07', w.x, sz(0.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
+const FK1 = (() => { const w = trailerMouth(T1), f = makeForklift('FL-07', w.x, sz(2.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
 FK1.do(() => scheduleUnload(FK1, T1, LANE5, X5));
 // scan worker beside the lane
 const W1 = createWorker({}); shadowAll(W1); W1.position.set(sx(LANE5.x + 1.4), FLOOR, sz(6.5)); W1.rotation.y = -Math.PI / 2; world.add(W1);

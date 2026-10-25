@@ -69,7 +69,7 @@ export function build(scene) {
   const rr = reachTruck(); rr.position.set(-27.1, 1.2, 0); rr.rotation.y = Math.PI / 2; scene.add(rr); T.reserve = rr;
   movers.push((t) => { rr.position.z = 4 * Math.sin(t * 0.25); rr.userData.carriage.position.y = 2.6 + 2.0 * (0.5 + 0.5 * Math.sin(t * 0.6)); });
   // cross-dock: forklift going north along X -2.5
-  const xf = forklift(); xf.position.set(-2.5, 1.2, 0); xf.rotation.y = Math.PI; scene.add(xf); T.crossdock = xf; movers.push((t) => { xf.position.z = -1 + 7 * Math.sin(t * 0.2); xf.rotation.y = Math.cos(t * 0.2) > 0 ? 0 : Math.PI; });
+  const xf = forklift(); xf.position.set(-2.5, 1.2, 0); xf.rotation.y = Math.PI; scene.add(xf); T.crossdock = xf; movers.push((t) => { xf.position.z = -1 + 4 * Math.sin(t * 0.3); xf.rotation.y = Math.cos(t * 0.2) > 0 ? 0 : Math.PI; });
   // replen: reach truck behind the flow racks (X ~3)
   const rp = reachTruck(); rp.position.set(-1.2, 1.2, 4); rp.rotation.y = Math.PI / 2; scene.add(rp); T.replen = rp;
   movers.push((t) => { rp.position.z = 4 + 3 * Math.sin(t * 0.3); rp.userData.carriage.position.y = 2.2 + 1.2 * (0.5 + 0.5 * Math.sin(t * 0.5)); });

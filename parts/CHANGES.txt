@@ -179,3 +179,29 @@ Hand pallet jack / pump truck (ref imgref/20_hand_pallet_pump_truck.jpg)
 - Verify: hand-to-grip error 0.000 m on all 8 vehicles, arm stretch 0.94-1.11; after steer -0.6 walkie/jack hands still on
   grip, operator yaws with the tiller, walking=false when stopped; detach/reattach OK; check.py TOTAL 103 FAIL 0,
   check_qa 32/0, check_tj 14/0, zero console errors.
+
+== STEP OPERATOR REVIEW FIXES (8:42 steer) ==
+- Two-bone arms: each arm is shoulder -> 'elbow' group (upper 0.27 m, fore+hand 0.29 m). attachHandsTo(obj|[a,b], spread, one?)
+  now solves analytic 2-bone IK (elbow pole down/out/back); ud.armStretch[i] = dist/0.56 (straightens and stretches only past
+  full reach). `one` = arm index for single-hand grips. Free-swinging arms get a slight natural elbow bend in the walk cycle.
+- Tiller trucks (handPalletJack, walkieStacker) have two operator modes:
+  PULL  (pose 'walking-tiller'): operator at the new anchors.pull, ahead of the tiller facing away from the truck, one hand behind
+        on the grip (elbow ~50-70 deg, stretch ~0.82-0.91), torso leans away from the load: lean = min(0.12, 0.1*|v|).
+  PUSH  (pose 'pushing-tiller'): operator at anchors.stand facing the truck, both hands on the handle (stretch ~0.92), short
+        shuffle steps (stride 0.5, cadence x1.7), small lean in (0.08*|v|).
+  ud.setOperatorMode('auto'|'pull'|'push'); ud.getOperatorMode(). Auto (default) uses the truck's own world velocity
+  along its +Z: < -0.08 m/s (tiller first) -> pull, > +0.08 (forks first) -> push, keeps the last mode when stopped.
+- Body lean (ud.lean -> body.rotation.x) is applied before plant(), so feet stay on the ground.
+- riderPalletTruck: deck enlarged to 0.62 x 0.44 (z -0.86..-0.42 in power-unit space) with an anti-slip mat (deck top 0.151 m);
+  backrest pad + bars and side guard rails/posts behind and beside the operator; grab bar moved to y 1.12, z -0.44 (stretch 0.92).
+  Asserted in check: sole bottom Y == deck top Y (0.151 == 0.151) and both shoes inside the platform footprint.
+- reachTruck steer knob/multi-task lever and forklift/tug lean adjusted so all seated/standing arm stretches are 0.90-0.97
+  (elbows visibly bent; previously straight at 0.94-1.11).
+- Toy face on every worker/operator: two dark ellipsoid eyes (r 0.019) with white catch-lights and a small smile arc, all
+  standing proud of the head sphere (no coplanar faces, no z-fighting).
+- Sheet: parts/ops_sheet.html -> parts/closeup_operators.png is now 4x3 at 1920x1080, with close zooms on the rider (feet on
+  deck, backrest) and on the hand jack PULL (moving -Z) and PUSH (moving +Z), plus a face close-up.
+- Verify: parts/check_operator_fixes_results.txt TOTAL 35 FAIL 0 (hand-to-grip error 0.000 m on all vehicles, rider feet on deck
+  within 1 cm and inside the footprint, pull/push bend + lean, auto mode switching, forced mode, detach/reattach, face, zero errors).
+  check.py TOTAL 103 FAIL 0 (SIZES regenerated: riderPalletTruck is 0.08 m longer from the bigger deck), check_qa 32/0, check_tj 14/0,
+  check_b4b11 16/0, check_b31 1/0.
