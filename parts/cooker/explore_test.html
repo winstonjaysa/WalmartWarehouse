@@ -7,24 +7,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as Signs from './signs.js';
 import * as Tour from './tour.js';
+import * as SceneMod from './explore_scene.js';
 const W = document.getElementById('wrap');
-const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(1280, 720); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; W.appendChild(r.domElement);
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(1280, 720); r.shadowMap.enabled = true; r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; W.appendChild(r.domElement);
 const s = new THREE.Scene(); s.background = new THREE.Color(0xe9eef4);
 s.add(new THREE.HemisphereLight(0xf4f8ff, 0xb9c3cf, 1.25)); const d = new THREE.DirectionalLight(0xffffff, 1.6); d.position.set(60, 120, 80); s.add(d);
-const M = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 });
-const g = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M(0xc9ced4)); g.rotation.x = -Math.PI / 2; s.add(g);
-const fl = new THREE.Mesh(new THREE.BoxGeometry(100, 1.2, 62), M(0xdfe3e8)); fl.position.y = 0.6; s.add(fl);
-const box = (w, h, dd, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd), M(c)); m.position.set(x, y, z); s.add(m); return m; };
-box(100, 12, 0.4, 0xf2f3f5, 0, 7.2, -31); box(0.4, 12, 62, 0xf2f3f5, -50, 7.2, 0); box(100, 4.5, 0.4, 0xf2f3f5, 0, 3.45, 31); box(0.4, 4.5, 62, 0xf2f3f5, 50, 3.45, 0);
-for (let i = 0; i < 8; i++) for (let j = 0; j < 5; j++) box(1.2, 10, 24, 0x0071ce, -46 + i * 5.4, 6.2, 2); // racks
-box(26, 0.6, 3, 0x8f969f, 35, 6.2, -16.5); // sorter
-// dummy moving targets
-const cols = { gate: 0xffc220, yard: 0x041e42, receiving: 0xe8590c, reserve: 0x2f9e44, crossdock: 0x9c36b5, replen: 0x1971c2, pick: 0xf03e3e, sorter: 0x0c8599, wrap: 0xffc220, shipping: 0xe8590c, depart: 0x041e42 };
-const T = {};
-for (const [id, p] of Object.entries(Tour.STAGE_POS)) { if (id === 'home') continue; const m = box(2.2, 1.6, 3.2, cols[id] ?? 0x555555, p[0], p[1] + 0.8, p[2]); m.userData.base = p; T[id] = m; }
+const SC = SceneMod.build(s); const T = SC.targets;
 let simT = 0;
-function moveTargets(dt) { simT += dt; let k = 0; for (const [id, m] of Object.entries(T)) { const b = m.userData.base, w = 0.25 + 0.03 * k++;
-  m.position.set(b[0] + 4 * Math.cos(simT * w) + (Math.random() - 0.5) * 0.3, b[1] + 0.8 + (Math.random() - 0.5) * 0.15, b[2] + 4 * Math.sin(simT * w) + (Math.random() - 0.5) * 0.3); m.rotation.y = -simT * w; } }
+function moveTargets(dt) { simT += dt; SC.update(simT, dt); }
 const signs = Signs.create(s, { floorY: 1.2, ceiling: 12.6 });
 const cam = new THREE.PerspectiveCamera(28, 1280 / 720, 1, 3000); cam.position.set(118, 150, 205);
 const controls = new OrbitControls(cam, r.domElement); controls.target.set(-4, 0, 4); controls.enableDamping = true; controls.maxPolarAngle = 1.32; controls.minDistance = 8; controls.update();
@@ -59,5 +49,10 @@ Tour.explore.onChange((e) => changes.push(e.id ?? ('released:' + e.released)));
 Tour.explore.onStop(() => stopped++);
 Tour.onCaption((c) => caps.push(c));
 r.render(s, cam);
+window.__framing = () => { const f = Tour.explore.checkFraming();
+  // independent check: raycast actual sign meshes between camera and target
+  const tgt = new THREE.Vector3(); T[f.id].getWorldPosition(tgt); tgt.y += 0.8; const dir = tgt.clone().sub(cam.position); const dist = dir.length(); dir.normalize();
+  const rc = new THREE.Raycaster(cam.position.clone(), dir, 0.1, dist - 0.3); const hits = rc.intersectObject(signs.root, true).filter((h) => h.object.name !== 'cable');
+  return { ...f, rayHits: hits.length, camDist: +cam.position.distanceTo(tgt).toFixed(1) }; };
 window.__ready = true;
 </script></body></html>

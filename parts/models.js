@@ -157,11 +157,26 @@ function installOperator(g, ud) {
     if (ud.operator && ud.operator !== op) ud.detachOperator();
     cfg.anchor.add(op); op.position.set(0, 0, 0); op.rotation.set(0, 0, 0);
     if (op.userData.setPose) op.userData.setPose(cfg.pose, { lean: cfg.lean });
-    if (op.userData.attachHandsTo) op.userData.attachHandsTo(cfg.grip, cfg.spread ?? 0.08);
+    if (op.userData.attachHandsTo) op.userData.attachHandsTo(cfg.grip, cfg.spread ?? 0.08, cfg.one ?? null);
     ud.operator = op; op.userData.update(0, 0); return op;
   };
   ud.detachOperator = () => { const op = ud.operator; if (op) { if (op.parent) op.parent.remove(op); if (op.userData.detachHands) op.userData.detachHands(); } ud.operator = null; return op; };
-  ud.update = (dt, t) => { base(dt, t); if (ud.operator) ud.operator.userData.update(dt, t); };
+  if (cfg.pose === 'walking-tiller') {   // tiller trucks: auto PULL when travelling tiller-first (-Z), PUSH when forks-first (+Z)
+    const par = cfg.anchor.parent, gp = new THREE.Vector3(); g.updateMatrixWorld(true); cfg.grip.getWorldPosition(gp); par.worldToLocal(gp);
+    const pullA = grp(par, 'anchorPull', gp.x + 0.235, cfg.anchor.position.y, gp.z - (cfg.pullReach ?? 0.32)); pullA.rotation.y = Math.PI; ud.anchors.pull = pullA;
+    let mode = null, vz = 0; const prev = new THREE.Vector3(), cur = new THREE.Vector3(), fz = new THREE.Vector3(); let has = false;
+    ud.operatorMode = cfg.mode || 'auto';
+    ud.setOperatorMode = (m) => { ud.operatorMode = m; if (m !== 'auto') applyMode(m); };
+    const applyMode = (m) => { const op = ud.operator; if (!op || m === mode) return; mode = m;
+      const A = m === 'pull' ? pullA : cfg.anchor; A.add(op); op.position.set(0, 0, 0); op.rotation.set(0, 0, 0);
+      op.userData.setPose(m === 'pull' ? 'walking-tiller' : 'pushing-tiller'); op.userData.attachHandsTo(cfg.grip, cfg.spread ?? 0.08, m === 'pull' ? 1 : null); };
+    const att = ud.attachOperator; ud.attachOperator = (op) => { op = att(op); mode = null; applyMode(ud.operatorMode === 'auto' ? 'push' : ud.operatorMode); return op; };
+    ud.getOperatorMode = () => mode;
+    ud.update = (dt, t) => { base(dt, t); g.updateWorldMatrix(true, false); cur.setFromMatrixPosition(g.matrixWorld);
+      if (has && dt > 0) { fz.set(0, 0, 1).transformDirection(g.matrixWorld); vz = damp(vz, cur.clone().sub(prev).dot(fz) / dt, 6, dt); } prev.copy(cur); has = has || dt > 0;
+      if (ud.operatorMode === 'auto') { if (vz < -0.08) applyMode('pull'); else if (vz > 0.08) applyMode('push'); }
+      if (ud.operator) ud.operator.userData.update(dt, t); };
+  } else ud.update = (dt, t) => { base(dt, t); if (ud.operator) ud.operator.userData.update(dt, t); };
   if (cfg.auto) ud.attachOperator();
 }
 function addSteerApi(ud, parts) {
@@ -780,9 +795,9 @@ export function createReachTruck(opts = {}) {
   for (let i = 0; i < 5; i++) add(og, rbox(0.04, 0.04, 1.22, 0.012), K, -0.5 + i * 0.25, 2.4, 0.35);
   const bc = makeBeacon(PALETTE.amber, 1.0); bc.position.set(0.45, 2.39, -0.15); og.add(bc); P.beacon = bc;
   // B29 side-stance operator: stands facing +X (back to the side pad), right hand on the steer knob, left on the multi-task lever
-  add(cp, cyl(0.02, 0.02, 0.9, 8), K, 0.22, 0.75, -0.12, 0, 0, 0, 'steerColumn');
-  const knobA = grp(cp, 'anchorSteerKnob', 0.22, 1.2, -0.12); add(knobA, roundCyl(0.05, 0.03, 0.008, 16), M.dark, 0, 0, 0, 0, 0, 0, 'steerKnob');
-  const standA = grp(cp, 'anchorStand', -0.12, 0.27, 0.02); standA.rotation.y = Math.PI / 2; const mtA = grp(cp, 'anchorMultiTask', 0.3, 1.3, 0.22);
+  add(cp, cyl(0.02, 0.02, 0.94, 8), K, 0.2, 0.77, -0.1, 0, 0, 0, 'steerColumn');
+  const knobA = grp(cp, 'anchorSteerKnob', 0.2, 1.24, -0.1); add(knobA, roundCyl(0.05, 0.03, 0.008, 16), M.dark, 0, 0, 0, 0, 0, 0, 'steerKnob');
+  const standA = grp(cp, 'anchorStand', -0.05, 0.27, 0.02); standA.rotation.y = Math.PI / 2; const mtA = grp(cp, 'anchorMultiTask', 0.26, 1.32, 0.17);
   // triplex mast on the nose
   const mast = makeMast({ H0: 4.0, half: 0.36, maxH: opts.maxForkHeight ?? 9.2, backrest: 1.2, forkSpread: 0.25, drop: 0.012 }); // B19: triplex, 9.2 m lift (RES beams 7.00 / 8.75)
   mast.root.position.set(0, 0.12, 0.3); ch.add(mast.root);
@@ -873,7 +888,7 @@ export function createTugTrain(opts = {}) {
   const ud = { speed: opts.speed ?? 0, steer: 0 };
   ud.rearSteer = false; ud.steerRate = 1.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -0.6, 0.6); applyAckermann(P.steer, ud.steer, 1.15, -0.55); sw.rotation.z = ud.steer * 3; };
   const seatT = grp(tug, 'anchorSeat', 0, 0.92, -0.34), swA = grp(tug, 'anchorSteerGrip', 0, 1.22, 0.3); swA.rotation.x = -0.9;   // B29 seated driver
-  ud.operatorCfg = { anchor: seatT, grip: swA, spread: 0.13, pose: 'seated', lean: 0.33, auto: opts.operator, anchors: { seat: seatT, steerGrip: swA } };
+  ud.operatorCfg = { anchor: seatT, grip: swA, spread: 0.13, pose: 'seated', lean: 0.4, auto: opts.operator, anchors: { seat: seatT, steerGrip: swA } };
   ud.setSpeed = (v) => { ud.speed = v; };
   ud.kin = { refZ: -0.55, L: 1.15, maxSteer: 0.6, tractorWheels: kinWheels(g, P.wheels), chain: P.carts.map((c, i) => ({ ...c, L: HZ - AX, rear: HZ - RZ, first: i === 0 })), hitchZ: -1.05 };
   const _p = new THREE.Vector3(), _q = new THREE.Vector3(), _m = new THREE.Matrix4();
@@ -1231,7 +1246,7 @@ export function createForklift(opts = {}) {
   ud.rearSteer = true; ud.steerRate = 1.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -0.75, 0.75); applyAckermann(P.steer, ud.steer, WB, 0.03, -1); }; // rear wheels turn opposite
   ud.kin = { refZ: 0.03, L: WB, maxSteer: 0.75, tractorWheels: kinWheels(g, P.wheels) };
   const seatF = grp(b, 'anchorSeat', 0, 1.16, -0.33), swF = grp(b, 'anchorSteerGrip', 0, 1.43, 0.33); swF.rotation.x = -1.97;   // B29 seated, hands on the wheel
-  ud.operatorCfg = { anchor: seatF, grip: swF, spread: 0.14, pose: 'seated', lean: 0.36, auto: opts.operator, anchors: { seat: seatF, steerGrip: swF } };
+  ud.operatorCfg = { anchor: seatF, grip: swF, spread: 0.14, pose: 'seated', lean: 0.44, auto: opts.operator, anchors: { seat: seatF, steerGrip: swF } };
   addForkApi(g, ud, mast); if (!ud.getForkHeight) ud.getForkHeight = () => mast.st.h; if (ud.setLoad) ud.setLoad(!!opts.load);
   return finish(g, P, (dt, t) => {
     if (ud.autoLift) { autoCycle(ud, mast, 2.6, dt); ud.tiltTarget = ud._al.up ? 0.06 : 0.0; }
@@ -1415,7 +1430,12 @@ export function createRiderPalletTruck(opts = {}) {
   add(rst, roundCyl(0.2, 0.06, 0.02, 24), C, 0, 0.78, 0, 0, 0, 0, 'steerHousingTop');
   const til = P.tiller = grp(rst, 'tiller', 0, 0.82, 0.08); add(til, cyl(0.03, 0.03, 0.35, 10), C, 0, 0.17, 0, 0.2);
   add(til, torus(0.1, 0.02), K, 0, 0.36, 0.04, -1.3);
-  add(pu, rbox(0.5, 0.05, 0.35, 0.02), C, 0, 0.12, -0.6, 0, 0, 0, 'riderPlatform');
+  add(pu, rbox(0.62, 0.05, 0.44, 0.02), C, 0, 0.12, -0.64, 0, 0, 0, 'riderPlatform');                   // deck top y 0.145, z -0.86..-0.42
+  add(pu, rbox(0.58, 0.006, 0.4, 0.003), mat(0x2b2f36, { roughness: 1 }), 0, 0.148, -0.64, 0, 0, 0, 'antiSlipMat');
+  for (const s of [-1, 1]) { add(pu, rbox(0.035, 0.95, 0.035, 0.012), K, s * 0.3, 0.62, -0.84, 0, 0, 0, 'guardPost');        // side guards + backrest
+    add(pu, rbox(0.035, 0.035, 0.4, 0.012), K, s * 0.3, 1.08, -0.65, 0, 0, 0, 'sideGuardRail'); add(pu, rbox(0.035, 0.035, 0.4, 0.012), K, s * 0.3, 0.6, -0.65, 0, 0, 0, 'sideGuardRail'); }
+  add(pu, rbox(0.4, 0.3, 0.07, 0.03), mat(0x1c2028, { roughness: 0.9 }), 0, 1.0, -0.82, 0, 0, 0, 'backrestPad');
+  add(pu, rbox(0.635, 0.035, 0.035, 0.012), K, 0, 1.0, -0.86, 0, 0, 0, 'backrestBar'); add(pu, rbox(0.635, 0.035, 0.035, 0.012), K, 0, 0.6, -0.86, 0, 0, 0, 'guardBar');
   add(pu, rbox(0.5, 0.06, 0.04, 0.02), Y, 0, 0.16, -0.78);
   const bc = P.beacon = makeBeacon(0xff7a1a, 0.9); bc.position.set(-0.3, 0.95, -0.35); pu.add(bc);
   decal(pu, sparkTex(), 0.25, 0.25, 0.392, 0.6, 0.1, Math.PI / 2); decal(pu, sparkTex(), 0.25, 0.25, -0.392, 0.6, 0.1, -Math.PI / 2);
@@ -1426,9 +1446,9 @@ export function createRiderPalletTruck(opts = {}) {
   ud.rearSteer = true; ud.steerRate = 2.5; ud.setSteer = (r) => { ud.steer = THREE.MathUtils.clamp(r, -1.2, 1.2); applyAckermann(P.steer, ud.steer, 1.25, 0.9, -1); };
   ud.kin = { refZ: 0.9, L: 1.25, maxSteer: 1.2, tractorWheels: kinWheels(g, P.wheels) };
   ud.setLift = (v) => { ud.liftT = THREE.MathUtils.clamp(v, 0, 1); }; ud.setSpeed = (v) => { ud.speed = v; };
-  for (const s of [-1, 1]) add(pu, rbox(0.04, 0.14, 0.04, 0.015), C, s * 0.2, 0.99, -0.4, 0, 0, 0, 'grabPost');
-  add(pu, rbox(0.46, 0.045, 0.045, 0.02), K, 0, 1.06, -0.4, 0, 0, 0, 'grabBar');
-  const platA = grp(pu, 'anchorPlatform', 0, 0.145, -0.62), gripR = grp(pu, 'anchorGrabBar', 0, 1.06, -0.4);   // B29 operator stands on the platform
+  for (const s of [-1, 1]) add(pu, rbox(0.04, 0.2, 0.04, 0.015), C, s * 0.2, 1.025, -0.44, 0, 0, 0, 'grabPost');
+  add(pu, rbox(0.46, 0.045, 0.045, 0.02), K, 0, 1.12, -0.44, 0, 0, 0, 'grabBar');
+  const platA = grp(pu, 'anchorPlatform', 0, 0.151, -0.63), gripR = grp(pu, 'anchorGrabBar', 0, 1.12, -0.44);   // B29 operator stands on the platform
   ud.operatorCfg = { anchor: platA, grip: gripR, spread: 0.16, pose: 'standing', auto: opts.operator, anchors: { platform: platA, stand: platA, grabBar: gripR } };
   return finish(g, P, (dt, t) => { ud.lift = damp(ud.lift, ud.liftT, 4, dt); lift.position.y = ud.lift * 0.12; if (!ud._driven) spinWheels(P.wheels, ud.speed, dt); ud._driven = false; bc.userData.mat.emissiveIntensity = flash(t, 1.5); }, ud);
 }
@@ -1580,6 +1600,7 @@ export function createRobotArm(opts = {}) {
  * parts: body (bobbing root), torso, vest, head, hardHat, armLeft, armRight, legLeft, legRight (pivot groups at shoulder/hip)
  * userData: setWalking(bool), walkSpeed (m/s, sets cadence), walkCycle(phase) (pose at phase radians), setWave(bool)
  */
+const UPPER = 0.27, FORE = 0.29;   // arm bones (shoulder->elbow, elbow->hand), total reach 0.56 m
 export function createWorker(opts = {}) {
   const vestC = opts.vest === 'blue' ? PALETTE.blue : 0xd8ef1f, shirt = opts.vest === 'blue' ? 0xe4e8ee : 0x2a3f63, pants = 0x1f2f4f;
   const g = grp(null, 'worker'), P = {}, body = P.body = grp(g, 'body'), skin = mat(PALETTE.skin, { roughness: 0.8 });
@@ -1598,21 +1619,26 @@ export function createWorker(opts = {}) {
   add(body, cyl(0.045, 0.05, 0.08, 12), sk, 0, 1.52, 0, 0, 0, 0, 'neck');
   const head = P.head = grp(body, 'head', 0, 1.66, 0);
   add(head, sph(0.12, 24, 18), sk, 0, 0, 0, 0, 0, 0, 'face');
-  for (const s of [-1, 1]) add(head, sph(0.016, 8, 6), mat(0x1c2028), s * 0.042, 0.015, 0.108, 0, 0, 0, 'eye');
+  // toy face: two dark eyes with a tiny catch-light, and a small smile arc; all sit just proud of the 0.12 m head sphere (no z-fighting)
+  for (const s of [-1, 1]) { add(head, sph(0.019, 12, 8), mat(0x1c2028, { roughness: 0.5 }), s * 0.042, 0.012, 0.106, 0, 0, 0, 'eye').scale.set(1, 1.15, 0.6);
+    add(head, sph(0.0055, 6, 4), mat(0xffffff), s * 0.042 + 0.006, 0.019, 0.1175, 0, 0, 0, 'eyeGlint'); }
+  add(head, cached(_geo, 'smile', () => new THREE.TorusGeometry(0.03, 0.0065, 6, 14, Math.PI * 0.8)), mat(0x7a3b2e, { roughness: 0.7 }), 0, -0.028, 0.104, -0.28, 0, Math.PI * 1.1, 'smile');
   add(head, sph(0.03, 8, 6), sk, 0, -0.01, 0.115).scale.set(0.8, 0.7, 0.6);
   if (opts.hardHat !== false) { const hat = P.hardHat = grp(head, 'hardHat', 0, 0.035, 0); const hm = mat(opts.vest === 'blue' ? PALETTE.spark : 0xf4f5f7, { roughness: 0.6 });
     add(hat, dome(0.132), hm, 0, 0, 0); add(hat, roundCyl(0.15, 0.02, 0.008, 28), hm, 0, 0.005, 0.02); add(hat, rbox(0.03, 0.03, 0.22, 0.012), hm, 0, 0.125, 0, 0, 0, 0, 'ridge'); }
   else add(head, dome(0.125), mat(0x3a2a1e), 0, 0.02, -0.01, -0.25, 0, 0, 'hair');
   const arms = [-1, 1].map((s) => { const sp = grp(body, s < 0 ? 'armLeft' : 'armRight', s * 0.235, 1.44, 0); sp.rotation.z = s * 0.08;
     add(sp, cap(0.058, 0.22, 12), vm, 0, -0.13, 0, 0, 0, 0, 'sleeve');
-    add(sp, cap(0.05, 0.3, 12), mat(shirt), 0, -0.33, 0, 0, 0, 0, 'forearm');
-    add(sp, sph(0.055, 12, 10), sk, 0, -0.56, 0, 0, 0, 0, 'hand'); return sp; });
+    const el = grp(sp, 'elbow', 0, -UPPER, 0); sp.userData.elbow = el;                                  // two-bone arm: shoulder -> elbow -> hand
+    add(el, cap(0.05, 0.3, 12), mat(shirt), 0, -0.06, 0, 0, 0, 0, 'forearm');
+    sp.userData.hand = add(el, sph(0.055, 12, 10), sk, 0, -FORE, 0, 0, 0, 0, 'hand'); return sp; });
   P.armLeft = arms[0]; P.armRight = arms[1];
   const ud = { walking: !!opts.walking, walkSpeed: opts.walkSpeed ?? 1.3, phase: r() * 6, w: opts.walking ? 1 : 0, wave: false };
   ud.walkCycle = (ph, k = 1) => {
-    const s = Math.sin(ph); legs[0].rotation.x = s * 0.5 * k; legs[1].rotation.x = -s * 0.5 * k;
+    const s = Math.sin(ph), kl = k * (ud.stride ?? 1); legs[0].rotation.x = s * 0.5 * kl; legs[1].rotation.x = -s * 0.5 * kl;
     arms[0].rotation.x = -s * 0.45 * k; arms[1].rotation.x = s * 0.45 * k;
-    body.position.y = 0; body.rotation.y = s * 0.06 * k; head.rotation.y = -s * 0.04 * k; plant();
+    for (const a of arms) a.userData.elbow.rotation.set(-0.15 - 0.15 * k * (1 + Math.sin(ph)) * 0.5, 0, 0);
+    body.position.y = 0; body.rotation.x = ud.lean || 0; body.rotation.y = s * 0.06 * k; head.rotation.y = -s * 0.04 * k; plant();
   };
   // keep the lowest sole exactly on y=0 (stance foot planted; gives a natural bob)
   const _inv = new THREE.Matrix4(), _mm = new THREE.Matrix4(), _p = new THREE.Vector3();
@@ -1623,19 +1649,29 @@ export function createWorker(opts = {}) {
   ud.setWalking = (b) => { ud.walking = !!b; }; ud.setWave = (b) => { ud.wave = !!b; };
   // hands rig: attachHandsTo(obj, spread) puts the hands at obj's local (+-spread, 0, 0) (e.g. anchors.tillerGrip / a
   // steering-wheel anchor); attachHandsTo([objA, objB]) puts one hand on each. Arms aim (and stretch slightly) every frame.
-  const ARM = 0.56, _hv = new THREE.Vector3(), _hs = [new THREE.Vector3(), new THREE.Vector3()], _bi = new THREE.Matrix4(), _q = new THREE.Quaternion(), _dn = new THREE.Vector3(0, -1, 0);
+  const _hv = new THREE.Vector3(), _hs = [new THREE.Vector3(), new THREE.Vector3()], _bi = new THREE.Matrix4(), _q = new THREE.Quaternion(), _dn = new THREE.Vector3(0, -1, 0);
   ud.hands = null;
-  ud.attachHandsTo = (obj, spread = 0.08) => { ud.hands = obj ? { objs: Array.isArray(obj) ? obj : [obj], spread } : null;
-    if (!obj) arms.forEach((a, i) => { a.scale.set(1, 1, 1); a.rotation.set(0, 0, i ? 0.08 : -0.08); }); return g; };
+  // one: 0|1 -> only that arm grips (at the grip centre), the other swings free.  Two-bone IK, elbow pole = down/out/back;
+  // if the grip is beyond full reach the arm straightens and stretches (ud.armStretch = distance / 0.56 reported per arm).
+  ud.attachHandsTo = (obj, spread = 0.08, one = null) => { ud.hands = obj ? { objs: Array.isArray(obj) ? obj : [obj], spread, one } : null;
+    arms.forEach((a, i) => { a.scale.set(1, 1, 1); a.rotation.set(0, 0, i ? 0.08 : -0.08); a.userData.elbow.rotation.set(-0.15, 0, 0); }); return g; };
+  const _e = new THREE.Vector3(), _pl = new THREE.Vector3(), _f = new THREE.Vector3(), _qi = new THREE.Quaternion(); ud.armStretch = [1, 1];
+  const ik = (a, i, tgt) => { _hv.copy(tgt).sub(a.position); const d = _hv.length(), R = UPPER + FORE, dc = THREE.MathUtils.clamp(d, 0.12, R - 1e-4); ud.armStretch[i] = d / R;
+    const dir = _hv.normalize(); _pl.set((i ? 1 : -1) * 0.55, -1, -0.45); _pl.addScaledVector(dir, -_pl.dot(dir)); if (_pl.lengthSq() < 1e-6) _pl.set(0, 0, -1); _pl.normalize();
+    const cA = THREE.MathUtils.clamp((UPPER * UPPER + dc * dc - FORE * FORE) / (2 * UPPER * dc), -1, 1), sA = Math.sqrt(1 - cA * cA);
+    _e.copy(dir).multiplyScalar(cA * UPPER).addScaledVector(_pl, sA * UPPER);                                  // elbow in body space (rel. shoulder)
+    _q.setFromUnitVectors(_dn, _f.copy(_e).normalize()); a.quaternion.copy(_q); const st = Math.max(1, d / R); a.scale.set(1, st, 1);
+    _f.copy(dir).multiplyScalar(dc).sub(_e).normalize().applyQuaternion(_qi.copy(_q).invert()); a.userData.elbow.quaternion.setFromUnitVectors(_dn, _f); };
   ud.detachHands = () => ud.attachHandsTo(null);
   ud.aimHands = () => { const h = ud.hands; if (!h) return; const o = h.objs;
     o.forEach((x) => x.updateWorldMatrix(true, false)); body.updateWorldMatrix(true, false); _bi.copy(body.matrixWorld).invert();
     if (o.length === 1) { _hs[0].set(-h.spread, 0, 0).applyMatrix4(o[0].matrixWorld); _hs[1].set(h.spread, 0, 0).applyMatrix4(o[0].matrixWorld); }
     else { _hs[0].setFromMatrixPosition(o[0].matrixWorld); _hs[1].setFromMatrixPosition(o[1].matrixWorld); }
-    _hs[0].applyMatrix4(_bi); _hs[1].applyMatrix4(_bi); const lo = _hs[0].x <= _hs[1].x ? 0 : 1;
-    arms.forEach((a, i) => { _hv.copy(_hs[i === 0 ? lo : 1 - lo]).sub(a.position); const L = _hv.length(); _q.setFromUnitVectors(_dn, _hv.normalize()); a.quaternion.copy(_q); a.scale.set(1, L / ARM, 1); });
+    _hs[0].applyMatrix4(_bi); _hs[1].applyMatrix4(_bi);
+    if (h.one != null) { _hs[0].add(_hs[1]).multiplyScalar(0.5); ik(arms[h.one], h.one, _hs[0]); return; }
+    const lo = _hs[0].x <= _hs[1].x ? 0 : 1; arms.forEach((a, i) => ik(a, i, _hs[i === 0 ? lo : 1 - lo]));
   };
-  ud.getHandPositions = () => arms.map((a) => a.localToWorld(new THREE.Vector3(0, -0.56, 0)));
+  ud.getHandPositions = () => arms.map((a) => a.userData.hand.getWorldPosition(new THREE.Vector3()));
   return finish(g, P, (dt, t) => {
     ud.w = damp(ud.w, ud.walking ? 1 : 0, 6, dt); ud.phase += dt * (ud.walkSpeed / 0.75) * Math.PI * ud.w;
     ud.walkCycle(ud.phase, ud.w);
@@ -1646,7 +1682,9 @@ export function createWorker(opts = {}) {
 }
 
 /**
- * createOperator({pose:'seated'|'standing'|'walking-tiller', vest, hardHat, seed})  vehicle operator in the worker style
+ * createOperator({pose:'seated'|'standing'|'walking-tiller'|'pushing-tiller', vest, hardHat, seed})
+ * walking-tiller = PULLING (walks ahead of the truck facing away from it, one hand behind on the tiller, leans away from the
+ * load in proportion to speed); pushing-tiller = faces the truck, both hands on the handle, short shuffle steps.  vehicle operator in the worker style
  * (hi-vis vest, hard hat). Origin: standing = between the soles; seated = seat-cushion contact point (hip joints 8 cm above),
  * facing +Z. 'walking-tiller' runs the walk cycle from the figure's own world motion (cadence follows speed, stops when the
  * truck stops). Same parts/API as createWorker plus: setPose(pose, {lean}), pose, motionSpeed, attachHandsTo(obj|[a,b], spread),
@@ -1662,7 +1700,7 @@ export function createOperator(opts = {}) {
   const sitPose = () => { body.rotation.set(lean, 0, 0); body.position.set(0, SEAT_H - HIP * Math.cos(lean), -HIP * Math.sin(lean)); hips.forEach((h) => h.rotation.set(-lean, 0, 0)); };
   ud.setPose = (p, o = {}) => { ud.pose = p; const sit = p === 'seated'; lean = sit ? (o.lean ?? 0.15) : 0;
     seatLegs.forEach((x) => { x.visible = sit; }); standKids.forEach((c) => { c.visible = !sit; });
-    if (sit) sitPose(); else { body.rotation.set(0, 0, 0); hips.forEach((h) => h.rotation.set(0, 0, 0)); } return w; };
+    if (sit) sitPose(); else { body.rotation.set(0, 0, 0); hips.forEach((h) => h.rotation.set(0, 0, 0)); } ud.stride = 1; return w; };
   const prev = new THREE.Vector3(), cur = new THREE.Vector3(), fwd = new THREE.Vector3(); let has = false; ud.motionSpeed = 0;
   ud.update = (dt, t) => {
     if (ud.pose === 'seated') { sitPose(); P.torso.scale.y = 1 + Math.sin(t * 1.8) * 0.008; P.head.rotation.y = Math.sin(t * 0.4) * 0.2;
@@ -1670,7 +1708,10 @@ export function createOperator(opts = {}) {
     w.updateWorldMatrix(true, false); cur.setFromMatrixPosition(w.matrixWorld);
     if (has && dt > 0) { fwd.set(0, 0, 1).transformDirection(w.matrixWorld); const v = prev.sub(cur).multiplyScalar(-1).dot(fwd) / dt; ud.motionSpeed = damp(ud.motionSpeed, v, 8, dt); }
     prev.copy(cur); has = dt > 0 || has;
-    if (ud.pose === 'walking-tiller') { const a = Math.abs(ud.motionSpeed); ud.walking = a > 0.05; ud.walkSpeed = Math.max(0.5, a); } else ud.walking = false;
+    const a = Math.abs(ud.motionSpeed);
+    if (ud.pose === 'walking-tiller') { ud.walking = a > 0.05; ud.walkSpeed = Math.max(0.5, a); ud.stride = 1; ud.lean = damp(ud.lean || 0, Math.min(0.12, 0.1 * a), 4, dt); }        // pulling: lean away from the load
+    else if (ud.pose === 'pushing-tiller') { ud.walking = a > 0.05; ud.walkSpeed = Math.max(0.6, a) * 1.7; ud.stride = 0.5; ud.lean = damp(ud.lean || 0, Math.min(0.1, 0.08 * a), 4, dt); } // short shuffle steps, lean in
+    else { ud.walking = false; ud.lean = damp(ud.lean || 0, 0, 4, dt); }
     baseUpdate(dt, t);
   };
   ud.setPose(opts.pose ?? 'standing'); return w;

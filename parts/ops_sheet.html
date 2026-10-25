@@ -8,7 +8,7 @@
 window.__errors = []; addEventListener('error', (e) => window.__errors.push(String(e.message)));
 import * as THREE from 'three';
 import { MODELS, createOperator } from './models.js';
-const W = innerWidth, H = innerHeight, C = 3, R = 3, tw = W / C, th = H / R;
+const W = innerWidth, H = innerHeight, C = 4, R = 3, tw = W / C, th = H / R;
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); renderer.setSize(W, H); renderer.setScissorTest(true);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.prepend(renderer.domElement);
@@ -18,14 +18,17 @@ const T = [
   ['forklift', 'forklift', 'seated · hands on wheel', [0, 1.25, -0.5], 55, 18, 4.2],
   ['reachTruck', 'reachTruck', 'standing side-stance', [0, 1.3, -0.9], 75, 16, 4.2],
   ['riderPalletTruck', 'riderPalletTruck', 'standing on platform', [0, 1.0, -0.8], 135, 18, 3.6],
-  ['walkieStacker', 'walkieStacker', 'walking · tiller grip', [0, 1.0, -1.0], 125, 16, 4.4, { v: 0.9, steer: 0.3 }],
-  ['handPalletJack', 'handPalletJack', 'walking · tiller grip', [0, 0.85, -0.8], 115, 18, 3.8, { v: 0.9, steer: 0.3 }],
+  ['riderPalletTruck close', 'riderPalletTruck', 'feet on deck · backrest', [0, 0.6, -1.2], 115, 14, 2.3],
+  ['walkieStacker', 'walkieStacker', 'auto: pulling (tiller first)', [0, 1.0, -1.4], 120, 14, 4.6, { v: -0.9, steer: 0.0 }],
+  ['handPalletJack PULL', 'handPalletJack', 'pull · lean away · elbow bend', [0, 0.85, -1.2], 110, 12, 3.2, { v: -1.0, steer: 0.0 }],
+  ['handPalletJack PUSH', 'handPalletJack', 'push · both hands · shuffle', [0, 0.85, -0.8], 115, 14, 3.2, { v: 0.6, steer: 0.25 }],
   ['tugTrain', 'tugTrain', 'seated · hands on wheel', [0, 1.1, -0.1], 50, 18, 4.0],
   ['yardTractor', 'yardTractor', 'seated in open cab', [-0.55, 2.15, 1.6], 35, 14, 5.2],
   ['semiTruck', 'semiTruck', 'driver behind windshield', [0.2, 2.5, 8.6], 18, 10, 7.0],
+  ['operator face', null, 'toy face · eyes + smile', [0, 1.62, 0], 15, 6, 1.3, null, 'face'],
   ['operators', null, 'createOperator poses', [0, 0.9, 0], 30, 12, 4.4],
 ];
-const tiles = T.map(([label, name, pose, tgt, az, el, dist, mo], i) => {
+const tiles = T.map(([label, name, pose, tgt, az, el, dist, mo, kind], i) => {
   const scene = new THREE.Scene(); scene.background = new THREE.Color(0xeef2f7);
   scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c4d2, 1.35));
   const sun = new THREE.DirectionalLight(0xffffff, 2.1); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
@@ -34,25 +37,30 @@ const tiles = T.map(([label, name, pose, tgt, az, el, dist, mo], i) => {
   const gnd = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0xdfe5ec, roughness: 1 })); gnd.rotation.x = -Math.PI / 2; gnd.receiveShadow = true; scene.add(gnd);
   const objs = [];
   if (name) { const m = MODELS[name]({ operator: true }); scene.add(m); objs.push(m); if (!m.userData.operator) window.__errors.push('no operator on ' + name); if (mo) m.userData.setSteer?.(mo.steer, true); }
-  else ['seated', 'standing', 'walking-tiller'].forEach((p, k) => { const o = createOperator({ pose: p }); o.position.set((k - 1) * 0.9, p === 'seated' ? 0.45 : 0, p === 'walking-tiller' ? -1.2 : 0); scene.add(o); objs.push(o);
+  else if (kind === 'face') { const o = createOperator({ pose: 'standing' }); scene.add(o); objs.push(o); }
+  else ['seated', 'standing', 'pushing-tiller'].forEach((p, k) => { const o = createOperator({ pose: p }); o.position.set((k - 1) * 0.9, p === 'seated' ? 0.45 : 0, p === 'pushing-tiller' ? -0.5 : 0); scene.add(o); objs.push(o);
     if (p === 'seated') { const st = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), new THREE.MeshStandardMaterial({ color: 0x2a3f63 })); st.position.set(o.position.x, 0.225, -0.05); st.castShadow = st.receiveShadow = true; scene.add(st); }
-    if (p === 'walking-tiller') o.userData.mo = 1; });
+    if (p === 'pushing-tiller') o.userData.mo = 1; });
   const cam = new THREE.PerspectiveCamera(32, tw / th, 0.05, 300);
   cam.position.set(c.x + Math.sin(d2r(az)) * Math.cos(d2r(el)) * dist, c.y + Math.sin(d2r(el)) * dist, c.z + Math.cos(d2r(az)) * Math.cos(d2r(el)) * dist); cam.lookAt(c);
   const lb = document.createElement('div'); lb.className = 't'; lb.innerHTML = `${label} <b>${pose}</b>`; lb.style.left = (i % C) * tw + 10 + 'px'; lb.style.top = Math.floor(i / C) * th + 8 + 'px'; document.body.appendChild(lb);
-  return { scene, cam, objs, mo, c, i };
+  return { scene, cam, objs, mo, c, i, label };
 });
 let t = 0;
 window.__step = (dt, n) => { for (let k = 0; k < n; k++) { t += dt; for (const tl of tiles) for (const o of tl.objs) {
-  if (tl.mo || o.userData.mo) { o.position.z += (tl.mo?.v ?? 0.9) * dt; o.userData.setSpeed?.(tl.mo?.v ?? 0.9); }
+  if (tl.mo || o.userData.mo) { o.position.z += (tl.mo?.v ?? 0.4) * dt; o.userData.setSpeed?.(tl.mo?.v ?? 0.4); }
   o.userData.update?.(dt, t); } }
   for (const tl of tiles) { if (tl.mo) { const o = tl.objs[0], dz = o.position.z; tl.cam.position.z += 0; tl.cam.lookAt(tl.c.x, tl.c.y, tl.c.z + dz); tl.cam.position.z = tl._z0 ??= tl.cam.position.z; tl.cam.position.z = tl._z0 + dz; tl.cam.lookAt(tl.c.x, tl.c.y, tl.c.z + dz); }
     const x = (tl.i % C) * tw, y = H - (Math.floor(tl.i / C) + 1) * th; renderer.setViewport(x, y, tw, th); renderer.setScissor(x + 1, y + 1, tw - 2, th - 2); renderer.render(tl.scene, tl.cam); } };
 // probes for the automated check: hand-to-grip error per vehicle
 window.__probe = () => tiles.filter((tl) => tl.objs[0].userData.operator).map((tl) => { const ud = tl.objs[0].userData, op = ud.operator, h = op.userData.hands, hp = op.userData.getHandPositions();
   const tg = h.objs.length === 1 ? [-h.spread, h.spread].map((x) => h.objs[0].localToWorld(new THREE.Vector3(x, 0, 0))) : h.objs.map((o) => o.getWorldPosition(new THREE.Vector3()));
-  const err = Math.max(Math.min(hp[0].distanceTo(tg[0]), hp[0].distanceTo(tg[1])), Math.min(hp[1].distanceTo(tg[0]), hp[1].distanceTo(tg[1])));
+  const err = h.one != null ? hp[h.one].distanceTo(tg[0].clone().add(tg[1]).multiplyScalar(0.5)) : Math.max(Math.min(hp[0].distanceTo(tg[0]), hp[0].distanceTo(tg[1])), Math.min(hp[1].distanceTo(tg[0]), hp[1].distanceTo(tg[1])));
   const sc = op.userData.parts.armLeft.scale.y, sc2 = op.userData.parts.armRight.scale.y;
-  return { name: tl.objs[0].name, pose: op.userData.pose, handErr: +err.toFixed(4), armStretch: [+sc.toFixed(2), +sc2.toFixed(2)], walking: !!op.userData.walking, anchors: Object.keys(ud.anchors) }; });
+    let feet = null; if (tl.objs[0].name === 'riderPalletTruck') { const m = tl.objs[0], deck = new THREE.Box3().setFromObject(m.getObjectByName('antiSlipMat')), pl = new THREE.Box3().setFromObject(m.getObjectByName('riderPlatform'));
+    const sh = []; op.traverse((o) => { let v = true; for (let q = o; q; q = q.parent) v = v && q.visible; if (o.name === 'shoe' && v) sh.push(new THREE.Box3().setFromObject(o)); });
+    feet = { ok: false, soleY: +Math.min(...sh.map((b) => b.min.y)).toFixed(4), deckTopY: +deck.max.y.toFixed(4), inside: sh.every((b) => b.min.x >= pl.min.x && b.max.x <= pl.max.x && b.min.z >= pl.min.z && b.max.z <= pl.max.z) }; }
+  const elb = ['armLeft', 'armRight'].map((n) => +(Math.PI - op.userData.parts[n].userData.elbow.quaternion.angleTo(new THREE.Quaternion()) ).toFixed(2));
+  return { label: tl.label, mode: ud.getOperatorMode?.() ?? null, lean: +(op.userData.lean || 0).toFixed(3), stretch: op.userData.armStretch.map((x) => +x.toFixed(2)), elbowBendDeg: ['armLeft', 'armRight'].map((n) => +THREE.MathUtils.radToDeg(op.userData.parts[n].userData.elbow.quaternion.angleTo(new THREE.Quaternion())).toFixed(1)), feet, name: tl.objs[0].name, pose: op.userData.pose, handErr: +err.toFixed(4), armStretch: [+sc.toFixed(2), +sc2.toFixed(2)], walking: !!op.userData.walking, anchors: Object.keys(ud.anchors) }; });
 window.__tiles = tiles; window.__step(1 / 30, 1); window.__ready = true;
 </script></body></html>

@@ -318,6 +318,7 @@ def export(name, meta):
         bpy.context.view_layer.update()
     qa['ground_shift'] = round(-qa['min_z'], 5)
     print('QA', name, json.dumps(qa))
+    if name in MERGE_ASSETS: meta = dict(meta); meta['material_pass'] = merge_materials(name)
     pivotize()
     for o in list(bpy.context.scene.objects):
         if o.hide_render and o.type == 'MESH': bpy.data.objects.remove(o, do_unlink=True)
@@ -504,3 +505,159 @@ def closeups(name, shots=(), rear=True, res=700):
     if rear: render(name + '__rear', res=res, view=(-0.9, 1.1, 0.6), samples=24, outdir=QA_DIR)
     for tag, tgt, view in shots:
         render(name + '__' + tag, res=res, view=view, target=tgt, samples=24, outdir=QA_DIR)
+
+# ---------------------------------------------------------------- draw-call pass (material merge + atlases)
+import re as _re
+UNLIT_RE = _re.compile(r'^(brand_|trailer_side|trailer_rear|mark53)|led|light_|beacon', _re.I)
+MERGE_ASSETS = {'walmart_truck', 'tug_cart_train', 'forklift_counterbalance', 'reach_truck', 'pallet_stacker_auto', 'amr'}
+GEN = os.path.join(TEX, 'gen')
+
+def _srgb(c):
+    return tuple(12.92 * x if x <= 0.0031308 else 1.055 * x ** (1 / 2.4) - 0.055 for x in c[:3])
+
+def _minfo(m):
+    b = m.node_tree.nodes.get('Principled BSDF') if m.use_nodes else None
+    if b is None: return None
+    img = None
+    for l in m.node_tree.links:
+        if l.to_node == b and l.to_socket.name == 'Base Color' and l.from_node.type == 'TEX_IMAGE': img = l.from_node.image
+    em = tuple(b.inputs['Emission Color'].default_value)[:3]; es = b.inputs['Emission Strength'].default_value
+    return dict(base=tuple(b.inputs['Base Color'].default_value)[:3], rough=b.inputs['Roughness'].default_value,
+                metal=b.inputs['Metallic'].default_value, alpha=b.inputs['Alpha'].default_value, img=img,
+                emit=em if es > 0 and max(em) > 0 else None, estr=es, blend=getattr(m, 'surface_render_method', 'DITHERED') == 'BLENDED' or m.blend_method == 'BLEND')
+
+def _img_np(img):
+    import numpy as np
+    a = np.empty(img.size[0] * img.size[1] * 4, dtype=np.float32); img.pixels.foreach_get(a)
+    return a.reshape(img.size[1], img.size[0], 4)
+
+def _save_img(nm, arr, noncolor=False):
+    import numpy as np
+    os.makedirs(GEN, exist_ok=True)
+    h, w = arr.shape[:2]
+    if nm in bpy.data.images: bpy.data.images.remove(bpy.data.images[nm])
+    im = bpy.data.images.new(nm, w, h, alpha=False)
+    if noncolor: im.colorspace_settings.name = 'Non-Color'
+    im.pixels.foreach_set(np.ascontiguousarray(arr, dtype=np.float32).ravel())
+    p = os.path.join(GEN, nm + '.png'); im.filepath_raw = p; im.file_format = 'PNG'; im.save()
+    im.source = 'FILE'; im.filepath = p; im.reload()
+    if noncolor: im.colorspace_settings.name = 'Non-Color'
+    return im
+
+def merge_materials(asset):
+    """Collapse every opaque, untextured, non-emissive material into ONE 'clay_palette' material
+    (base colour + roughness/metal palette textures, NEAREST sampled, UVs collapsed to the palette texel), and every
+    brand/livery/lamp material (UNLIT_RE, emissive, or brand textures) into ONE 'brand_atlas' material (atlas of the
+    decal textures + solid brand/lamp swatches, emissive mask atlas) -> 1-2 primitives per node."""
+    import numpy as np
+    objs = [o for o in bpy.context.scene.objects if o.type == 'MESH' and not o.name.startswith('_')
+            and not any(md.type == 'ARMATURE' for md in o.modifiers)]
+    used = []
+    for o in objs:
+        for m in o.data.materials:
+            if m and m not in used: used.append(m)
+    info = {m.name: _minfo(m) for m in used}
+    cls = {}
+    for m in used:
+        i = info[m.name]
+        if i is None or i['blend'] or i['alpha'] < 0.999: cls[m.name] = 'keep'
+        elif i['img'] is not None: cls[m.name] = 'atlas_tex' if UNLIT_RE.search(m.name) else 'keep'
+        elif UNLIT_RE.search(m.name) or i['emit']: cls[m.name] = 'atlas_solid'
+        else: cls[m.name] = 'pal'
+    # ---- palette (lit)
+    pal = [m.name for m in used if cls[m.name] == 'pal']
+    B = 16; PC = 8
+    PW = B * PC; PH = B * max(1, -(-len(pal) // PC))
+    pbase = np.ones((PH, PW, 4), np.float32); pmr = np.ones((PH, PW, 4), np.float32); puv = {}
+    for k, nm in enumerate(pal):
+        cx, cy = k % PC, k // PC; i = info[nm]
+        pbase[cy * B:(cy + 1) * B, cx * B:(cx + 1) * B, :3] = _srgb(i['base'])
+        pmr[cy * B:(cy + 1) * B, cx * B:(cx + 1) * B, :3] = (0.0, i['rough'], i['metal'])
+        puv[nm] = ((cx + 0.5) * B / PW, (cy + 0.5) * B / PH)
+    # ---- brand atlas (decal textures shelf-packed with edge gutters + 64 px solid swatches)
+    tex = [m.name for m in used if cls[m.name] == 'atlas_tex']; sol = [m.name for m in used if cls[m.name] == 'atlas_solid']
+    PAD = 8; SW = 64
+    imgs = {nm: _img_np(info[nm]['img']) for nm in tex}
+    AW = max([a.shape[1] + 2 * PAD for a in imgs.values()] + [SW * 8])
+    AW = -(-AW // 16) * 16
+    rects = {}; x = y = rowh = 0
+    for nm in sorted(tex, key=lambda n: -imgs[n].shape[0]):
+        h, w = imgs[nm].shape[:2]
+        if x + w + 2 * PAD > AW: x = 0; y += rowh; rowh = 0
+        rects[nm] = (x + PAD, y + PAD, w, h); x += w + 2 * PAD; rowh = max(rowh, h + 2 * PAD)
+    y += rowh; sy0 = y; scol = AW // SW
+    AH = sy0 + SW * max(1, -(-len(sol) // scol)) if sol else max(sy0, 16)
+    AH = -(-AH // 16) * 16
+    abase = np.ones((AH, AW, 4), np.float32); aem = np.zeros((AH, AW, 4), np.float32); aem[..., 3] = 1
+    for nm, (rx, ry, w, h) in rects.items():
+        abase[ry - PAD:ry + h + PAD, rx - PAD:rx + w + PAD] = np.pad(imgs[nm], ((PAD, PAD), (PAD, PAD), (0, 0)), mode='edge')
+    emax = max([info[n]['estr'] for n in sol if info[n]['emit']] + [1.0])
+    for k, nm in enumerate(sol):
+        cx, cy = k % scol, k // scol; i = info[nm]
+        sl = (slice(sy0 + cy * SW, sy0 + (cy + 1) * SW), slice(cx * SW, (cx + 1) * SW))
+        abase[sl][..., :3] = _srgb(i['base'])
+        if i['emit']: aem[sl][..., :3] = _srgb(tuple(min(1.0, c * i['estr'] / emax) for c in i['emit']))
+        rects[nm] = ((cx + 0.5) * SW, sy0 + (cy + 0.5) * SW, 0, 0)
+    has_atlas = bool(tex or sol); has_em = has_atlas and any(info[n]['emit'] for n in sol)
+    # ---- materials
+    newm = {}
+    if pal:
+        ib = _save_img(asset + '_palette', pbase); imr = _save_img(asset + '_palette_mr', pmr, noncolor=True)
+        m = bpy.data.materials.new('clay_palette'); m.use_nodes = True; nt = m.node_tree; b = nt.nodes['Principled BSDF']
+        t1 = nt.nodes.new('ShaderNodeTexImage'); t1.image = ib; t1.interpolation = 'Closest'
+        t2 = nt.nodes.new('ShaderNodeTexImage'); t2.image = imr; t2.interpolation = 'Closest'
+        sp = nt.nodes.new('ShaderNodeSeparateColor')
+        nt.links.new(t1.outputs['Color'], b.inputs['Base Color']); nt.links.new(t2.outputs['Color'], sp.inputs['Color'])
+        nt.links.new(sp.outputs['Green'], b.inputs['Roughness']); nt.links.new(sp.outputs['Blue'], b.inputs['Metallic'])
+        newm['pal'] = m
+    if has_atlas:
+        ia = _save_img(asset + '_brand_atlas', abase)
+        m = bpy.data.materials.new('brand_atlas'); m.use_nodes = True; nt = m.node_tree; b = nt.nodes['Principled BSDF']
+        t1 = nt.nodes.new('ShaderNodeTexImage'); t1.image = ia; t1.interpolation = 'Linear'
+        nt.links.new(t1.outputs['Color'], b.inputs['Base Color']); b.inputs['Roughness'].default_value = 0.6
+        if has_em:
+            ie = _save_img(asset + '_brand_emissive', aem)
+            t2 = nt.nodes.new('ShaderNodeTexImage'); t2.image = ie; t2.interpolation = 'Linear'
+            nt.links.new(t2.outputs['Color'], b.inputs['Emission Color']); b.inputs['Emission Strength'].default_value = emax
+        newm['atlas_tex'] = newm['atlas_solid'] = m
+    # ---- remap meshes
+    done = set(); uvwarn = []
+    for o in objs:
+        me = o.data
+        if me.name in done or not me.materials: continue
+        done.add(me.name)
+        if not me.uv_layers: me.uv_layers.new(name='UVMap')
+        uvl = me.uv_layers.active
+        np_ = len(me.polygons); nl = len(me.loops)
+        mi = np.zeros(np_, np.int32); me.polygons.foreach_get('material_index', mi)
+        ls = np.zeros(np_, np.int32); me.polygons.foreach_get('loop_start', ls)
+        lt = np.zeros(np_, np.int32); me.polygons.foreach_get('loop_total', lt)
+        lpoly = np.repeat(np.arange(np_), lt)
+        uv = np.zeros(nl * 2, np.float32); uvl.data.foreach_get('uv', uv); uv = uv.reshape(nl, 2)
+        old = list(me.materials); slots = []; remap = []
+        for m in old:
+            c = cls.get(m.name, 'keep') if m else 'keep'
+            tgt = newm.get(c, m)
+            if tgt not in slots: slots.append(tgt)
+            remap.append(slots.index(tgt))
+        lmi = mi[lpoly]
+        for si, m in enumerate(old):
+            if m is None: continue
+            c = cls.get(m.name, 'keep'); sel = lmi == si
+            if not sel.any() or c == 'keep': continue
+            if c == 'pal': uv[sel] = puv[m.name]
+            elif c == 'atlas_solid': rx, ry, _, _ = rects[m.name]; uv[sel] = (rx / AW, ry / AH)
+            else:
+                rx, ry, w, h = rects[m.name]; u = uv[sel]
+                if u.min() < -0.002 or u.max() > 1.002: uvwarn.append((o.name, m.name, float(u.min()), float(u.max())))
+                u = np.clip(u, 0, 1)
+                uv[sel] = np.stack([(rx + u[:, 0] * w) / AW, (ry + u[:, 1] * h) / AH], 1)
+        uvl.data.foreach_set('uv', uv.ravel())
+        me.materials.clear()
+        for m in slots: me.materials.append(m)
+        me.polygons.foreach_set('material_index', np.array(remap, np.int32)[mi])
+        me.update()
+    rep = dict(palette=pal, atlas_textures=tex, atlas_solid=sol, kept=[n for n in cls if cls[n] == 'keep'],
+               palette_px=[PW, PH], atlas_px=[AW, AH] if has_atlas else None, emissive_strength=emax if has_em else None, uv_warnings=uvwarn)
+    print('MERGE', asset, json.dumps({k: (len(v) if isinstance(v, list) and k != 'uv_warnings' else v) for k, v in rep.items()}))
+    return rep

@@ -318,7 +318,7 @@ class SorterInstance {
     for (const l of this.lanes) for (let i = 0; i < l.cases.length; i++) { const c = l.cases[i], lead = l.cases[i - 1];
       const stop = lead ? lead.s - this._spacing(lead, c, o.laneGap) : l.path.len - c.hl - 0.04;
       this._speed(c, stop, dt);
-      if (!lead && !c.arrived && c.s >= l.path.len - c.hl - 0.045 && c.u < 1e-3) { c.arrived = true; this.stats.arrived++; this._pose(c); for (const cb of this.cbs) cb(c.mesh, l.k); } }
+      if (!c.arrived && (!lead || lead.arrived) && c.s >= stop - 0.005 && c.u < 1e-3 && c.s > l.path.len - o.laneLength) { c.arrived = true; this.stats.arrived++; this._pose(c); for (const cb of this.cbs) cb(c.mesh, l.k); } }
     for (const c of this.cases) if (c.where !== 'pending' && c.where !== 'removed') this._pose(c);
     this._updateBed(dt);
     this.pulse *= Math.exp(-dt * 5); this.archMat.emissiveIntensity = 0.25 + 3.0 * this.pulse; this.archSpark.emissiveIntensity = 0.2 + 2.2 * this.pulse;

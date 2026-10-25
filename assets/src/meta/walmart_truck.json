@@ -32,6 +32,46 @@
   "trailer_door_L/R": "children of trailer, origin on the outer hinge line at door bottom: rotate about Y to swing open (L: negative angle opens outward, R: positive)"
  },
  "texture": "trailer_side.png (Walmart + spark + com), trailer_rear.png, mark53.png embedded",
+ "material_pass": {
+  "palette": [
+   "bumper_grey",
+   "cab_white",
+   "truck_charcoal",
+   "glass_dark",
+   "alu",
+   "mirror_glass",
+   "deckplate",
+   "truck_black",
+   "tyre",
+   "hub_grey",
+   "trailer_white",
+   "trailer_trim"
+  ],
+  "atlas_textures": [
+   "brand_cab_logo",
+   "brand_cab_spark",
+   "trailer_side",
+   "mark53",
+   "trailer_rear"
+  ],
+  "atlas_solid": [
+   "brand_blue",
+   "lamp_white",
+   "lamp_amber",
+   "lamp_red"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   32
+  ],
+  "atlas_px": [
+   2064,
+   1760
+  ],
+  "emissive_strength": 4.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": 0.0,
   "zfight_faces": 0,
