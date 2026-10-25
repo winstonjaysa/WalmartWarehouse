@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#dfe3e8}#l{position:fixed;left:10px;top:8px;font:600 15px sans-serif;color:#041E42}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head>
+<body><div id="l"></div><script type="module">
+import * as THREE from 'three'; import * as W from './wrapper.js';
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true}); r.setSize(1280,720); r.shadowMap.enabled=true; document.body.appendChild(r.domElement);
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0xdfe3e8);
+sc.add(new THREE.HemisphereLight(0xffffff,0x8090a0,1.6)); const dl=new THREE.DirectionalLight(0xffffff,1.6); dl.position.set(6,10,7); dl.castShadow=true; dl.shadow.mapSize.set(1024,1024); sc.add(dl);
+const fl=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({color:0xc9ced6,roughness:.9})); fl.rotation.x=-Math.PI/2; fl.receiveShadow=true; sc.add(fl);
+const cam=new THREE.PerspectiveCamera(32,16/9,.1,200); cam.position.set(6.5,4.2,6.2); cam.lookAt(0.4,1.0,-0.2);
+const w=W.create(sc,{position:[0,0,0]});
+const pal=new THREE.Group(); sc.add(pal);
+const box=(p,w_,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w_,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.85}));m.position.set(x,y,z);m.castShadow=true;p.add(m);return m;};
+box(pal,1.0,0.14,1.2,0xb08a5a,0,0.07,0); for(let l=0;l<4;l++)for(let i=0;i<2;i++)for(let j=0;j<3;j++)box(pal,0.47,0.33,0.38,[0xc0915a,0xb3834d,0xd0a56e][(l+i+j)%3],-0.245+i*0.49,0.14+0.17+l*0.34,-0.4+j*0.4);
+pal.position.copy(w.getTurntableWorld());
+let done=null; const ph=[]; window.__p=w.wrap(pal).then(p=>{done={parent:p.parent===sc, film:!!p.userData.wrapFilm, filmParent:p.userData.wrapFilm&&p.userData.wrapFilm.parent===p}; return done;});
+window.__step=(n,dt=1/30)=>{for(let i=0;i<n;i++){w.update(dt); const s=w.getState(); if(ph[ph.length-1]!==s)ph.push(s);} const o=w.getOperator(); const v=new THREE.Vector3(); o.getWorldPosition(v); document.getElementById('l').textContent='state: '+w.getState()+'  operator '+v.toArray().map(a=>a.toFixed(2)); r.render(sc,cam); return {state:w.getState(),ph,done,op:v.toArray()};};
+window.__ready=true; window.__step(1);
+</script></body></html>

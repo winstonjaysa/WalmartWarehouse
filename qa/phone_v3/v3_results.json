@@ -1,0 +1,1615 @@
+{
+ "360x780": {
+  "ready_s": 4.6,
+  "peek": {
+   "V": {
+    "w": 360,
+    "h": 780
+   },
+   "sw": 360,
+   "bsw": 360,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 352,
+     "b": 56,
+     "w": 344,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 360,
+     "b": 156,
+     "w": 360,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 662,
+     "r": 360,
+     "b": 780,
+     "w": 360,
+     "h": 118
+    },
+    "dock": {
+     "x": 54,
+     "y": 606,
+     "r": 307,
+     "b": 652,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 159,
+     "y": 580,
+     "r": 201,
+     "b": 610,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 352,
+     "b": 267,
+     "w": 344,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 360,
+     "b": 169,
+     "w": 360,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,759,359,813]",
+    "#filters [13,769,347,813]",
+    "button.chip-f [13,781,48,805]",
+    "button.chip-f [52,781,119,805]",
+    "button.chip-f [123,781,197,805]",
+    "button.chip-f [201,781,278,805]",
+    "button.chip-f [282,781,326,805]",
+    "#panel-missions [1,813,359,833]",
+    "button.mission.is-active [13,817,347,930]",
+    "div.m-row [26,830,334,871]",
+    "span.m-ico.t-unl [26,835,58,867]",
+    "svg [34,842,51,859]",
+    "use [36,847,48,856]",
+    "div.m-main [70,830,334,871]",
+    "div.m-title [70,830,334,849]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 358x22",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1655,
+    "containerBottom": 780,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    118,
+    "390px",
+    ""
+   ],
+   "full": [
+    "full",
+    118,
+    "716px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 360,
+    "h": 780
+   },
+   "sw": 360,
+   "bsw": 360,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 352,
+     "b": 56,
+     "w": 344,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 360,
+     "b": 156,
+     "w": 360,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 64,
+     "r": 360,
+     "b": 780,
+     "w": 360,
+     "h": 716
+    },
+    "dock": {
+     "x": 54,
+     "y": 8,
+     "r": 307,
+     "b": 54,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 159,
+     "y": -18,
+     "r": 201,
+     "b": 12,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 360,
+     "b": 169,
+     "w": 360,
+     "h": 15
+    }
+   },
+   "ov": [
+    "topnav\u00d7dock 253x46",
+    "topnav\u00d7caption 42x4",
+    "kpis\u00d7sheet 360x92",
+    "sheet\u00d7foot 360x15",
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "button.mission [13,703,347,816]",
+    "div.m-foot [26,785,334,803]",
+    "span.who [26,785,101,803]",
+    "span.mini-av.eq [26,785,44,803]",
+    "svg [30,788,41,799]",
+    "use [31,790,39,797]",
+    "b [50,785,101,802]",
+    "span.eta.num [249,785,334,802]",
+    "svg [249,787,262,800]",
+    "use [251,789,260,798]",
+    "span.pct [304,785,334,802]",
+    "button.mission [13,824,347,936]",
+    "div.m-row [26,837,334,877]",
+    "span.m-ico.t-yrd [26,841,58,873]",
+    "svg [34,849,51,866]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 358x22",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.sheet-tab 64x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "span.mini-av 8.5px": 2,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1057,
+    "containerBottom": 780,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ },
+ "390x844": {
+  "ready_s": 3.9,
+  "peek": {
+   "V": {
+    "w": 390,
+    "h": 844
+   },
+   "sw": 390,
+   "bsw": 390,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 382,
+     "b": 56,
+     "w": 374,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 390,
+     "b": 156,
+     "w": 390,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 726,
+     "r": 390,
+     "b": 844,
+     "w": 390,
+     "h": 118
+    },
+    "dock": {
+     "x": 69,
+     "y": 670,
+     "r": 322,
+     "b": 716,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 174,
+     "y": 644,
+     "r": 216,
+     "b": 674,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 382,
+     "b": 267,
+     "w": 374,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 390,
+     "b": 169,
+     "w": 390,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,823,389,877]",
+    "#filters [13,833,377,877]",
+    "button.chip-f [13,845,48,869]",
+    "button.chip-f [52,845,119,869]",
+    "button.chip-f [123,845,197,869]",
+    "button.chip-f [201,845,278,869]",
+    "button.chip-f [282,845,326,869]",
+    "#panel-missions [1,877,389,897]",
+    "button.mission.is-active [13,881,377,994]",
+    "div.m-row [26,894,364,935]",
+    "span.m-ico.t-unl [26,899,58,931]",
+    "svg [34,906,51,923]",
+    "use [36,911,48,920]",
+    "div.m-main [70,894,364,935]",
+    "div.m-title [70,894,364,913]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 388x22",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1719,
+    "containerBottom": 844,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    118,
+    "422px",
+    ""
+   ],
+   "full": [
+    "full",
+    118,
+    "780px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 390,
+    "h": 844
+   },
+   "sw": 390,
+   "bsw": 390,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 382,
+     "b": 56,
+     "w": 374,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 390,
+     "b": 156,
+     "w": 390,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 726,
+     "r": 390,
+     "b": 844,
+     "w": 390,
+     "h": 118
+    },
+    "dock": {
+     "x": 69,
+     "y": 670,
+     "r": 322,
+     "b": 716,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 174,
+     "y": 644,
+     "r": 216,
+     "b": 674,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 390,
+     "b": 169,
+     "w": 390,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,823,389,877]",
+    "#filters [13,833,377,877]",
+    "button.chip-f [13,845,48,869]",
+    "button.chip-f [52,845,119,869]",
+    "button.chip-f [123,845,197,869]",
+    "button.chip-f [201,845,278,869]",
+    "button.chip-f [282,845,326,869]",
+    "#panel-missions [1,877,389,897]",
+    "button.mission.is-active [13,881,377,994]",
+    "div.m-row [26,894,364,935]",
+    "span.m-ico.t-unl [26,899,58,931]",
+    "svg [34,906,51,923]",
+    "use [36,911,48,920]",
+    "div.m-main [70,894,364,935]",
+    "div.m-title [70,894,364,913]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 388x22",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.sheet-tab 70x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1719,
+    "containerBottom": 844,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ },
+ "393x852": {
+  "ready_s": 4.3,
+  "peek": {
+   "V": {
+    "w": 393,
+    "h": 852
+   },
+   "sw": 393,
+   "bsw": 393,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 385,
+     "b": 56,
+     "w": 377,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 393,
+     "b": 156,
+     "w": 393,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 734,
+     "r": 393,
+     "b": 852,
+     "w": 393,
+     "h": 118
+    },
+    "dock": {
+     "x": 70,
+     "y": 678,
+     "r": 323,
+     "b": 724,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 176,
+     "y": 652,
+     "r": 218,
+     "b": 682,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 385,
+     "b": 267,
+     "w": 377,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 393,
+     "b": 169,
+     "w": 393,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,831,392,885]",
+    "#filters [13,841,380,885]",
+    "button.chip-f [13,853,48,877]",
+    "button.chip-f [52,853,119,877]",
+    "button.chip-f [123,853,197,877]",
+    "button.chip-f [201,853,278,877]",
+    "button.chip-f [282,853,326,877]",
+    "#panel-missions [1,885,392,905]",
+    "button.mission.is-active [13,889,380,1002]",
+    "div.m-row [26,902,367,943]",
+    "span.m-ico.t-unl [26,907,58,939]",
+    "svg [34,914,51,931]",
+    "use [36,919,48,928]",
+    "div.m-main [70,902,367,943]",
+    "div.m-title [70,902,367,921]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 391x22",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1727,
+    "containerBottom": 852,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    118,
+    "426px",
+    ""
+   ],
+   "full": [
+    "full",
+    118,
+    "788px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 393,
+    "h": 852
+   },
+   "sw": 393,
+   "bsw": 393,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 385,
+     "b": 56,
+     "w": 377,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 393,
+     "b": 156,
+     "w": 393,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 734,
+     "r": 393,
+     "b": 852,
+     "w": 393,
+     "h": 118
+    },
+    "dock": {
+     "x": 70,
+     "y": 678,
+     "r": 323,
+     "b": 724,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 176,
+     "y": 652,
+     "r": 218,
+     "b": 682,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 393,
+     "b": 169,
+     "w": 393,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,831,392,885]",
+    "#filters [13,841,380,885]",
+    "button.chip-f [13,853,48,877]",
+    "button.chip-f [52,853,119,877]",
+    "button.chip-f [123,853,197,877]",
+    "button.chip-f [201,853,278,877]",
+    "button.chip-f [282,853,326,877]",
+    "#panel-missions [1,885,392,905]",
+    "button.mission.is-active [13,889,380,1002]",
+    "div.m-row [26,902,367,943]",
+    "span.m-ico.t-unl [26,907,58,939]",
+    "svg [34,914,51,931]",
+    "use [36,919,48,928]",
+    "div.m-main [70,902,367,943]",
+    "div.m-title [70,902,367,921]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 391x22",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.sheet-tab 71x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1727,
+    "containerBottom": 852,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ },
+ "412x915": {
+  "ready_s": 4.4,
+  "peek": {
+   "V": {
+    "w": 412,
+    "h": 915
+   },
+   "sw": 412,
+   "bsw": 412,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 404,
+     "b": 56,
+     "w": 396,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 412,
+     "b": 156,
+     "w": 412,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 797,
+     "r": 412,
+     "b": 915,
+     "w": 412,
+     "h": 118
+    },
+    "dock": {
+     "x": 80,
+     "y": 741,
+     "r": 333,
+     "b": 787,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 185,
+     "y": 715,
+     "r": 227,
+     "b": 745,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 404,
+     "b": 267,
+     "w": 396,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 412,
+     "b": 169,
+     "w": 412,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,894,411,948]",
+    "#filters [13,904,399,948]",
+    "button.chip-f [13,916,48,940]",
+    "button.chip-f [52,916,119,940]",
+    "button.chip-f [123,916,197,940]",
+    "button.chip-f [201,916,278,940]",
+    "button.chip-f [282,916,326,940]",
+    "#panel-missions [1,948,411,968]",
+    "button.mission.is-active [13,952,399,1065]",
+    "div.m-row [26,965,386,1006]",
+    "span.m-ico.t-unl [26,970,58,1002]",
+    "svg [34,977,51,994]",
+    "use [36,982,48,991]",
+    "div.m-main [70,965,386,1006]",
+    "div.m-title [70,965,386,984]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 410x22",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1790,
+    "containerBottom": 915,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    118,
+    "458px",
+    ""
+   ],
+   "full": [
+    "full",
+    118,
+    "851px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 412,
+    "h": 915
+   },
+   "sw": 412,
+   "bsw": 412,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 404,
+     "b": 56,
+     "w": 396,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 412,
+     "b": 156,
+     "w": 412,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 797,
+     "r": 412,
+     "b": 915,
+     "w": 412,
+     "h": 118
+    },
+    "dock": {
+     "x": 80,
+     "y": 741,
+     "r": 333,
+     "b": 787,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 185,
+     "y": 715,
+     "r": 227,
+     "b": 745,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 412,
+     "b": 169,
+     "w": 412,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,894,411,948]",
+    "#filters [13,904,399,948]",
+    "button.chip-f [13,916,48,940]",
+    "button.chip-f [52,916,119,940]",
+    "button.chip-f [123,916,197,940]",
+    "button.chip-f [201,916,278,940]",
+    "button.chip-f [282,916,326,940]",
+    "#panel-missions [1,948,411,968]",
+    "button.mission.is-active [13,952,399,1065]",
+    "div.m-row [26,965,386,1006]",
+    "span.m-ico.t-unl [26,970,58,1002]",
+    "svg [34,977,51,994]",
+    "use [36,982,48,991]",
+    "div.m-main [70,965,386,1006]",
+    "div.m-title [70,965,386,984]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 410x22",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.sheet-tab 75x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1790,
+    "containerBottom": 915,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ },
+ "430x932": {
+  "ready_s": 3.5,
+  "peek": {
+   "V": {
+    "w": 430,
+    "h": 932
+   },
+   "sw": 430,
+   "bsw": 430,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 422,
+     "b": 56,
+     "w": 414,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 430,
+     "b": 156,
+     "w": 430,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 814,
+     "r": 430,
+     "b": 932,
+     "w": 430,
+     "h": 118
+    },
+    "dock": {
+     "x": 89,
+     "y": 758,
+     "r": 342,
+     "b": 804,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 194,
+     "y": 732,
+     "r": 236,
+     "b": 762,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 422,
+     "b": 267,
+     "w": 414,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 430,
+     "b": 169,
+     "w": 430,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,911,429,965]",
+    "#filters [13,921,417,965]",
+    "button.chip-f [13,933,48,957]",
+    "button.chip-f [52,933,119,957]",
+    "button.chip-f [123,933,197,957]",
+    "button.chip-f [201,933,278,957]",
+    "button.chip-f [282,933,326,957]",
+    "#panel-missions [1,965,429,985]",
+    "button.mission.is-active [13,969,417,1082]",
+    "div.m-row [26,982,404,1023]",
+    "span.m-ico.t-unl [26,987,58,1019]",
+    "svg [34,994,51,1011]",
+    "use [36,999,48,1008]",
+    "div.m-main [70,982,404,1023]",
+    "div.m-title [70,982,404,1001]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 428x22",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1807,
+    "containerBottom": 932,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    118,
+    "466px",
+    ""
+   ],
+   "full": [
+    "full",
+    118,
+    "868px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 430,
+    "h": 932
+   },
+   "sw": 430,
+   "bsw": 430,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 422,
+     "b": 56,
+     "w": 414,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 430,
+     "b": 156,
+     "w": 430,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 814,
+     "r": 430,
+     "b": 932,
+     "w": 430,
+     "h": 118
+    },
+    "dock": {
+     "x": 89,
+     "y": 758,
+     "r": 342,
+     "b": 804,
+     "w": 253,
+     "h": 46
+    },
+    "cam": null,
+    "caption": {
+     "x": 194,
+     "y": 732,
+     "r": 236,
+     "b": 762,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 430,
+     "b": 169,
+     "w": 430,
+     "h": 15
+    }
+   },
+   "ov": [
+    "dock\u00d7caption 42x4"
+   ],
+   "clip": [
+    "div.side-head [1,911,429,965]",
+    "#filters [13,921,417,965]",
+    "button.chip-f [13,933,48,957]",
+    "button.chip-f [52,933,119,957]",
+    "button.chip-f [123,933,197,957]",
+    "button.chip-f [201,933,278,957]",
+    "button.chip-f [282,933,326,957]",
+    "#panel-missions [1,965,429,985]",
+    "button.mission.is-active [13,969,417,1082]",
+    "div.m-row [26,982,404,1023]",
+    "span.m-ico.t-unl [26,987,58,1019]",
+    "svg [34,994,51,1011]",
+    "use [36,999,48,1008]",
+    "div.m-main [70,982,404,1023]",
+    "div.m-title [70,982,404,1001]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#themeBtn 36x36",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "button 34x28",
+    "#sheetGrab 428x22",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.sheet-tab 78x30",
+    "button.chip-f 35x24",
+    "button.chip-f 67x24",
+    "button.chip-f 74x24",
+    "button.chip-f 77x24",
+    "button.chip-f 44x24"
+   ],
+   "ntaps": 19,
+   "small": {
+    "span.live 10.5px": 1,
+    "div.foot-note 10.5px": 1,
+    "b 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1807,
+    "containerBottom": 932,
+    "scrollable": false
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ },
+ "844x390": {
+  "ready_s": 4.0,
+  "peek": {
+   "V": {
+    "w": 844,
+    "h": 390
+   },
+   "sw": 844,
+   "bsw": 844,
+   "rects": {
+    "topnav": {
+     "x": 16,
+     "y": 16,
+     "r": 828,
+     "b": 72,
+     "w": 812,
+     "h": 56
+    },
+    "kpis": {
+     "x": 376,
+     "y": 88,
+     "r": 828,
+     "b": 297,
+     "w": 452,
+     "h": 209
+    },
+    "sheet": {
+     "hidden": 1
+    },
+    "dock": {
+     "x": 346,
+     "y": 298,
+     "r": 858,
+     "b": 350,
+     "w": 512,
+     "h": 52
+    },
+    "cam": null,
+    "caption": {
+     "x": 581,
+     "y": 266,
+     "r": 623,
+     "b": 296,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 488,
+     "y": 195,
+     "r": 828,
+     "b": 286,
+     "w": 340,
+     "h": 91
+    },
+    "foot": {
+     "x": 16,
+     "y": 362,
+     "r": 364,
+     "b": 378,
+     "w": 348,
+     "h": 16
+    }
+   },
+   "ov": [
+    "kpis\u00d7caption 42x30",
+    "kpis\u00d7toasts 340x91",
+    "caption\u00d7toasts 42x20"
+   ],
+   "clip": [
+    "nav.ui.glass [346,298,858,350]",
+    "#scalebar [743,312,851,336]"
+   ],
+   "taps": [
+    "a.brand 118x24",
+    "button.facility 181x36",
+    "#search 102x36",
+    "#dayNightBtn 36x36",
+    "#themeBtn 36x36",
+    "button.icon-btn 36x36",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30"
+   ],
+   "ntaps": 12,
+   "small": {
+    "span.live 10.5px": 1,
+    "span.demo-tag 9px": 1,
+    "#cnt-missions 10.5px": 1,
+    "#cnt-vehicles 10.5px": 1,
+    "span.mini-av 8.5px": 1,
+    "span.tgt 10.5px": 6,
+    "span.c 10.5px": 1,
+    "span.w 10.5px": 1,
+    "#floorLbl 10.5px": 1,
+    "span 10.5px": 1,
+    "#scaleMid 10.5px": 1,
+    "#scaleMax 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1061,
+    "containerBottom": 349,
+    "scrollable": true
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    0,
+    "",
+    ""
+   ],
+   "half": [
+    "half",
+    0,
+    "",
+    ""
+   ],
+   "full": [
+    "full",
+    0,
+    "",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 844,
+    "h": 390
+   },
+   "sw": 844,
+   "bsw": 844,
+   "rects": {
+    "topnav": {
+     "x": 16,
+     "y": 16,
+     "r": 828,
+     "b": 72,
+     "w": 812,
+     "h": 56
+    },
+    "kpis": {
+     "x": 376,
+     "y": 88,
+     "r": 828,
+     "b": 297,
+     "w": 452,
+     "h": 209
+    },
+    "sheet": {
+     "hidden": 1
+    },
+    "dock": {
+     "x": 346,
+     "y": 298,
+     "r": 858,
+     "b": 350,
+     "w": 512,
+     "h": 52
+    },
+    "cam": null,
+    "caption": {
+     "x": 581,
+     "y": 266,
+     "r": 623,
+     "b": 296,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "x": 16,
+     "y": 362,
+     "r": 364,
+     "b": 378,
+     "w": 348,
+     "h": 16
+    }
+   },
+   "ov": [
+    "kpis\u00d7caption 42x30"
+   ],
+   "clip": [
+    "nav.ui.glass [346,298,858,350]",
+    "#scalebar [743,312,851,336]"
+   ],
+   "taps": [
+    "a.brand 118x24",
+    "button.facility 181x36",
+    "#search 102x36",
+    "#dayNightBtn 36x36",
+    "#themeBtn 36x36",
+    "button.icon-btn 36x36",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30",
+    "button 44x30"
+   ],
+   "ntaps": 12,
+   "small": {
+    "span.live 10.5px": 1,
+    "span.demo-tag 9px": 1,
+    "#cnt-missions 10.5px": 1,
+    "#cnt-vehicles 10.5px": 1,
+    "span.mini-av 8.5px": 1,
+    "span.tgt 10.5px": 6,
+    "span.c 10.5px": 1,
+    "span.w 10.5px": 1,
+    "#floorLbl 10.5px": 1,
+    "span 10.5px": 1,
+    "#scaleMid 10.5px": 1,
+    "#scaleMax 10.5px": 1
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1061,
+    "containerBottom": 349,
+    "scrollable": true
+   },
+   "safeArea": 1,
+   "saSample": [
+    "@media (max-width: 768px) {\n  :root { --sheet-h: 118px; }\n  html, body { overflow: hidden;"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1"
+  },
+  "shotErr": "Page.screenshot: Timeout 20000ms exceeded.\nCall log:\n  - taking page screenshot\n",
+  "shot_s": 20.0,
+  "errs": []
+ }
+}

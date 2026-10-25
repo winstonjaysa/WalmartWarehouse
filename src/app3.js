@@ -27,6 +27,7 @@ const imBase = new THREE.InstancedMesh(palBase.geometry, palBase.material, SLOTS
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _c = new THREE.Color();
 const LOAD_COLS = [0xc9a170, 0xd3b17f, 0xbf9363, 0xe6edf3, 0x2f6fb8, 0xd9c29a];
 function setSlot(sl, occ, sku) {
+  if (typeof RC !== 'undefined' && RC) { try { RC.setSlot(sl.id, !!occ && !sl.dyn); } catch (e) { /* keep sim going */ } }
   const i = SLOTS.indexOf(sl); sl.occ = occ; sl.state = occ ? 'occupied' : 'empty'; sl.sku = occ ? sku : null;
   const hh = occ ? (sl.lv === 5 ? 1.0 : 0.8 + ((i * 7) % 5) * 0.08) : 0;
   _q.setFromAxisAngle(V3(0, 1, 0), Math.PI / 2);
@@ -62,6 +63,13 @@ imCartons.castShadow = !LOW; imCartons.receiveShadow = true; imCartons.computeBo
 const wrapGeo = new THREE.BoxGeometry(1.24, 1, 1.03); wrapGeo.translate(0, 0.5, 0);
 const imWrap = new THREE.InstancedMesh(wrapGeo, new THREE.MeshStandardMaterial({ color: 0xe8f2fb, transparent: true, opacity: 0.28, roughness: 0.15, depthWrite: false }), wrapList.length);
 wrapList.forEach(([x, y, z, h], k) => { _m.compose(V3(x, y, z), _q.identity(), _s.set(1, h + 0.02, 1)); imWrap.setMatrixAt(k, _m); }); imWrap.computeBoundingSphere(); racks.add(imWrap);
+let RC = null; // Inky rackCartons (instanced pallets + cartons + wrap); falls back to the built-in instancing
+if (RACKC && !QS.has('norc')) { try {
+  RC = RACKC.create({ scene: racks, quality: LOW ? 'low' : Q, slots: SLOTS.map((sl, i) => ({ id: sl.id, position: V3(sl.X, sl.Y, sl.Z), rotY: 0, w: 1.2, d: 1.0, h: sl.lv === 5 ? 1.15 : 1.45, seed: i, occupied: !!sl.occ && !sl.dyn })) });
+  if (RC.group && !RC.group.parent) racks.add(RC.group);
+  imBase.visible = false; imCartons.visible = false; imWrap.visible = false;
+  console.info('[gf] rackCartons', JSON.stringify(RC.stats()));
+} catch (e) { console.warn('[gf] rackCartons.js skipped:', e && e.message); RC = null; imBase.visible = true; imCartons.visible = true; imWrap.visible = true; } }
 console.info('[gf] rack cartons', cartonList.length, 'slots occupied', SLOTS.filter((s) => s.occ).length, '/', SLOTS.length);
 // stage-lane pallets (FIFO) inbound side: dynamic pallet objects
 const LANES = {};
@@ -89,6 +97,7 @@ conveyorRun(52, 16, 52, 44, 0.85); conveyorRun(70, 16, 70, 44, 0.85);
   for (const p of fr) { const im = new THREE.InstancedMesh(p.geometry, p.material, pts.length); pts.forEach(([x, y, f], i) => { q.setFromAxisAngle(V3(0, 1, 0), f * Math.PI / 2); m.compose(V3(sx(x), FLOOR, sz(y)), q, V3(1, 1, 1)); im.setMatrixAt(i, m); }); im.castShadow = im.receiveShadow = true; world.add(im); }
 }
 // sorter loop SRT1 (elevated +5 over NXA) as a tube + cases
+const __ws0 = world.children.length;
 const sorterCurve = new THREE.CatmullRomCurve3([V3(sx(22), 0, sz(46.5)), V3(sx(96), 0, sz(46.5)), V3(sx(97.5), 0, sz(47.5)), V3(sx(96), 0, sz(48.5)), V3(sx(22), 0, sz(48.5)), V3(sx(20.5), 0, sz(47.5))], true, 'catmullrom', 0.2);
 { const sh = new THREE.Shape(); sh.moveTo(-0.45, -0.12); sh.lineTo(0.45, -0.12); sh.lineTo(0.45, 0.12); sh.lineTo(-0.45, 0.12); sh.closePath();
   const pts = sorterCurve.getSpacedPoints(400).map((p) => p.clone().setY(FLOOR + 5.0));
@@ -96,6 +105,20 @@ const sorterCurve = new THREE.CatmullRomCurve3([V3(sx(22), 0, sz(46.5)), V3(sx(9
   for (let i = 0; i < 40; i++) { const p = sorterCurve.getPointAt(i / 40); box(0.12, 5.0, 0.12, M(0x8a94a3), p.x, FLOOR + 2.5, p.z, world); } }
 const caseGeo = new THREE.BoxGeometry(0.5, 0.32, 0.4), caseMat = cartonMat;
 const NCASE = LOW ? 30 : 90, cases = new THREE.InstancedMesh(caseGeo, caseMat, NCASE); cases.castShadow = true; world.add(cases);
+const OLD_SORT = world.children.slice(__ws0);
+let SRT = null, __srtT = 0, __srtN = 0; // Cooker sorter.js (sliding-shoe loop) replaces the tube stand-in when it builds cleanly
+if (SORTERM && !QS.has('nosorter')) { try {
+  SRT = SORTERM.create(world, { position: [sx(59), FLOOR, sz(47.5)], rotation: 0, lanes: 8, speed: 1.8, straight: 72, turnRadius: 1.0, laneLength: 3, elevation: 5.0 });
+  OLD_SORT.forEach((o) => { o.visible = false; });
+  SRT.onCaseArrived((mesh) => { if (mesh.parent) mesh.parent.remove(mesh); });
+  console.info('[gf] sorter.js SRT1 built');
+} catch (e) { console.warn('[gf] sorter.js skipped:', e && e.message); try { if (SRT && SRT.group) SRT.group.removeFromParent(); } catch (_) {} SRT = null; OLD_SORT.forEach((o) => { o.visible = true; }); } }
+const __srtGeo = new THREE.BoxGeometry(0.5, 0.32, 0.4), __srtCols = [0xc9a170, 0xd8b483, 0x2f6fb8, 0xbf9363].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8 }));
+function sorterTick(dt) {
+  if (!SRT) return;
+  __srtT += dt; if (__srtT > (LOW ? 1.6 : 0.9)) { __srtT = 0; const m = new THREE.Mesh(__srtGeo, __srtCols[__srtN % 4]); m.castShadow = !LOW; SRT.addCase(m, __srtN % 8); __srtN++; }
+  SRT.update(dt);
+}
 const caseU = Array.from({ length: NCASE }, (_, i) => i / NCASE + rnd() * 0.004);
 for (let i = 0; i < NCASE; i++) cases.setColorAt(i, _c.set(pick([0xc9a170, 0xd8b483, 0x2f6fb8, 0x1f2833])));
 function updateCases(dt) {

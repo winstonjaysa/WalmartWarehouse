@@ -1,0 +1,458 @@
+{
+ "390x844": {
+  "ready_s": 1.0,
+  "peek": {
+   "V": {
+    "w": 390,
+    "h": 844
+   },
+   "sw": 390,
+   "bsw": 390,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 382,
+     "b": 56,
+     "w": 374,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 390,
+     "b": 156,
+     "w": 390,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 726,
+     "r": 390,
+     "b": 844,
+     "w": 390,
+     "h": 118
+    },
+    "dock": {
+     "x": 56,
+     "y": 658,
+     "r": 334,
+     "b": 716,
+     "w": 278,
+     "h": 58
+    },
+    "cam": null,
+    "caption": {
+     "x": 174,
+     "y": 630,
+     "r": 216,
+     "b": 660,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 382,
+     "b": 267,
+     "w": 374,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 390,
+     "b": 170,
+     "w": 390,
+     "h": 16
+    }
+   },
+   "ov": [],
+   "clip": [
+    "div.side-head [1,839,389,909]",
+    "#filters [13,849,377,909]",
+    "button.chip-f [13,861,53,901]",
+    "button.chip-f [57,861,124,901]",
+    "button.chip-f [128,861,202,901]",
+    "button.chip-f [206,861,283,901]",
+    "button.chip-f [287,861,331,901]",
+    "#panel-missions [1,909,389,929]",
+    "button.mission.is-active [13,913,377,1026]",
+    "div.m-row [26,926,364,967]",
+    "span.m-ico.t-unl [26,931,58,963]",
+    "svg [34,938,51,955]",
+    "use [36,943,48,952]",
+    "div.m-main [70,926,364,967]",
+    "div.m-title [70,926,364,945]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#sheetGrab 388x28"
+   ],
+   "ntaps": 2,
+   "small": {
+    "text 9.5px": 4
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1751,
+    "containerBottom": 844,
+    "scrollable": false
+   },
+   "safeArea": 2,
+   "saSample": [
+    "@media (max-width: 768px), (max-height: 500px) {\n  :root { --sheet-h: 118px; }\n  html, bod",
+    ":root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --s"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1, viewport-fit=cover"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    118,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    422,
+    "422px",
+    ""
+   ],
+   "full": [
+    "full",
+    780,
+    "780px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 390,
+    "h": 844
+   },
+   "sw": 390,
+   "bsw": 390,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 8,
+     "r": 382,
+     "b": 56,
+     "w": 374,
+     "h": 48
+    },
+    "kpis": {
+     "x": 0,
+     "y": 64,
+     "r": 390,
+     "b": 156,
+     "w": 390,
+     "h": 92
+    },
+    "sheet": {
+     "x": 0,
+     "y": 421,
+     "r": 390,
+     "b": 844,
+     "w": 390,
+     "h": 423
+    },
+    "dock": {
+     "x": 56,
+     "y": 353,
+     "r": 334,
+     "b": 411,
+     "w": 278,
+     "h": 58
+    },
+    "cam": null,
+    "caption": {
+     "x": 174,
+     "y": 325,
+     "r": 216,
+     "b": 355,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "x": 8,
+     "y": 176,
+     "r": 382,
+     "b": 267,
+     "w": 374,
+     "h": 91
+    },
+    "foot": {
+     "x": 0,
+     "y": 154,
+     "r": 390,
+     "b": 170,
+     "w": 390,
+     "h": 16
+    }
+   },
+   "ov": [],
+   "clip": [
+    "button.mission [13,850,377,963]",
+    "div.m-row [26,863,364,904]",
+    "span.m-ico.t-rpl [26,868,58,900]",
+    "svg [34,875,51,892]",
+    "use [36,878,48,890]",
+    "div.m-main [70,863,364,904]",
+    "div.m-title [70,863,364,882]",
+    "div.m-sub [70,884,364,904]",
+    "span.m-id [70,887,209,902]",
+    "span.status.s-crit [296,884,364,904]",
+    "div.progress.p-crit [26,916,364,922]",
+    "span [26,916,94,922]",
+    "div.m-foot [26,932,364,950]",
+    "span.who [26,932,101,950]",
+    "span.mini-av.eq [26,932,44,950]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#sheetGrab 388x28"
+   ],
+   "ntaps": 2,
+   "small": {
+    "text 9.5px": 4
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1447,
+    "containerBottom": 844,
+    "scrollable": false
+   },
+   "safeArea": 2,
+   "saSample": [
+    "@media (max-width: 768px), (max-height: 500px) {\n  :root { --sheet-h: 118px; }\n  html, bod",
+    ":root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --s"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1, viewport-fit=cover"
+  },
+  "shot": "/workspace/gateflow/qa/phone_v3/chrome_fixed_390x844.png",
+  "shot_s": 1.8,
+  "errs": []
+ },
+ "844x390": {
+  "ready_s": 0.9,
+  "peek": {
+   "V": {
+    "w": 844,
+    "h": 390
+   },
+   "sw": 844,
+   "bsw": 844,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 4,
+     "r": 476,
+     "b": 44,
+     "w": 468,
+     "h": 40
+    },
+    "kpis": {
+     "x": 0,
+     "y": 48,
+     "r": 476,
+     "b": 101,
+     "w": 476,
+     "h": 53
+    },
+    "sheet": {
+     "x": 484,
+     "y": 266,
+     "r": 844,
+     "b": 390,
+     "w": 360,
+     "h": 124
+    },
+    "dock": {
+     "x": 82,
+     "y": 324,
+     "r": 402,
+     "b": 382,
+     "w": 319,
+     "h": 58
+    },
+    "cam": null,
+    "caption": {
+     "x": 221,
+     "y": 290,
+     "r": 263,
+     "b": 320,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "hidden": 1
+    }
+   },
+   "ov": [],
+   "clip": [
+    "div.side-head [485,379,843,449]",
+    "#filters [497,389,831,449]",
+    "button.chip-f [497,401,537,441]",
+    "button.chip-f [541,401,608,441]",
+    "button.chip-f [612,401,686,441]",
+    "button.chip-f [690,401,767,441]",
+    "button.chip-f [771,401,815,441]",
+    "#panel-missions [485,449,843,469]",
+    "button.mission.is-active [497,453,831,566]",
+    "div.m-row [510,466,818,507]",
+    "span.m-ico.t-unl [510,471,542,503]",
+    "svg [518,478,535,495]",
+    "use [520,483,532,492]",
+    "div.m-main [554,466,818,507]",
+    "div.m-title [554,466,818,485]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#sheetGrab 358x28"
+   ],
+   "ntaps": 2,
+   "small": {
+    "text 9.5px": 4
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1291,
+    "containerBottom": 390,
+    "scrollable": false
+   },
+   "safeArea": 2,
+   "saSample": [
+    "@media (max-width: 768px), (max-height: 500px) {\n  :root { --sheet-h: 118px; }\n  html, bod",
+    ":root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --s"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1, viewport-fit=cover"
+  },
+  "sheetH": {
+   "peek": [
+    "peek",
+    124,
+    "118px",
+    ""
+   ],
+   "half": [
+    "half",
+    386,
+    "195px",
+    ""
+   ],
+   "full": [
+    "full",
+    386,
+    "326px",
+    ""
+   ]
+  },
+  "half": {
+   "V": {
+    "w": 844,
+    "h": 390
+   },
+   "sw": 844,
+   "bsw": 844,
+   "rects": {
+    "topnav": {
+     "x": 8,
+     "y": 4,
+     "r": 476,
+     "b": 44,
+     "w": 468,
+     "h": 40
+    },
+    "kpis": {
+     "x": 0,
+     "y": 48,
+     "r": 476,
+     "b": 101,
+     "w": 476,
+     "h": 53
+    },
+    "sheet": {
+     "x": 484,
+     "y": 4,
+     "r": 844,
+     "b": 390,
+     "w": 360,
+     "h": 386
+    },
+    "dock": {
+     "x": 82,
+     "y": 324,
+     "r": 402,
+     "b": 382,
+     "w": 319,
+     "h": 58
+    },
+    "cam": null,
+    "caption": {
+     "x": 221,
+     "y": 290,
+     "r": 263,
+     "b": 320,
+     "w": 42,
+     "h": 30
+    },
+    "gfCap": null,
+    "toasts": {
+     "hidden": 1
+    },
+    "foot": {
+     "hidden": 1
+    }
+   },
+   "ov": [],
+   "clip": [
+    "button.mission [497,312,831,425]",
+    "div.m-foot [510,394,818,412]",
+    "span.who [510,394,571,412]",
+    "span.mini-av [510,394,528,412]",
+    "b [534,394,571,412]",
+    "span.eta.num [733,394,818,412]",
+    "svg [733,397,746,410]",
+    "use [735,398,744,408]",
+    "span.pct [788,394,818,412]",
+    "button.mission [497,433,831,546]",
+    "div.m-row [510,446,818,487]",
+    "span.m-ico.t-rpl [510,451,542,483]",
+    "svg [518,458,535,475]",
+    "use [520,460,532,473]",
+    "div.m-main [554,446,818,487]"
+   ],
+   "taps": [
+    "a.brand 110x24",
+    "#sheetGrab 358x28"
+   ],
+   "ntaps": 2,
+   "small": {
+    "text 9.5px": 4
+   },
+   "last": {
+    "sel": "button.mission",
+    "bottom": 1029,
+    "containerBottom": 390,
+    "scrollable": false
+   },
+   "safeArea": 2,
+   "saSample": [
+    "@media (max-width: 768px), (max-height: 500px) {\n  :root { --sheet-h: 118px; }\n  html, bod",
+    ":root { --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --s"
+   ],
+   "metaViewport": "width=device-width, initial-scale=1, viewport-fit=cover"
+  },
+  "shot": "/workspace/gateflow/qa/phone_v3/chrome_fixed_844x390.png",
+  "shot_s": 1.5,
+  "errs": []
+ }
+}

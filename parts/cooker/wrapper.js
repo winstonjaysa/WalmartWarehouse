@@ -134,7 +134,50 @@ class StretchWrapper {
     this.web = new THREE.Mesh(webGeo, this.webMat); this.web.name = 'filmWeb'; this.web.frustumCulled = false; this.web.userData.noShadow = true; this.web.renderOrder = 3; R.add(this.web);
     this._webEnd = new THREE.Vector3(); this._headWorldLocal(this._webEnd); this._setWeb(this._webEnd, 0.5);
     this.carriage.position.y = this._carY = 0.6;
+    // ---- human operator (clay figure, Walmart vest) standing at the control box. No driverless anything: every cycle is started by this person.
+    if (this.opts.operator !== false) this._buildOperator();
   }
+
+  _buildOperator() {
+    const M = this.M, op = this.operator = new THREE.Group(); op.name = 'wrapOperator';
+    const skin = this._m(0xc89a74), pants = this._m(0x2c3e5c), shirt = this._m(0x7f8b99), vest = this._m(COL.yellow, { roughness: 0.7 }), refl = this._m(0xf2f4f6, { roughness: 0.3 }), boot = this._m(0x22252b);
+    const leg = (x) => { const g = new THREE.Group(); g.position.set(x, 0.86, 0); op.add(g); this._add(g, this._rb(0.15, 0.8, 0.17, 0.06), pants, 0, -0.42, 0, 'leg'); this._add(g, this._rb(0.16, 0.1, 0.27, 0.04), boot, 0, -0.81, 0.04, 'boot'); return g; };
+    this.opLegs = [leg(-0.1), leg(0.1)];
+    const torso = this.opTorso = new THREE.Group(); torso.position.y = 0.86; op.add(torso);
+    this._add(torso, this._rb(0.4, 0.58, 0.24, 0.09), shirt, 0, 0.3, 0, 'torso');
+    this._add(torso, this._rb(0.42, 0.44, 0.26, 0.08), vest, 0, 0.27, 0, 'vest');
+    for (const y of [0.16, 0.3]) this._add(torso, this._rb(0.425, 0.035, 0.265, 0.01), refl, 0, y, 0, 'vestStripe');
+    this._add(torso, this._rb(0.12, 0.05, 0.01, 0.01), this._m(COL.blue), 0.09, 0.4, 0.133, 'vestBadge');
+    this._add(torso, this._rb(0.3, 0.07, 0.01, 0.01), this._m(COL.blue), 0, 0.36, -0.133, 'vestBackLogo');
+    const head = this.opHead = new THREE.Group(); head.position.y = 0.66; torso.add(head);
+    const hg = new THREE.SphereGeometry(0.12, 20, 14); this._geos.push(hg); this._add(head, hg, skin, 0, 0.1, 0, 'head');
+    const cap = new THREE.SphereGeometry(0.128, 20, 10, 0, TAU, 0, Math.PI / 2); this._geos.push(cap); this._add(head, cap, M.navy, 0, 0.12, 0, 'cap');
+    this._add(head, this._rb(0.18, 0.02, 0.1, 0.01), M.navy, 0, 0.13, 0.11, 'capBrim');
+    const arm = (x) => { const g = new THREE.Group(); g.position.set(x, 0.53, 0); torso.add(g); this._add(g, this._rb(0.11, 0.56, 0.12, 0.05), shirt, 0, -0.26, 0, 'arm'); this._add(g, this._rb(0.1, 0.1, 0.1, 0.04), skin, 0, -0.56, 0, 'hand'); return g; };
+    this.opArmL = arm(-0.27); this.opArmR = arm(0.27);
+    this.root.add(op);
+    this._opHome = new THREE.Vector3(MAST_X + 0.05, 0, 0.24 + 0.62); // in front of the control box, facing it
+    op.position.copy(this._opHome); op.rotation.y = Math.PI;
+    this._op = { reach: 0, yaw: Math.PI, pos: this._opHome.clone(), walk: 0 };
+    op.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  }
+  /** Drive the operator toward a pose: pos (root space), yaw, reach 0..1 (right arm), pointAt (root space) */
+  _opDrive(dt, pos, yaw, reach) {
+    if (!this.operator) return; const o = this._op, k = 1 - Math.exp(-dt * 5);
+    const before = o.pos.clone(), dv = pos.clone().sub(o.pos), dl = dv.length();
+    if (dl > 0.3) o.pos.addScaledVector(dv, Math.min(1, (Math.min(1.0, o.v = Math.min(1.0, (o.v || 0) + dt * 2)) * dt) / dl)); else { o.pos.lerp(pos, k); o.v = Math.max(0, (o.v || 0) - dt * 3); } const sp = before.distanceTo(o.pos) / Math.max(dt, 1e-4);
+    const dy = Math.atan2(Math.sin(yaw - o.yaw), Math.cos(yaw - o.yaw)); o.yaw += dy * k; o.reach += (reach - o.reach) * k;
+    o.walk += sp * dt * 6;
+    const sw = Math.min(1, sp * 2) * Math.sin(o.walk) * 0.45;
+    this.opLegs[0].rotation.x = sw; this.opLegs[1].rotation.x = -sw; this.opArmL.rotation.x = -sw * 0.6;
+    this.opArmR.rotation.x = lerp(sw * 0.6, -1.25, o.reach); this.opArmR.rotation.z = lerp(0, 0.12, o.reach);
+    this.opTorso.rotation.x = 0.06 * o.reach; this.opHead.rotation.x = 0.15 * o.reach;
+    this.operator.position.copy(o.pos); this.operator.position.y = Math.abs(Math.sin(o.walk)) * 0.025 * Math.min(1, sp * 2);
+    this.operator.rotation.y = o.yaw;
+  }
+  _yawTo(from, to) { return Math.atan2(to.x - from.x, to.z - from.z); }
+  /** The operator figure (THREE.Group, child of the station root; origin at the feet, faces local +Z). */
+  getOperator() { return this.operator || null; }
 
   _makeCase(w, h, d, color) {
     const g = new THREE.Group(); g.name = 'case';
@@ -224,7 +267,7 @@ class StretchWrapper {
     const film = new THREE.Mesh(geo, this.filmMat); film.name = 'stretchFilm'; film.frustumCulled = false; film.renderOrder = 2;
     film.userData.isWrapFilm = true; film.userData.noShadow = true; disc.add(film);
     const lead = 0.75;
-    const J = this._job = { pallet, origParent, resolve, D, Tpre, Tpost, Trot, Tr, wMax, PHI, N, SEG, cx, cz, a, b, hb, ht, film, geo, lead, t: 0, written: 0, phase: 'present', tailN: TAILN, nSamples: 0, cut: null, armY0: this._armY };
+    const J = this._job = { pallet, origParent, resolve, D, Tstart: 1.4, Tpre, Tpost, Trot, Tr, wMax, PHI, N, SEG, cx, cz, a, b, hb, ht, film, geo, lead, t: 0, written: 0, phase: 'present', tailN: TAILN, nSamples: 0, cut: null, armY0: this._armY };
     J.start = this._perim(J, lead, 0, new THREE.Vector3());
     J.webFrom = this._webEnd.clone();
     this._carY0 = this._carY;
@@ -294,7 +337,16 @@ class StretchWrapper {
   update(dt) {
     dt = Math.min(Math.max(dt || 0, 0), 0.1); this._t += dt;
     const J = this._job;
-    if (!J) { this.beacon.material.emissiveIntensity = 0.15; return; }
+    const panel = new THREE.Vector3(MAST_X + 0.05, 1.15, 0.24), cen = new THREE.Vector3();
+    if (!J) { this.beacon.material.emissiveIntensity = 0.15; this.M.green.emissiveIntensity = 0.1; this._opDrive(dt, this._opHome, Math.PI, 0); return; }
+    J.t0 = (J.t0 || 0) + dt;
+    // ---------- 0) operator presses START on the control box; nothing moves until then
+    if (J.t0 < J.Tstart) {
+      J.phase = 'start';
+      const k = J.t0 / J.Tstart; this._opDrive(dt, this._opHome, Math.PI, k < 0.75 ? 1 : 0.3);
+      this.M.green.emissiveIntensity = k > 0.6 ? 0.8 : 0.1; return;
+    }
+    this.M.green.emissiveIntensity = 0.8;
     const prevT = J.t; J.t += dt; const t = J.t;
     const v = new THREE.Vector3(), w = new THREE.Vector3();
     this.beacon.material.emissiveIntensity = 0.5 + 0.9 * (0.5 + 0.5 * Math.sin(this._t * 7));
@@ -366,12 +418,24 @@ class StretchWrapper {
         this._armTheta = lerp(C.thEnd, ARM_PARK + 0 * TAU, k);
         this._writeTail(J, C, 1);
         this._setWeb(this._headWorldLocal(w), this._carY, this._carY);
-        if (tp >= J.Tpost) this._finish(J);
+        if (tp >= J.Tpost && (!this.operator || this._op.wp < 0)) this._finish(J); // cycle ends when the operator is back at the panel
       }
       if (J.phase === 'wiping' && tp >= 3.3 - 1e-6) C.thEnd = this._armTheta;
       if (C.thEnd === undefined) C.thEnd = C.thWipe * 0.2 + C.thCut * 0.8;
     }
     this.carriage.position.y = this._carY; this._applyArm();
+    // operator: watches the load while it wraps; for the cut + wipe steps up beside the cut arm, reaches in and smooths the tail
+    if (this.operator) {
+      const ph = J.phase, o = this._op, head = this._headWorldLocal(new THREE.Vector3());
+      // walking route home <-> cut spot goes round the outside of the mast pedestal, between the bollards
+      const route = [new THREE.Vector3(2.45, 0, 0.55), new THREE.Vector3(2.45, 0, -0.55), new THREE.Vector3(2.3, 0, -1.02)];
+      const goCut = ph === 'cutting' || ph === 'wiping' || (ph === 'wrapping' && tr > J.Trot - 3.2);
+      if (goCut) { if (o.wp === undefined || o.wp < 0) o.wp = 0; if (o.wp < 2 && o.pos.distanceTo(route[o.wp]) < 0.25) o.wp++; }
+      else if (ph === 'parking') { if (o.wp === undefined) o.wp = -1; if (o.wp >= 0 && o.pos.distanceTo(route[o.wp]) < 0.25) o.wp--; }
+      if (goCut) { const at = o.wp === 2 && o.pos.distanceTo(route[2]) < 0.2; this._opDrive(dt, route[o.wp], at || ph !== 'wrapping' ? this._yawTo(o.pos, ph === 'wiping' ? this._discToRoot(new THREE.Vector3(J.cx, 0, J.cz), new THREE.Vector3()) : head) : this._yawTo(o.pos, route[o.wp]), ph === 'cutting' && at ? 0.9 : ph === 'wiping' ? 0.75 + 0.25 * Math.sin(J.t * 5) : 0); }
+      else if (ph === 'parking' && o.wp >= 0) this._opDrive(dt, route[o.wp], this._yawTo(o.pos, route[o.wp]), 0);
+      else this._opDrive(dt, this._opHome, this._yawTo(this._opHome, ph === 'parking' ? panel : cen), 0);
+    }
   }
 
   _planCut(J) {
@@ -433,5 +497,6 @@ export function getCaseStackWorld(target) { return _last ? _last.getCaseStackWor
 export function takeCase(p) { return _last ? _last.takeCase(p) : null; }
 export function isBusy() { return _last ? _last.isBusy() : false; }
 export function getState() { return _last ? _last.getState() : 'idle'; }
+export function getOperator() { return _last ? _last.getOperator() : null; }
 export const TURNTABLE_TOP = TT_TOP;
 export { StretchWrapper };

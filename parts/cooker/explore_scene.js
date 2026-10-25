@@ -59,7 +59,7 @@ export function build(scene) {
   const gt = semi(13); gt.position.set(99, 0, 74); scene.add(gt); T.gate = gt; movers.push((t) => { gt.position.z = 76 - 3 * (0.5 + 0.5 * Math.sin(t * 0.25)); });
   // yard: slots + tractor pulling a trailer along X
   for (let i = 0; i < 6; i++) { const tr = semi(13); tr.children.slice(-1)[0].visible = false; tr.position.set(10 + i * 4.5, 0, 82); scene.add(tr); }
-  const yt = new THREE.Group(); const ytr = yardTractor(); yt.add(ytr); const ytl = semi(13); ytl.children.slice(-1)[0].visible = false; ytl.position.z = -8.5; yt.add(ytl); yt.rotation.y = Math.PI / 2; yt.position.set(40, 0, 66); scene.add(yt); T.yard = ytr;
+  const yt = new THREE.Group(); const ytr = yardTractor(); yt.add(ytr); const ytl = semi(13); ytl.children.slice(-1)[0].visible = false; ytl.position.z = -8.5; yt.add(ytl); yt.rotation.y = Math.PI / 2; yt.position.set(40, 0, 66); scene.add(yt); T.yard = yt;
   movers.push((t) => { yt.position.x = 40 + 6 * Math.sin(t * 0.2); });
   // receiving: trailer at DR-004 (X -28) + forklift unloading
   const rt = semi(13); rt.position.set(-28, 0.2, 39.2); rt.rotation.y = 0; scene.add(rt);
@@ -77,7 +77,7 @@ export function build(scene) {
   const pk = person(); pk.position.set(7.2, 1.2, 4); scene.add(pk); T.pick = pk; movers.push((t) => { pk.position.z = 4 + 3 * Math.sin(t * 0.35); pk.rotation.y = Math.cos(t * 0.35) > 0 ? 0 : Math.PI; });
   // wrap: wrapper.js station + stand-in operator at the control panel
   const w = Wrapper.create(sceneAdd, { position: [32, 1.2, -24], rotationY: 0 });
-  const op = person(); w.root.add(op); op.position.set(1.62, 0, 0.66); op.rotation.y = Math.PI;
+  // operator is now built into wrapper.js (w.getOperator())
   const wrapT = new THREE.Group(); w.root.add(wrapT); T.wrap = wrapT; // turntable centre
   const pal = new THREE.Group(); scene.add(pal); box(pal, 1.2, 0.14, 1.0, 0xb08a5a, 0, 0.07, 0); box(pal, 1.15, 1.4, 0.95, C.card, 0, 0.84, 0);
   pal.position.copy(w.getTurntableWorld(new THREE.Vector3()));

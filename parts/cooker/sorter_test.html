@@ -1,57 +1,26 @@
-<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#dfe6ee;overflow:hidden}</style>
+<!doctype html><html><head><meta charset="utf-8"><title>sorter test</title><style>html,body{margin:0;background:#dfe6ee;overflow:hidden}#out{position:absolute;left:8px;top:8px;font:12px monospace;color:#041E42;white-space:pre-wrap;max-width:1500px}</style>
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/jsm/"}}</script></head><body><pre id="out"></pre>
 <script type="module">
+// Headless test for sorter.js. ?shot=<simSeconds> renders a mid-flow frame without checks; default runs full checks.
 import * as THREE from 'three';
 import * as Sorter from './sorter.js';
-const qs = new URLSearchParams(location.search), SHOT = qs.has('shot') ? +qs.get('shot') : null;
-let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-Math.random = rnd; // deterministic
+import { runTest } from './sorter_test_core.js';
+const qs = new URLSearchParams(location.search), shotAt = qs.has('shot') ? +qs.get('shot') : null;
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0xdfe6ee);
-const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 80), new THREE.MeshStandardMaterial({ color: 0xc8ced6, roughness: 0.95 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
-const srt = Sorter.create(scene, { position: [0, 0, 0], lanes: 8, speed: 2.0 });
-const srt2check = Sorter.getInstance() === srt;
-const arrived = []; srt.onCaseArrived((m, lane) => arrived.push({ id: m.userData.id, lane, want: m.userData.lane, t: srt.time }));
-const cols = [0xc0915a, 0xb4834e, 0xcfa06a, 0x0071ce];
-const meshes = [];
-for (let i = 0; i < 40; i++) { const L = 0.4 + rnd() * 0.25, H = 0.22 + rnd() * 0.25, W = 0.3 + rnd() * 0.2;
-  const m = new THREE.Mesh(new THREE.BoxGeometry(L, H, W), new THREE.MeshStandardMaterial({ color: cols[i % 4 === 3 && i % 8 === 3 ? 3 : i % 3], roughness: 0.85 }));
-  m.castShadow = true; m.userData = { id: i, lane: (i * 3) % 8, L, H, W }; meshes.push(m); srt.addCase(m, m.userData.lane); }
-const ray = new THREE.Raycaster(); const statics = []; srt.group.traverse((o) => { if ((o.isMesh || o.isInstancedMesh) && !o.parent.name.includes('sorterCases')) statics.push(o); });
-const R = { maxPen: 0, maxPenAt: null, maxHover: 0, overlaps: 0, worstOverlap: 0, samples: 0, maxLift: 0 };
-const v = new THREE.Vector3(), dn = new THREE.Vector3(0, -1, 0);
-function checkPen() {
-  for (const c of srt.cases) { if (c.where === 'pending') continue; const m = c.mesh; m.updateMatrixWorld(); R.maxLift = Math.max(R.maxLift, c.lift || 0);
-    const { L, H, W } = m.userData, off = Math.min(0.2, H * 0.9);
-    for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) { v.set(a / 2 * L / 2, -H / 2, b / 2 * W / 2).applyMatrix4(m.matrixWorld);
-      ray.set(v.clone().addScaledVector(THREE.Object3D.DEFAULT_UP, off), dn); ray.far = off + 0.3;
-      const h = ray.intersectObjects(statics, false)[0]; R.samples++;
-      if (!h) continue; const pen = off - h.distance;
-      if (pen > R.maxPen) { R.maxPen = pen; R.maxPenAt = { where: c.where, s: +c.s.toFixed(2), obj: h.object.name, id: m.userData.id, t: +srt.time.toFixed(2) }; }
-      if (-pen > R.maxHover && (a === 0 && b === 0)) R.maxHover = -pen; } }
-}
-function obb(m) { m.updateMatrixWorld(); const e = m.matrixWorld.elements; const { L, H, W } = m.userData;
-  return { c: new THREE.Vector3(e[12], e[13], e[14]), a: [new THREE.Vector3(e[0], e[1], e[2]).normalize(), new THREE.Vector3(e[4], e[5], e[6]).normalize(), new THREE.Vector3(e[8], e[9], e[10]).normalize()], h: [L / 2, H / 2, W / 2] }; }
-function sat(A, B) { // returns penetration depth (>0 overlap)
-  const axes = [...A.a, ...B.a]; for (const x of A.a) for (const y of B.a) { const z = x.clone().cross(y); if (z.lengthSq() > 1e-8) axes.push(z.normalize()); }
-  const d = B.c.clone().sub(A.c); let minO = Infinity;
-  for (const ax of axes) { const ra = A.h.reduce((s, h, i) => s + h * Math.abs(A.a[i].dot(ax)), 0), rb = B.h.reduce((s, h, i) => s + h * Math.abs(B.a[i].dot(ax)), 0);
-    const o = ra + rb - Math.abs(d.dot(ax)); if (o <= 0) return 0; minO = Math.min(minO, o); } return minO; }
-function checkOverlap() { const live = srt.cases.filter((c) => c.where !== 'pending').map((c) => obb(c.mesh));
-  for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) { const o = sat(live[i], live[j]); if (o > 0.001) { R.overlaps++; R.worstOverlap = Math.max(R.worstOverlap, o); } } }
-const dt = 1 / 60; let steps = 0;
-const tEnd = SHOT ?? 900;
-while (srt.time < tEnd && !(SHOT === null && arrived.length === 40)) { srt.update(dt); steps++; if (SHOT === null && steps % 3 === 0) { checkPen(); checkOverlap(); } }
-R.arrived = arrived.length; R.wrongLane = arrived.filter((a) => a.lane !== a.want).length; R.simTime = +srt.time.toFixed(1); R.stats = srt.stats; R.facade = srt2check;
-R.laneEnds = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => srt.getLaneEndWorld(k).toArray().map((x) => +x.toFixed(2)));
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(140, 90), new THREE.MeshStandardMaterial({ color: 0xc9cfd6, roughness: 0.95 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const R = runTest(THREE, Sorter, scene, { check: shotAt === null, shotAt, log: (...a) => console.log(a.join(' ')), colors: [0xc0915a, 0xb4834e, 0xd2a46c, 0xa9774a] });
+const srt = R.srt; delete R.srt;
+R.facadeIsLast = Sorter.getInstance() === srt;
+R.laneEnds = srt.laneNames.map((n, k) => [n, ...srt.getLaneEndWorld(k).toArray().map((x) => +x.toFixed(2))]);
 R.inductStarts = [0, 1, 2].map((k) => srt.getInductStartWorld(k).toArray().map((x) => +x.toFixed(2)));
 const bb = new THREE.Box3().setFromObject(srt.group); R.bbox = [bb.min.toArray().map((x) => +x.toFixed(2)), bb.max.toArray().map((x) => +x.toFixed(2))];
-let calls = 0; srt.group.traverse((o) => { if (o.isMesh) calls++; }); R.meshes = calls;
 R.loopLen = +srt.loop.len.toFixed(2);
-// render
 const ren = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); ren.setSize(1600, 900); ren.shadowMap.enabled = true; ren.shadowMap.type = THREE.PCFSoftShadowMap; document.body.appendChild(ren.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa4b0, 1.4)); const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(20, 40, 25); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
-Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, far: 120 }); scene.add(sun);
-const cam = new THREE.PerspectiveCamera(40, 16 / 9, 0.1, 300); const cv = (qs.get('cam') || '14,16,24,-2,3,-3').split(',').map(Number); cam.position.set(cv[0], cv[1], cv[2]); cam.lookAt(cv[3], cv[4], cv[5]);
-ren.render(scene, cam); R.drawCalls = ren.info.render.calls;
-document.getElementById('out').textContent = JSON.stringify(R); window.RESULT = R;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa4b0, 1.3)); const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(15, 40, 25); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -32, right: 32, top: 32, bottom: -32, far: 120 }); scene.add(sun);
+const cam = new THREE.PerspectiveCamera(40, 16 / 9, 0.1, 300); const cv = (qs.get('cam') || '16,20,30,-2,2,-4').split(',').map(Number); cam.position.set(cv[0], cv[1], cv[2]); cam.lookAt(cv[3], cv[4], cv[5]);
+ren.render(scene, cam); R.drawCalls = ren.info.render.calls; R.triangles = ren.info.render.triangles;
+R.pass = shotAt === null ? (R.maxPen <= 0.01 && R.overlaps === 0 && R.arrived === 40 && R.wrong === 0) : null;
+window.RESULT = R; document.title = 'RESULT ' + (R.pass === null ? 'shot' : R.pass ? 'PASS' : 'FAIL');
+if (qs.has('hud')) document.getElementById('out').textContent = JSON.stringify(R);
 </script></body></html>

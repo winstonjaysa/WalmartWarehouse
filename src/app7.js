@@ -1,8 +1,9 @@
 // ====================================================================== POST
 
-let composer = null, outline = null;
+let composer = null, outline = null, FX = null;
 function setupPost() {
   if (LOW || QS.has('nopost')) return;
+  if (USE_FX) { try { FX = PFX.create(renderer, scene, camera, { quality: Q, outlineObjects: VEH.map((v) => v.obj).filter(Boolean) }); console.info('[gf] postfx', Q); return; } catch (e) { console.warn('[gf] postfx.js skipped:', e && e.message); FX = null; } }
   const { EffectComposer, RenderPass, GTAOPass, OutlinePass, SMAAPass, OutputPass } = window.POST || {};
   if (!EffectComposer) return;
   const w = innerWidth, h = innerHeight, pr = renderer.getPixelRatio();
@@ -53,6 +54,7 @@ function tourTick(dt) {
 function simStep(dt) {
   SIMT += dt;
   for (const v of VEH) { v.px = v.x; v.pz = v.z; v.pth = v.th; v.step(dt); v.obj.userData.update && v.obj.userData.update(dt, SIMT); }
+  try { sorterTick(dt); } catch (e) { console.warn('[gf] sorter disabled:', e && e.message); if (SRT && SRT.group) SRT.group.visible = false; SRT = null; OLD_SORT.forEach((o) => { o.visible = true; }); }
   try { popStep(dt); if (SIGNS && SIGNS.update) SIGNS.update(dt); if (WRAP0() && WRAP0().update) WRAP0().update(dt); } catch (e) { if (!simStep.err) { simStep.err = 1; console.warn("[gf] popStep", e && e.message); } }
   updateDoors(dt); updateCases(dt); uiTick(); tourTick(dt);
   for (const a of AMRS) { a.u = (a.u + 1.1 * dt / a.L) % 1; }
@@ -67,6 +69,7 @@ function render(alpha, draw = true) {
   for (const v of VEH) if (!v.isSemi) v.obj.position.y = deckYAt(v.obj.position.z);
   checkJumps(SIMT - (render.t ?? SIMT)); render.t = SIMT;
   if (!draw) return;
+  if (FX) { try { FX.render(1 / 60); return; } catch (e) { console.warn('[gf] postfx render failed, direct:', e && e.message); FX = null; } }
   if (composer) composer.render(); else renderer.render(scene, camera);
 }
 function frame(now) {
@@ -74,16 +77,19 @@ function frame(now) {
   last = now; acc += dt * speed;
   let n = 0; while (acc >= STEP && n < 8) { simStep(STEP); acc -= STEP; n++; }
   if (n >= 8) acc = 0;
-  controls.update(); render(acc / STEP); if (!QS.has('capture')) requestAnimationFrame(frame);
+  if (CAMRIG) CAMRIG.update(dt); else controls.update();
+  if (EXPLORE && EXPLORE.active) { try { EXPLORE.update(dt); } catch (e) { console.warn('[gf] explore stopped:', e && e.message); try { EXPLORE.stop(); } catch (_) {} EXPLORE = null; } }
+  render(acc / STEP); if (!QS.has('capture')) requestAnimationFrame(frame);
 }
 // capture API: deterministic
 window.__step = (dt) => { let k = Math.round(dt / STEP); while (k-- > 0) simStep(STEP); };
 window.__place = () => render(1, false);
 window.__render = () => { controls.update(); render(0); };
 window.__cam = (px, py, pz, tx, ty, tz) => { camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); };
-function onResize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) composer.setSize(w, h); }
+function onResize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) composer.setSize(w, h); if (FX) FX.setSize(w, h); }
 addEventListener('resize', onResize);
 camera.position.set(-20, 95, 150); controls.target.set(-14, 0, 22); controls.update();
+try { if (PFX) PFX.markBrandDecals(scene); } catch (e) { console.warn('[gf] markBrandDecals', e && e.message); }
 setupPost();
 if (UIX) { try { UIX.stopDemo(); UIX.clearScenePlaceholder(); UIX.onViewChange((v) => {}); } catch (e) { console.error(e); } }
 // shadow camera fitting to building + court
@@ -94,5 +100,20 @@ try { await renderer.compileAsync(scene, camera); } catch (e) { console.warn('co
 __hideLoad();
 window.__sim = { VEH, PALS, SLOTS, LOC, COUNTS, ASSERT, get t() { return SIMT; } };
 window.__quality = Q; window.__assert = ASSERT; window.__ready = true;
+// Cooker tour.js Explore mode: one department per wheel gesture / swipe / arrow key, toggled from the dock
+let EXPLORE = null;
+if (TOURM && TOURM.explore) { try {
+  const dock = document.querySelector('nav.dock');
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'gf-explore'; btn.textContent = 'Explore'; btn.setAttribute('aria-pressed', 'false'); btn.title = 'Explore the DC department by department';
+  const stopX = () => { try { TOURM.explore.stop(); } catch (_) {} controls.enabled = true; btn.setAttribute('aria-pressed', 'false'); };
+  btn.addEventListener('click', () => {
+    if (TOURM.explore.active) { stopX(); return; }
+    EXPLORE = TOURM.explore;
+    EXPLORE.start(camera, controls, { signs: typeof SIGNS !== 'undefined' ? SIGNS : null, ui: window.UI || null, domElement: canvas, container: canvas.parentElement });
+    btn.setAttribute('aria-pressed', 'true');
+  });
+  if (dock) { const sp = document.createElement('span'); sp.className = 'sep'; dock.insertBefore(btn, dock.querySelector('.sep')); }
+  if (QS.has('explore')) btn.click();
+} catch (e) { console.warn('[gf] tour.js Explore skipped:', e && e.message); EXPLORE = null; } }
 requestAnimationFrame(frame);
 window.__dbg = { docked, reachD, FK1, tineTopY, carriageOf, syncPose, placeVehicle, LANES, THREE };

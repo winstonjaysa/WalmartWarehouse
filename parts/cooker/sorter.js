@@ -231,7 +231,8 @@ class SorterInstance {
   }
   _buildBed() { // sliding-shoe slat chain over the north straight
     const o = this.opts, W = o.loopWidth, P = new THREE.Vector3(), T = new THREE.Vector3(), N = new THREE.Vector3(), L = new THREE.Vector3();
-    this.loop.frame(this.sBed0, P, T, N, L);
+    const P1 = new THREE.Vector3(); this.loop.frame(this.sBed1, P1, T, N, L); this.loop.frame(this.sBed0, P, T, N, L);
+    T.subVectors(P1, P).setY(0).normalize(); // exact chord direction (avoids drift from a finite-difference tangent)
     const bed = this.bed = { O: P.clone(), T: T.clone(), D: new THREE.Vector3().crossVectors(T, UP).normalize(), Lb: this.sBed1 - this.sBed0, rD: 0.09, home: -(W / 2 - 0.05), far: W / 2 - 0.05 };
     if (bed.D.z > 0) bed.D.negate(); // divert side = -Z (north)
     bed.perim = 2 * bed.Lb + 2 * Math.PI * bed.rD; bed.n = Math.round(bed.perim / 0.155); bed.pitch = bed.perim / bed.n; bed.q0 = 0;
@@ -344,6 +345,7 @@ class SorterInstance {
       let s2 = c.s + a * c.hl; for (let it = 0; it < 2; it++) { path.frame(s2, P2, T2, N2, L2); s2 += sf.subVectors(cc, P2).dot(T2); }
       path.frame(s2, P2, T2, N2, L2); sf.copy(P2).addScaledVector(L2, sf.subVectors(cc, P2).dot(L2));
       const pen = sf.sub(cc).dot(N2); if (pen > lift) lift = pen; }
+    if (lift > 0.001) lift = lift * 1.12 + 0.004; // margin for sampled-surface curvature between probe points (helix inner edge)
     c.lift = lift; const m = c.mesh;
     m.position.copy(P).addScaledVector(N, c.hh + lift + 0.0005 - c.cy);
     _m4.makeBasis(T, N, L); m.quaternion.setFromRotationMatrix(_m4);
@@ -356,12 +358,13 @@ class SorterInstance {
       else if (q <= Lb + Math.PI * rD) { ang = (q - Lb) / rD; u = Lb + rD * Math.sin(ang); y = -0.01 - rD * (1 - Math.cos(ang)); }
       else if (q <= 2 * Lb + Math.PI * rD) { ang = Math.PI; u = Lb - (q - Lb - Math.PI * rD); y = -0.01 - 2 * rD; }
       else { ang = Math.PI + (q - 2 * Lb - Math.PI * rD) / rD; u = -rD * Math.sin(ang - Math.PI); y = -0.01 - rD * (1 + Math.cos(ang - Math.PI)); }
+      if (ang > 0) y -= Math.min(0.03, 0.08 * Math.min(ang, 2 * Math.PI - ang)); // dip on drums so slat corners never rise above the belt plane
       pos.copy(b.O).addScaledVector(b.T, u); pos.y += y;
       rot.setFromAxisAngle(_Z, -ang); qq.copy(b.base).multiply(rot);
       _m4.compose(pos, qq, sc); b.slats.setMatrixAt(i, _m4);
       // shoe lateral
       if (q <= Lb) { const c = b.who[i];
-        if (c && c.where !== 'removed') { const w = this._southEdge(c, u); if (w !== null) b.lat[i] = Math.min(b.far, Math.max(b.lat[i], w - 0.03)); }
+        if (c && c.where !== 'removed') { const w = this._southSpan(c, u, 0.055); if (w !== null) b.lat[i] = Math.min(b.far, Math.max(b.home, w - 0.03)); }
         b.top[i] = b.lat[i]; }
       else { b.who[i] = null; const f = Math.min(1, (q - Lb) / (perim - Lb)); const e = f * f * (3 - 2 * f); b.lat[i] = b.top[i] + (b.home - b.top[i]) * e; if (f >= 1) b.lat[i] = b.home; }
       if (q > perim - 0.2) b.lat[i] = b.home;
@@ -371,11 +374,16 @@ class SorterInstance {
     }
     b.slats.instanceMatrix.needsUpdate = b.shoes.instanceMatrix.needsUpdate = true;
   }
+  _southSpan(c, u, hu) { // lowest case-footprint lateral over the shoe's along-belt extent [u-hu, u+hu]
+    let best = null; for (let k = -4; k <= 4; k++) { const w = this._southEdge(c, u + hu * k / 4); if (w !== null && (best === null || w < best)) best = w; }
+    if (best !== null) for (const p of this._pts) if (p[0] >= u - hu && p[0] <= u + hu && p[1] < best) best = p[1];
+    return best;
+  }
   _southEdge(c, u) { // lowest lateral (bed w) of the case footprint at along-position u (null if outside)
     const b = this.bed, m = c.mesh, rel = _v[4].copy(m.position).sub(b.O), uc = rel.dot(b.T), wc = rel.dot(b.D);
     const ax = _v[5].set(1, 0, 0).applyQuaternion(m.quaternion), th = Math.atan2(ax.dot(b.D), ax.dot(b.T)); const ct = Math.cos(th), st = Math.sin(th);
     const pts = [[1, 1], [1, -1], [-1, -1], [-1, 1]].map(([a, bb]) => [uc + a * c.hl * ct - bb * c.hw * st, wc + a * c.hl * st + bb * c.hw * ct]);
-    let best = null; for (let i = 0; i < 4; i++) { const p = pts[i], q = pts[(i + 1) % 4]; if ((u - p[0]) * (u - q[0]) > 0 || p[0] === q[0]) continue;
+    this._pts = pts; let best = null; for (let i = 0; i < 4; i++) { const p = pts[i], q = pts[(i + 1) % 4]; if ((u - p[0]) * (u - q[0]) > 0 || p[0] === q[0]) continue;
       const w = p[1] + (q[1] - p[1]) * (u - p[0]) / (q[0] - p[0]); if (best === null || w < best) best = w; }
     return best;
   }

@@ -40,6 +40,16 @@ CK = {n: cooker(n) for n in ['signs', 'wrapper'] if (R/f'parts/cooker/{n}.js').e
 COOKER = ''.join(f"const COOKER_{n.upper()} = (() => {{\n{re.sub(r"</(script)", r"<\\/\1", js, flags=re.I)}\nreturn {{ {ex} }};\n}})();\n" for n, (js, ex) in CK.items())
 models = strip_comments(models); app = strip_comments(app)
 esc = lambda s: re.sub(r'</(script)', r'<\\/\1', s, flags=re.I)
+import json
+MODS = [('PFX', 'parts/postfx/postfx.js'), ('CAMX', 'parts/inky/camera.js'), ('RACKC', 'parts/inky/rackCartons.js'), ]  # sorter.js / tour.js cut from v4 (scope cut)
+def modsrc(path):
+    f = R/path
+    if not f.exists(): return 'null'
+    return esc(json.dumps(f.read_text())).replace('<!--', '<\\!--')
+MODJS = """const __mod = async (name, src) => { if (!src) return null; try { const u = URL.createObjectURL(new Blob([src], { type: 'text/javascript' })); const m = await import(u); URL.revokeObjectURL(u); console.info('[gf] module ok', name); return m; } catch (e) { console.warn('[gf] module skipped', name, e && e.message); return null; } };\n"""
+MODJS += ''.join(f"const {v} = QS0.has('no{v.lower()}') ? null : await __mod('{path}', {modsrc(path)});\n" for v, path in MODS)
+MODJS += "const SORTERM = null, TOURM = null;\n"
+MODJS = "const QS0 = new URLSearchParams(location.search);\n" + MODJS
 models = esc(models); app = esc(app)
 # --- chrome patches: dock ids match the sim (DR-001..008 / DS-101..108), no AMR demo content ---
 for a, b in [('DR-012', 'DR-005'), ('DR-019', 'DR-003'), ('DS-147', 'DS-103'), ('DS-131', 'DS-105'), ('DR012', 'DR005'), ('14-032-C-2', '04-016-C-2'), ('22-041-D-1', '06-021-D-1'), ('07-118-A-1', '02-011-A-1'), ('aisle 14', 'aisle 04'), ('aisle 22', 'aisle 06'), ('RES aisle 14', 'RES aisle 04')]:
@@ -47,6 +57,8 @@ for a, b in [('DR-012', 'DR-005'), ('DR-019', 'DR-003'), ('DS-147', 'DS-103'), (
 chrome = '\n'.join(l for l in chrome.split('\n') if not re.search(r"g: 'AMR'|INFO AMR|WARN AMR|BATTERY_LOW|\['INFO', 'AMR'", l))
 MOBILE_CSS = '''
 <style id="gf-extra">
+@media (max-width:430px){html,body{overflow-x:hidden;max-width:100vw}.gf-cam .gf-cam-in,.gf-cam .gf-cam-out{width:28px;height:28px}nav.dock{max-width:calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right));overflow-x:auto;scrollbar-width:none;bottom:max(8px,env(safe-area-inset-bottom))}nav.dock::-webkit-scrollbar{display:none}nav.dock .scalebar,nav.dock .sep-scale{display:none}}
+@media (max-width:400px){.gf-cam,.gf-cam-sep{display:none!important}}
 #gfLoad{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;min-width:260px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,.86);box-shadow:0 8px 30px rgba(4,30,66,.18);font:600 13px Inter,Arial,sans-serif;color:#041E42;text-align:center}
 #gfLoad .bar{height:6px;border-radius:3px;background:#dfe7f1;margin-top:10px;overflow:hidden}#gfLoad .bar i{display:block;height:100%;width:0;background:#0071CE;transition:width .2s}
 #gfLoad.err{background:#fff4f2;color:#9b1c10}#gfLoad.err .bar{display:none}
@@ -80,6 +92,7 @@ window.POST = {{ EffectComposer, RenderPass, GTAOPass, OutlinePass, SMAAPass, Ou
 const __gfl = document.getElementById('gfLoad');
 async function __yield(pct, label) {{ if (__gfl) {{ __gfl.firstChild.textContent = 'Loading 3D scene · ' + label + '…'; __gfl.querySelector('i').style.width = pct + '%'; }} await new Promise((r) => setTimeout(r, 0)); }}
 try {{
+{MODJS}
 const MODELS = (() => {{
 {models}
 return {{ {EXPORTS} }};

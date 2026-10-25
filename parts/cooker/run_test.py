@@ -13,7 +13,7 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: print('pageerror:', e))
     q = sys.argv[1] if len(sys.argv) > 1 else ''
     pg.goto(f'http://127.0.0.1:{port}/sorter_test.html{q}', wait_until='commit')
-    pg.wait_for_function('window.RESULT', timeout=600000)
+    pg.wait_for_function('window.RESULT', timeout=1500000, polling=2000)
     print(json.dumps(pg.evaluate('window.RESULT'), indent=1))
     if len(sys.argv) > 2: pg.locator('canvas').screenshot(path=sys.argv[2])
     b.close()

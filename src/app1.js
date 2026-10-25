@@ -33,10 +33,13 @@ const canvas = $('#gl');
 const GL_INFO = (() => { try { const c = document.createElement('canvas'), g = c.getContext('webgl2'); if (!g) return { weak: true, name: 'no webgl2' };
   const e = g.getExtension('WEBGL_debug_renderer_info'), name = e ? String(g.getParameter(e.UNMASKED_RENDERER_WEBGL)) : 'unknown', maxTex = g.getParameter(g.MAX_TEXTURE_SIZE);
   g.getExtension('WEBGL_lose_context')?.loseContext(); return { weak: /swiftshader|llvmpipe|softpipe|software|basic render|mali-4|adreno \(tm\) 3/i.test(name) || maxTex < 8192, name }; } catch (e) { return { weak: true, name: 'error' }; } })();
-const Q = QS.get('q') || (GL_INFO.weak ? 'low' : 'high'), LOW = Q === 'low';
+let __q0 = QS.get('q') || (GL_INFO.weak ? 'low' : 'high');
+try { if (PFX && !QS.get('q')) __q0 = GL_INFO.weak ? 'low' : PFX.pickQuality(null); } catch (e) { console.warn('[gf] pickQuality', e && e.message); }
+if (!QS.get('q') && GL_INFO.weak) __q0 = 'low';
+const Q = __q0, LOW = Q === 'low', USE_FX = !!PFX && !LOW && !QS.has('nopost');
 console.info(`[gateflow] GL: ${GL_INFO.name} -> quality ${Q}`);
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LOW, powerPreference: 'high-performance', preserveDrawingBuffer: QS.has('capture') });
-renderer.setPixelRatio(LOW ? 1 : Math.min(devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LOW && !USE_FX, powerPreference: 'high-performance', preserveDrawingBuffer: QS.has('capture') });
+renderer.setPixelRatio(LOW || Q === 'med' ? 1 : Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = LOW ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -50,11 +53,13 @@ scene.fog = new THREE.Fog(DAY_BG.clone(), 380, 900);
 const camera = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 1, 3000);
 const HOME = { pos: V3(118, 150, 205), tgt: V3(-4, 0, 4) };
 camera.position.copy(HOME.pos);
-const controls = new OrbitControls(camera, canvas);
+let CAMRIG = null;
+if (CAMX && !QS.has('nocamrig')) { try { CAMRIG = CAMX.create({ camera, domElement: canvas, scene, syncView: false, home: { position: HOME.pos.clone(), target: HOME.tgt.clone() }, minDistance: 8, maxDistance: 600, maxPolarAngle: 1.32 }); } catch (e) { console.warn('[gf] camera.js skipped:', e && e.message); CAMRIG = null; } }
+const controls = CAMRIG ? CAMRIG.controls : new OrbitControls(camera, canvas);
 controls.target.copy(HOME.tgt);
 controls.enableDamping = true; controls.dampingFactor = 0.07;
 controls.maxPolarAngle = 1.32; controls.minDistance = 8; controls.maxDistance = 600;
-controls.screenSpacePanning = false; controls.zoomSpeed = 0.9; controls.rotateSpeed = 0.6;
+controls.screenSpacePanning = false; if (!CAMRIG) controls.zoomSpeed = 0.9; controls.rotateSpeed = 0.6;
 controls.update();
 
 // lights

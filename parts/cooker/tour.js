@@ -202,11 +202,11 @@ export const DEFAULT_STOPS = [
   { id: 'receiving', title: 'Receiving', sign: 'RECEIVING',
     what: 'The dock restraint locks the trailer before the door opens and the leveler drops. A receiver pulls the pallets to the stage lane with an electric pallet jack and scans each pallet against the supplier\u2019s advance ship notice, checking quantity and damage.',
     watch: 'Receiver unloading with an electric pallet jack',
-    shot: { offset: [-12.5, 6.2, -3.4], lookOffset: [0, 1, 0], orbit: 0.3 } },
+    shot: { offset: [-12.5, 6.2, -3.4], lookOffset: [0, 1, 0], orbit: 0.5 } },
   { id: 'reserve', title: 'Reserve storage', sign: 'RESERVE STORAGE',
     what: 'The warehouse system picks a rack slot by sales velocity and zone. A power equipment operator on a reach truck carries the pallet into the narrow aisle (one truck per aisle), lifts it into the slot and scans the location to confirm the putaway.',
     watch: 'Reach truck putting a pallet away',
-    shot: { offset: [5, 12, 17], lookOffset: [0, 1.5, 0] } },
+    shot: { offset: [0, 8.3, 14.5], lookOffset: [0, 1.5, 0], orbit: 0.15 } },
   { id: 'crossdock', title: 'Cross-dock', sign: 'CROSS-DOCK',
     what: 'Pallets already allocated to stores skip storage. A driver takes them straight across the one-way, northbound cross-dock lane from the receiving docks to the outbound lanes on the opposite side.',
     watch: 'Forklift carrying a cross-dock pallet',
@@ -218,7 +218,7 @@ export const DEFAULT_STOPS = [
   { id: 'pick', title: 'Pick module', sign: 'PICK MODULE',
     what: 'Order fillers working by voice or RF scanner pick full cases from the flow-rack faces on three tiers. Each case gets a store label, is scanned, and goes onto the takeaway conveyor.',
     watch: 'Order filler picking cases at a pick face',
-    shot: { offset: [0, 7, 17], lookOffset: [0, 1.5, 0], orbit: 0.15 } },
+    shot: { offset: [0, 4.4, -10.5], lookOffset: [0, 1.3, 0], orbit: 0.1 } },
   { id: 'sorter', title: 'Sorter', sign: 'SORTER',
     what: 'Conveyors merge cases from the pick module and the receiving conveyor. Each case is inducted, spaced and scanned, then the sliding-shoe sorter diverts it to its store\u2019s lane: one door per store. Unreadable cases go round again or to rework.',
     watch: 'Cases on sorter SRT1 diverting to store lanes',
@@ -360,13 +360,14 @@ class ExploreMode {
   prev() { this.step(-1); }
   step(dir) {
     if (!this.active) return;
+    if (this._pendRel) { if ((this._pendRel === 'start') !== (dir < 0)) this._pendRel = null; return; } // release queued behind a moving camera: opposite input cancels it
     if (!this.engaged) { // re-enter from the released end
       if (this.released === 'end' && dir < 0) this._engage(this.stops.length - 1);
       else if (this.released === 'start' && dir > 0) this._engage(0);
       return;
     }
     const j = this.index + dir;
-    if (j < 0) this._release('start'); else if (j >= this.stops.length) this._release('end'); else this._go(j);
+    if (j < 0 || j >= this.stops.length) { const end = j < 0 ? 'start' : 'end'; if (this.trans) { this._pendRel = end; this._pendT = 0; } else this._release(end); } else this._go(j);
   }
   goTo(id) {
     if (!this.active) return;
@@ -380,13 +381,14 @@ class ExploreMode {
     this.index = -1; this._go(i);
   }
   _release(end) {
-    this.engaged = false; this.released = end; this.trans = null;
+    this._pendRel = null; this.engaged = false; this.released = end; this.trans = null;
     if (this.controls) { if (this.controls.target) this.controls.target.copy(this.rig.oLook); this.controls.enabled = true; }
     this._setPanelVisible(false); this._renderRail();
     try { this.opts.ui?.setCaption?.(''); } catch (e) { /* ignore */ }
     this._emit({ id: null, index: -1, stop: null, released: end });
   }
   _go(i) {
+    this._pendRel = null;
     if (i === this.index && this.engaged) return;
     const s = this.stops[i];
     this.from.pos.copy(this.rig.pos); this.from.look.copy(this.rig.look); this.from.fov = this.rig.fov;
@@ -445,6 +447,7 @@ class ExploreMode {
       blendPose(this.rig, this.from, P, L, F, easeInOutCubic(k)); if (k >= 1) this.trans = null;
     } else { this.rig.pos.copy(P); this.rig.look.copy(L); this.rig.fov = F; }
     this.rig.apply(this.camera, this.controls, dt);
+    if (this._pendRel && !this.trans && (this._pendT += dt) > 0.35) this._release(this._pendRel); // hand over to OrbitControls only once the camera has come to rest
   }
 
   stop() {
@@ -461,7 +464,7 @@ class ExploreMode {
   onChange(cb) { this._chgCbs.add(cb); return () => this._chgCbs.delete(cb); }
   isActive() { return this.active; }
   isEngaged() { return this.active && this.engaged; }
-  getState() { return { active: this.active, engaged: this.engaged, released: this.released, index: this.index, id: this.engaged ? this.stops[this.index]?.id : null, transitioning: !!this.trans, camera: this.rig.oPos.toArray(), look: this.rig.oLook.toArray() }; }
+  getState() { return { active: this.active, engaged: this.engaged, released: this.released, index: this.index, id: this.engaged ? this.stops[this.index]?.id : null, transitioning: !!this.trans, pendingRelease: this._pendRel || null, camera: this.rig.oPos.toArray(), look: this.rig.oLook.toArray() }; }
 
   /* ---------- input */
   _listen() {

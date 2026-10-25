@@ -25,7 +25,7 @@ const CAP = 0.72;                       // cap-height / font-size ratio (Inter/A
 export const DEFAULT_ZONES = {
   'GATE':            { position: [100, 5.2, 60.5], rotationY: 0, mount: 'posts', outdoor: true, sub: 'GTE · CHECK-IN / CHECK-OUT' },
   'YARD':            { position: [74, 5.2, 46], rotationY: Math.PI / 2, mount: 'posts', outdoor: true, sub: 'TRAILER SLOTS YA · YD' },
-  'RECEIVING':       { position: [-26, 6, 25.5], rotationY: 0, sub: 'RCV · DOORS DR-001–008' },
+  'RECEIVING':       { position: [-26, 6, 29.5], rotationY: 0, sub: 'RCV · DOORS DR-001–008' },
   'RESERVE STORAGE': { position: [-26, 6, 18.2], rotationY: 0, sub: 'RES · AISLES 01–08' },
   'CROSS-DOCK':      { position: [-2.5, 6, 9], rotationY: Math.PI / 2, sub: 'XDK · STRAIGHT TO SHIPPING' },
   'PICK MODULE':     { position: [11, 6, 18.2], rotationY: 0, sub: 'PM · CASE PICK' },
