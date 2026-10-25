@@ -30,6 +30,40 @@
   "caster": "caster yoke, origin at axle centre",
   "beacon": "emissive orange dome"
  },
+ "material_pass": {
+  "palette": [
+   "rt_white",
+   "rt_charcoal",
+   "rt_red",
+   "mat_grey",
+   "rt_black",
+   "seat_black",
+   "fork_steel",
+   "pu_tread",
+   "rt_grey",
+   "tyre",
+   "rt_lip",
+   "chrome_soft"
+  ],
+  "atlas_textures": [],
+  "atlas_solid": [
+   "screen",
+   "lamp_white",
+   "safety_blue",
+   "beacon_orange"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   32
+  ],
+  "atlas_px": [
+   512,
+   64
+  ],
+  "emissive_strength": 6.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": -0.0,
   "zfight_faces": 0,

@@ -6,18 +6,19 @@
  "nodes": {
   "pallet": "pallet (merged), origin ground centre",
   "load": "cartons + tape + labels (merged); hide/show to load/unload",
-  "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+  "film": "stretch film: glossy translucent shell (material stretch_film: roughness 0.12, alpha 0.36-0.62 from the banded RGBA webp film_bands, blue-white tint, specular streaks) 10 mm off the cartons + bunched rolled lip overhanging the top edge; alphaMode BLEND, double-sided"
  },
  "note": "half-height load on a blue (CHEP-style) pallet, 2 layers, wrapped; total ~0.83 m",
- "height_m": 0.825,
+ "height_m": 0.833,
  "qa": {
   "min_z": 0.0,
   "zfight_faces": 0,
   "zfight_samples": [],
   "open_edges": 0,
   "open_by_node": {},
+  "open_samples": [],
   "ground_shift": -0.0
  },
- "blender_tris": 5612,
+ "blender_tris": 8684,
  "file": "pallet_load_half.glb"
 }

@@ -78,8 +78,8 @@ class Vehicle {
       const rem = a.tr.L - a.s, lag = Math.abs(dT - this.steer);
       if (a.pre) { if (lag < 0.01) a.pre = false; else { this.v = 0; this.sv = 0; return; } } // steer at standstill before moving off
       const vmax = a.vmax ?? this.vmax, vcurve = Math.sqrt(1.2 / Math.max(1e-3, Math.abs(Math.tan(this.steer) / wb)));
-      const vt = Math.min(vmax, vcurve, vmax * Math.max(0.15, 1 - lag / 0.4), Math.sqrt(2 * this.acc * Math.max(0, rem)));
-      const dv = clamp(vt - this.v, -this.acc * 1.4 * dt, this.acc * dt); this.v = Math.max(rem > 0.004 ? 0.04 : 0, this.v + dv); this.accel = dv / dt;
+      const vt = this.hold ? 0 : Math.min(vmax, vcurve, vmax * Math.max(0.15, 1 - lag / 0.4), Math.sqrt(2 * this.acc * Math.max(0, rem)));
+      const dv = clamp(vt - this.v, -this.acc * 1.4 * dt, this.acc * dt); this.v = Math.max(rem > 0.004 && !this.hold ? 0.04 : 0, this.v + dv); this.accel = dv / dt;
       const sd = g * Math.min(this.v * dt, rem + 0.002), kv = Math.tan(this.steer) / wb, dth = sd * kv, thm = this.th + dth / 2;
       this.x += Math.sin(thm) * sd; this.z += Math.cos(thm) * sd; this.th += dth;
       this.curv = kv; this.gear = g; this.sv = g * this.v; this.ds = sd; this.odo += Math.abs(sd);
@@ -108,7 +108,7 @@ class Vehicle {
 // ---------------------------------------------------------------- forklift (rear-wheel steer, reference = front drive axle)
 const FK_WB = 1.26;
 function makeForklift(id, x, z, th, opts = {}) {
-  const obj = createForklift({ autoLift: false, ...opts }); shadowAll(obj);
+  const obj = createForklift({ autoLift: false, operator: true, ...opts }); shadowAll(obj);
   if (opts.reach) { obj.userData.reach = true; }
   const v = new Vehicle({ id, type: opts.reach ? 'Reach truck' : 'Counterbalance forklift', obj, R: 1.5, vmax: opts.vmax ?? 2.2, acc: 0.9, wb: FK_WB, x, z, th });
   { const k = obj.userData.kin; v.refZ = k ? k.refZ : 0; if (k) v.wb = k.L; v.dmax = k ? k.maxSteer : 0.75; } v.steerRate = 1.4; v.Lc = 0.9;
@@ -126,7 +126,7 @@ function makeForklift(id, x, z, th, opts = {}) {
 // ---------------------------------------------------------------- semi (tractor rear axle at kingpin z=4.9; front axle 9.75; trailer bogie -8.9)
 const KP = 4.9, TR_WB = 4.85, TL_L = 13.8;
 function makeSemi(id, x, z, th, opts = {}) {
-  const obj = createSemiTruck(opts); shadowAll(obj);
+  const obj = createSemiTruck({ operator: true, ...opts }); shadowAll(obj);
   const v = new Vehicle({ id, type: 'Road tractor + 53\' trailer', obj, R: 12.5, vmax: opts.vmax ?? 6, acc: 0.7, wb: TR_WB, x, z, th });
   v.dmax = 0.6; v.steerRate = 0.5; v.Lc = 4;
   v.tth = th; // trailer heading

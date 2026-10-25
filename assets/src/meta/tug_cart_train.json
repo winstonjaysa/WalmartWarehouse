@@ -34,6 +34,39 @@
   "cartN_hitch": "Empty at the cart rear pin coupler",
   "tug_steer_FL/FR": "Empty on each tug front kingpin, parent of the wheel"
  },
+ "material_pass": {
+  "palette": [
+   "tug_charcoal",
+   "tug_black",
+   "seat_black",
+   "hitch_steel",
+   "tyre",
+   "tug_rim",
+   "hub_dark",
+   "cart_deck",
+   "cart_frame",
+   "tug_grey"
+  ],
+  "atlas_textures": [],
+  "atlas_solid": [
+   "brand_blue",
+   "lamp_white",
+   "brand_yellow",
+   "lamp_red",
+   "beacon_orange"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   32
+  ],
+  "atlas_px": [
+   512,
+   64
+  ],
+  "emissive_strength": 6.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": 0.0,
   "zfight_faces": 0,

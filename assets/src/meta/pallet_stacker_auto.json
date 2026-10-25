@@ -25,6 +25,38 @@
   "mast_inner": "child of mast_outer, inner uprights + crosshead + chains + lift rod; origin at mast foot; translate +Y 0..1.60 m",
   "fork_carriage": "child of mast_inner; carriage, backrest, guide rollers, 2 tines (1.07 m x 0.12 x 0.06 m, tapered tips); origin at the fork heel on the ground; translate +Y 0..1.30 m (free lift)"
  },
+ "material_pass": {
+  "palette": [
+   "stacker_charcoal",
+   "stacker_black",
+   "stacker_orange",
+   "decal_white",
+   "sensor_glass",
+   "estop_red",
+   "pu_wheel",
+   "stacker_grey",
+   "fork_steel",
+   "chrome_soft"
+  ],
+  "atlas_textures": [],
+  "atlas_solid": [
+   "brand_blue",
+   "brand_yellow",
+   "beacon_blue",
+   "strip_cyan"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   32
+  ],
+  "atlas_px": [
+   512,
+   64
+  ],
+  "emissive_strength": 6.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": 0.0,
   "zfight_faces": 0,

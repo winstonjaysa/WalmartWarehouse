@@ -39,9 +39,9 @@ window.__key = (key) => window.dispatchEvent(new KeyboardEvent('keydown', { key,
 window.__wheelC = (dy) => { const e = new WheelEvent('wheel', { deltaY: dy, bubbles: true, cancelable: true }); W.dispatchEvent(e); return e.defaultPrevented; };
 window.__wheel = (dy) => { const e = new WheelEvent('wheel', { deltaY: dy, bubbles: true, cancelable: true }); r.domElement.dispatchEvent(e); return e.defaultPrevented; };
 window.__goTo = (id) => Tour.explore.goTo(id);
-window.__startExplore = () => { Tour.explore.start(cam, controls, { getTarget, getFacts, signs: Signs, ui, container: W }); };
+window.__startExplore = () => { Tour.explore.start(cam, controls, { getTarget, getFacts, signs: Signs, ui, container: W, blockers: SC.blockers }); };
 window.__info = () => ({ changes: changes.slice(), caption: captionText, stopped, hl: [...(signs.getSigns ? signs.getSigns().keys() : [])].length, dom: !!W.querySelector('.gf-explore'), dots: W.querySelectorAll('.gf-explore button').length, caps: caps.length, capStages: caps.map((c) => c.stage).join(','), fov: cam.fov });
-window.__startTour = () => Tour.start(cam, controls, getTarget, { ui, signs: Signs });
+window.__startTour = () => Tour.start(cam, controls, getTarget, { ui, signs: Signs, blockers: SC.blockers });
 window.__stopTour = () => Tour.stop();
 window.__stopExplore = () => Tour.explore.stop();
 window.__api = { tour: Object.keys(Tour), explore: Object.getOwnPropertyNames(Object.getPrototypeOf(Tour.explore)) };
@@ -53,6 +53,7 @@ window.__framing = () => { const f = Tour.explore.checkFraming();
   // independent check: raycast actual sign meshes between camera and target
   const tgt = new THREE.Vector3(); T[f.id].getWorldPosition(tgt); tgt.y += 0.8; const dir = tgt.clone().sub(cam.position); const dist = dir.length(); dir.normalize();
   const rc = new THREE.Raycaster(cam.position.clone(), dir, 0.1, dist - 0.3); const hits = rc.intersectObject(signs.root, true).filter((h) => h.object.name !== 'cable');
-  return { ...f, rayHits: hits.length, camDist: +cam.position.distanceTo(tgt).toFixed(1) }; };
+  const all = rc.intersectObjects(SC.blockers, true).filter((h) => { let own = false; for (let q = h.object; q; q = q.parent) if (q === T[f.id]) own = true; const m = h.object.material; return !own && h.object.isMesh && !(m.transparent && m.opacity < 0.6) && h.object.name !== 'cable'; });
+  return { ...f, rayHits: hits.length, sceneHits: all.length, camDist: +cam.position.distanceTo(tgt).toFixed(1) }; };
 window.__ready = true;
 </script></body></html>

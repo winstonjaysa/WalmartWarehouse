@@ -24,6 +24,32 @@
   "wheel_*": "origin on axle centre",
   "lift_top": "origin at the lift base"
  },
+ "material_pass": {
+  "palette": [
+   "amr_charcoal",
+   "amr_body",
+   "tread_black",
+   "amr_grey"
+  ],
+  "atlas_textures": [],
+  "atlas_solid": [
+   "brand_blue",
+   "brand_yellow",
+   "amr_led_cyan",
+   "amr_led_red"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   16
+  ],
+  "atlas_px": [
+   512,
+   64
+  ],
+  "emissive_strength": 5.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": -0.0,
   "zfight_faces": 0,

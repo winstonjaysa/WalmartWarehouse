@@ -9,6 +9,8 @@ const TRL_REAR = -10.8;
 function trailerPose(doorX, side = 1) { return { X: doorX, Z: side * (DOCK_Z - TRL_REAR), th: side > 0 ? 0 : Math.PI }; }
 // ---------- docked trailers (initial state: already at doors, restraint engaged, doors up)
 const docked = {};
+const TRL_ROWS = 11; // 22 pallet positions, two wide
+function trlPos(k) { return new THREE.Vector3(k % 2 ? 0.56 : -0.56, 1.30, -9.95 + Math.floor(k / 2) * 1.3); }
 function dockedSemi(id, door, side, fill) {
   const d = (side > 0 ? IN_DOORS : OUT_DOORS).find((q) => q.id === door), X = sx(d.x);
   const p = trailerPose(X, side), kx = p.X + Math.sin(p.th) * (KP + 0) , kz = p.Z;
@@ -16,7 +18,7 @@ function dockedSemi(id, door, side, fill) {
   v.tth = p.th; v.door = door; v.pallets = []; docked[door] = v;
   const tl = v.P.trailer; if (v.P.rearDoors) { v.P.rearDoors.left.rotation.y = 3 * Math.PI / 2 * 0.98; v.P.rearDoors.right.rotation.y = -3 * Math.PI / 2 * 0.98; }
   doorPanels[door].userData.target = 1;
-  for (let k = 0; k < fill; k++) { const pal = makePalletObj(100 + k + door.length * 7); pal.position.set((k % 2 ? 0.56 : -0.56), 1.30 - 0.0, -9.95 + Math.floor(k / 2) * 1.3); tl.add(pal); trackPal(pal); pal.userData.loc = `${id}/P${String(k + 1).padStart(2, '0')}`; v.pallets.push(pal); }
+  for (let k0 = 0; k0 < fill; k0++) { const k = side > 0 ? k0 : TRL_ROWS * 2 - 1 - k0; const pal = makePalletObj(100 + k + door.length * 7); pal.position.set((k % 2 ? 0.56 : -0.56), 1.30 - 0.0, -9.95 + Math.floor(k / 2) * 1.3); pal.userData.k = k; tl.add(pal); trackPal(pal); pal.userData.loc = `${id}/P${String(k + 1).padStart(2, '0')}`; v.pallets.push(pal); }
   placeVehicle(v, 1); v.obj.updateMatrixWorld(true);
   return v;
 }
@@ -24,6 +26,8 @@ function dockedSemi(id, door, side, fill) {
 const T1 = dockedSemi('TRL-48213', 'DR-005', 1, 10);
 const T2 = dockedSemi('TRL-50177', 'DR-002', 1, 6);
 const T3 = dockedSemi('TRL-71540', 'DS-103', -1, 4);
+const T4 = dockedSemi('TRL-53390', 'DR-007', 1, 10);
+const T5 = dockedSemi('TRL-66102', 'DS-105', -1, 0);
 // ---------- inbound truck arriving through the gate and backing into DR-003
 const ARR = makeSemi('TRL-50311', 100, 92, Math.PI, { vmax: 7 });
 ARR.state = 'Arriving'; ARR.task = 'Gate → DR-003';
@@ -68,11 +72,16 @@ function checkJumps(simDt) {
     if (l && l.distanceTo(_w) > lim) { ASSERT.jumps++; console.warn(`[ASSERT] pallet jump ${p.userData.lpn} ${(l.distanceTo(_w) * 100).toFixed(1)}cm in one frame`); }
     (p.userData.lp ||= new THREE.Vector3()).copy(_w); }
 }
+// reservation locks (lane / P&D / wrapper): a vehicle queues until(free) then owns the key
+const LOCKS = {};
+function lockQ(v, key) { return v.until(() => !LOCKS[key] || LOCKS[key] === v.id, 'Waiting for ' + key).do(() => { LOCKS[key] = v.id; }); }
+function unlockQ(v, key) { return v.do(() => { if (LOCKS[key] === v.id) delete LOCKS[key]; }); }
 function scheduleUnload(fk, trl, lane, doorX) {
   const next = trl.pallets.find((p) => !p.userData.taken);
   if (!next) { fk.state = 'Idle'; fk.task = 'Trailer empty'; return; }
   // FL enters from the south: deepest reachable empty slot = lowest k in the contiguous empty run from k=3
   let si = -1; for (let k = lane.slots.length - 1; k >= 0 && lane.slots[k].state === 'empty'; k--) si = k; if (si < 0) { fk.wait(2).do(() => scheduleUnload(fk, trl, lane, doorX)); return; }
+  if (!lane.slots.some((s) => s.state !== 'empty') && false) {}
   const slot = lane.slots[si]; next.userData.taken = true; slot.state = 'reserved'; slot.res = fk.id;
   const wp = new THREE.Vector3(); if (trl.isSemi) placeVehicle(trl, 1); trl.obj.updateMatrixWorld(true); next.getWorldPosition(wp); // B23: trailer must be posed before reading its pallets
   const src = { id: next.userData.loc, X: wp.x, Y: wp.y, Z: wp.z }, lx = sx(lane.x), EZ = sz(2.2), diam = lx - wp.x, RD = reachD(fk);
@@ -80,24 +89,26 @@ function scheduleUnload(fk, trl, lane, doorX) {
   fk.state = 'Unloading'; fk.task = `${src.id} → ${slot.id}`;
   if (Math.abs(fk.x - wp.x) > 0.01 || Math.abs(Math.sin(fk.th)) > 0.01 || Math.cos(fk.th) < 0) fk.drive(wp.x, EZ, 0, 1, { label: 'U-turn to trailer', vmax: 1.1, R: Math.max(1.5, diam / 2) });
   fk.liftTo((f) => hFor(f, src.Y + ENTRY, wp.z - RD))
+    .drive(wp.x, wp.z - RD - 1.0, 0, 1, { label: 'Into trailer', vmax: 1.3, lead: 0.6 })
     .drive(wp.x, wp.z - RD, 0, 1, { label: 'Creep into pallet pockets', vmax: 0.6 })
     .liftTo((f) => hFor(f, src.Y + DECK_UNDER))
     .do(() => { slotAssert('pickup', fk, next, src); carriageOf(fk).attach(next); fk.carry = next; fk.state = 'Picking'; next.userData.loc = fk.id; })
     .liftTo((f) => f.obj.userData.getForkHeight() + CLEAR).tilt(0.05)
     .drive(wp.x, EZ, 0, -1, { label: 'Reverse out of trailer', vmax: 0.9, lead: 0 })
     .liftTo((f) => hFor(f, FLOOR + TRAVEL, f.z))
-    .drive(lx, EZ, Math.PI, -1, { label: 'Reverse turn', vmax: 0.9, R: Math.max(1.5, diam / 2) })
-    .drive(lx, dst.Z + RD, Math.PI, 1, { label: 'To ' + slot.id, vmax: 1.4 })
+    .drive(lx, EZ, Math.PI, -1, { label: 'Reverse turn', vmax: 1.3, R: Math.max(1.5, diam / 2) });
+  lockQ(fk, lane.id).drive(lx, dst.Z + RD, Math.PI, 1, { label: 'To ' + slot.id, vmax: 1.4 })
     .tilt(0)
     .liftTo((f) => hFor(f, dst.Y + DECK_UNDER, f.z))
     .do(() => { slotAssert('drop', fk, next, dst); world.attach(next); slot.state = 'occupied'; slot.pal = next; slot.res = null; next.userData.loc = slot.id; COUNTS.received++; fk.carry = null; fk.state = 'Staged';
       flashScan(next); log('RCV', fk.id, `${next.userData.lpn} staged at ${slot.id}`, 'info'); })
     .liftTo((f) => hFor(f, dst.Y + ENTRY))
-    .drive(lx, dst.Z + RD + 1.4, Math.PI, -1, { label: 'Back out', vmax: 0.9, lead: 0 })
-    .liftTo((f) => hFor(f, FLOOR + TRAVEL - 0.08))
+    .drive(lx, EZ, Math.PI, -1, { label: 'Back out', vmax: 1.1, lead: 0 });
+  unlockQ(fk, lane.id).liftTo((f) => hFor(f, FLOOR + TRAVEL - 0.08))
     .do(() => scheduleUnload(fk, trl, lane, doorX));
 }
-const FK1 = makeForklift('FL-07', sx(LANE5.x), sz(2.2), Math.PI);
+function trailerMouth(trl) { const p = trl.pallets.find((q) => !q.userData.taken), w = new THREE.Vector3(); trl.obj.updateMatrixWorld(true); p.getWorldPosition(w); return w; }
+const FK1 = (() => { const w = trailerMouth(T1), f = makeForklift('FL-07', w.x, sz(0.2), 0); f.obj.userData.setForkHeight(0.08, true); return f; })();
 FK1.do(() => scheduleUnload(FK1, T1, LANE5, X5));
 // scan worker beside the lane
 const W1 = createWorker({}); shadowAll(W1); W1.position.set(sx(LANE5.x + 1.4), FLOOR, sz(6.5)); W1.rotation.y = -Math.PI / 2; world.add(W1);

@@ -28,8 +28,10 @@ function yardTractor() { const g = new THREE.Group(); box(g, 2.2, 2.3, 2.2, C.ye
   for (const s of [-1, 1]) for (const z of [1.3, -1.3]) { const w = cyl(g, 0.5, 0.35, C.dark, s * 1.0, 0.5, z); w.rotation.z = Math.PI / 2; } const p = person(); p.position.set(0, 1.0, 1.1); p.scale.setScalar(0.9); g.add(p); return g; }
 
 export function build(scene) {
-  const T = {}, movers = [];
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), M(0xc9ced4)); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  const T = {}, movers = [], blockers = [];
+  const bl = new THREE.Group(); scene.add(bl); const sceneAdd = scene; scene = bl; // everything solid goes under `bl` (= line-of-sight blockers)
+  blockers.push(bl);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), M(0xc9ced4)); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; sceneAdd.add(ground);
   box(scene, 100, 1.2, 62, 0xdfe3e8, 0, 0.6, 0);
   // shell: north/west full height, south/east cut low (as walmart-dc.html)
   box(scene, 100, 12, 0.4, C.wall, 0, 7.2, -31); box(scene, 0.4, 12, 62, C.wall, -50, 7.2, 0); box(scene, 100, 4.5, 0.4, C.wall, 0, 3.45, 31); box(scene, 0.4, 4.5, 62, C.wall, 50, 3.45, 0);
@@ -67,14 +69,14 @@ export function build(scene) {
   const rr = reachTruck(); rr.position.set(-27.1, 1.2, 0); rr.rotation.y = Math.PI / 2; scene.add(rr); T.reserve = rr;
   movers.push((t) => { rr.position.z = 4 * Math.sin(t * 0.25); rr.userData.carriage.position.y = 2.6 + 2.0 * (0.5 + 0.5 * Math.sin(t * 0.6)); });
   // cross-dock: forklift going north along X -2.5
-  const xf = forklift(); xf.position.set(-2.5, 1.2, 0); xf.rotation.y = Math.PI; scene.add(xf); T.crossdock = xf; movers.push((t) => { xf.position.z = 6 - ((t * 2) % 14); });
+  const xf = forklift(); xf.position.set(-2.5, 1.2, 0); xf.rotation.y = Math.PI; scene.add(xf); T.crossdock = xf; movers.push((t) => { xf.position.z = -1 + 7 * Math.sin(t * 0.2); xf.rotation.y = Math.cos(t * 0.2) > 0 ? 0 : Math.PI; });
   // replen: reach truck behind the flow racks (X ~3)
   const rp = reachTruck(); rp.position.set(-1.2, 1.2, 4); rp.rotation.y = Math.PI / 2; scene.add(rp); T.replen = rp;
   movers.push((t) => { rp.position.z = 4 + 3 * Math.sin(t * 0.3); rp.userData.carriage.position.y = 2.2 + 1.2 * (0.5 + 0.5 * Math.sin(t * 0.5)); });
   // pick: order filler in pick aisle X 8 walking + takeaway case
   const pk = person(); pk.position.set(8, 1.2, 4); scene.add(pk); T.pick = pk; movers.push((t) => { pk.position.z = 4 + 3 * Math.sin(t * 0.35); pk.rotation.y = Math.cos(t * 0.35) > 0 ? 0 : Math.PI; });
   // wrap: wrapper.js station + stand-in operator at the control panel
-  const w = Wrapper.create(scene, { position: [32, 1.2, -24], rotationY: 0 });
+  const w = Wrapper.create(sceneAdd, { position: [32, 1.2, -24], rotationY: 0 });
   const op = person(); w.root.add(op); op.position.set(1.62, 0, 0.66); op.rotation.y = Math.PI;
   const wrapT = new THREE.Group(); w.root.add(wrapT); T.wrap = wrapT; // turntable centre
   const pal = new THREE.Group(); scene.add(pal); box(pal, 1.2, 0.14, 1.0, 0xb08a5a, 0, 0.07, 0); box(pal, 1.15, 1.4, 0.95, C.card, 0, 0.84, 0);
@@ -86,6 +88,6 @@ export function build(scene) {
   const sj = forklift(); sj.position.set(-10, 1.2, -26); scene.add(sj); T.shipping = sj; movers.push((t) => { sj.position.z = -25 - 2.5 * (0.5 + 0.5 * Math.sin(t * 0.5)); sj.position.x = -10 - 2 * (0.5 + 0.5 * Math.sin(t * 0.5)); });
   for (let i = 0; i < 5; i++) palletLoad(scene, -8, 1.2, -20 - i * 1.4, 0x9db6cf);
   // depart: loaded trailer leaving east along the north court
-  const dp = semi(13); dp.rotation.y = Math.PI / 2; dp.position.set(40, 0, -55); scene.add(dp); T.depart = dp; movers.push((t) => { dp.position.x = 34 + ((t * 2) % 20); });
-  return { targets: T, update: (t, dt) => movers.forEach((f) => f(t, dt)), wrapper: w };
+  const dp = semi(13); dp.rotation.y = Math.PI / 2; dp.position.set(40, 0, -55); scene.add(dp); T.depart = dp; movers.push((t) => { dp.position.x = 40 + 8 * Math.sin(t * 0.12); });
+  return { blockers, targets: T, update: (t, dt) => movers.forEach((f) => f(t, dt)), wrapper: w };
 }

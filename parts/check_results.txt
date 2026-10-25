@@ -35,9 +35,9 @@ PASS handPalletJack driven minY=0 size=[1.5531, 1.2665, 0.9848] {"tiller": {"whe
 PASS handPalletJackRaised rest minY=0 size=[0.548, 1.3665, 1.5349] {"tiller": {"wheels": 2, "tillerChild": true, "axleY": 0.08, "wheelR": 0.08}} 
 PASS handPalletJackRaised animated minY=0 size=[0.548, 1.3665, 1.5349] {"tiller": {"wheels": 2, "tillerChild": true, "axleY": 0.08, "wheelR": 0.08}} 
 PASS handPalletJackRaised driven minY=0 size=[1.5531, 1.3665, 0.9848] {"tiller": {"wheels": 2, "tillerChild": true, "axleY": 0.08, "wheelR": 0.08}, "pos": [-1.7741, 0, -8.1107], "yaw": 1.9677} 
-PASS riderPalletTruck rest minY=0 size=[0.8, 1.4183, 2.475] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}} 
-PASS riderPalletTruck animated minY=0 size=[0.8, 1.4183, 2.475] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}} 
-PASS riderPalletTruck driven minY=0 size=[2.5201, 1.4183, 1.1854] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}, "pos": [0.7924, 0, -9.2013], "yaw": 1.8261} 
+PASS riderPalletTruck rest minY=0 size=[0.8, 1.4183, 2.5525] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}} 
+PASS riderPalletTruck animated minY=0 size=[0.8, 1.4183, 2.5525] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}} 
+PASS riderPalletTruck driven minY=0 size=[2.6138, 1.4183, 1.2193] {"tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.13, "wheelR": 0.13}, "pos": [0.7924, 0, -9.2013], "yaw": 1.8261} 
 PASS walkieStacker rest minY=-0.0 size=[0.94, 1.78, 2.2649] {"carriageY": 0, "tineLocal": [-0.22, 0, 0], "mast": {"stages": 1, "overlaps": [1.75], "carTopGap": 0.835}, "tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.12, "wheelR": 0.12}} 
 PASS walkieStacker animated minY=-0.0 size=[0.94, 2.83, 2.2649] {"carriageY": 0.75, "tineLocal": [-0.22, 0, 0], "mast": {"stages": 1, "overlaps": [0.7], "carTopGap": 0.085}, "tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.12, "wheelR": 0.12}} 
 PASS walkieStacker driven minY=0 size=[2.3118, 1.78, 0.9678] {"carriageY": 0, "tineLocal": [-0.22, 0, 0], "mast": {"stages": 1, "overlaps": [1.75], "carTopGap": 0.835}, "tiller": {"wheels": 1, "tillerChild": true, "axleY": 0.12, "wheelR": 0.12}, "pos": [7.9015, 0, -9.728], "yaw": 1.5423} 
@@ -48,9 +48,9 @@ PASS amrPod animated minY=-0.0 size=[0.99, 2.0625, 0.99]
 PASS robotArm rest minY=0 size=[1.211, 1.6838, 1.0711] {"L1": 0.9, "L2": 0.78} 
 PASS robotArm animated minY=0 size=[1.2451, 1.5638, 1.0982] {"L1": 0.9, "L2": 0.78} 
 PASS worker rest minY=0 size=[0.6692, 1.835, 0.302]  
-PASS worker animated minY=-0.0 size=[0.6634, 1.8427, 0.6134]  
+PASS worker animated minY=-0.0 size=[0.6619, 1.8427, 0.6134]  
 PASS workerBlue rest minY=0 size=[0.6692, 1.8047, 0.2997]  
-PASS workerBlue animated minY=-0.0 size=[0.6499, 1.7876, 0.8976]  
+PASS workerBlue animated minY=-0.0 size=[0.6484, 1.7876, 0.8976]  
 PASS rackBay rest minY=0 size=[2.96, 7.2725, 1.25]  
 PASS rackBay animated minY=0 size=[2.96, 7.2725, 1.25]  
 PASS conveyor rest minY=-0.0 size=[1.04, 1.228, 4.07]  

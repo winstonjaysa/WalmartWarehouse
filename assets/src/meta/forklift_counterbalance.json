@@ -28,6 +28,44 @@
   "fork_carriage": "child of mast_inner, origin at carriage bottom; translate +Y (lift)",
   "fork_L/fork_R": "children of fork_carriage, origin at fork heel; translate X for side-shift / spread"
  },
+ "material_pass": {
+  "palette": [
+   "fl_yellow",
+   "fl_charcoal",
+   "fl_black",
+   "knob_red",
+   "fl_guard",
+   "mirror_glass",
+   "lpg_red",
+   "steel_light",
+   "valve_red",
+   "sticker_yellow",
+   "tyre",
+   "fl_rim",
+   "hub_dark",
+   "fl_mast",
+   "chain",
+   "fl_fork"
+  ],
+  "atlas_textures": [],
+  "atlas_solid": [
+   "lamp_red",
+   "lamp_amber",
+   "lamp_white",
+   "beacon_orange"
+  ],
+  "kept": [],
+  "palette_px": [
+   128,
+   32
+  ],
+  "atlas_px": [
+   512,
+   64
+  ],
+  "emissive_strength": 6.0,
+  "uv_warnings": []
+ },
  "qa": {
   "min_z": -0.00807,
   "zfight_faces": 0,

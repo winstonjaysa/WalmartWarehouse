@@ -79,9 +79,70 @@ def layer_grid(z, h, rnd, skip=()):
             out += case('c', x, y, z, cx - 0.006, cy - 0.006, h, rnd, label=(j == 0))
     return out
 
+FILM_OFF = 0.010   # film stands 10 mm (+3 mm case inset) off the cartons -> no z-fight
+
+def film_mat():
+    if 'stretch_film' in bpy.data.materials: return bpy.data.materials['stretch_film']
+    m = bpy.data.materials.new('stretch_film'); m.use_nodes = True; nt = m.node_tree; b = nt.nodes['Principled BSDF']
+    t = nt.nodes.new('ShaderNodeTexImage'); t.image = bpy.data.images.load(os.path.join(TEX, 'film_bands.png')); t.interpolation = 'Linear'
+    nt.links.new(t.outputs['Color'], b.inputs['Base Color']); nt.links.new(t.outputs['Alpha'], b.inputs['Alpha'])
+    b.inputs['Roughness'].default_value = 0.12; b.inputs['Metallic'].default_value = 0.0
+    m.blend_method = 'BLEND'; m.surface_render_method = 'BLENDED'; m.use_backface_culling = False
+    m.diffuse_color = (0.88, 0.92, 0.96, 0.45)
+    return m
+
+def _set_uv(o, fn):
+    me = o.data
+    if not me.uv_layers: me.uv_layers.new(name='UVMap')
+    uv = me.uv_layers.active.data
+    for lp in me.loops: uv[lp.index].uv = fn(o.matrix_world @ me.vertices[lp.vertex_index].co)
+
 def film(z0, z1):
-    F = mat('stretch_film', '#DDE8EE', 0.35, alpha=0.32)
-    return box2('film', (-PL_X / 2 - 0.008, -PL_Y / 2 - 0.008, z0), (PL_X / 2 + 0.008, PL_Y / 2 + 0.008, z1), F, bev=0.03, seg=3)
+    """stretch-film shell (sides + top sheet) + bunched/rolled lip that overhangs the top edge"""
+    F = film_mat(); hx, hy = PL_X / 2 + FILM_OFF, PL_Y / 2 + FILM_OFF
+    body = box2('film_body', (-hx, -hy, z0), (hx, hy, z1), F, bev=0.03, seg=3)
+    bpy.context.view_layer.update()
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(body.evaluated_get(dg)); body.modifiers.clear(); body.data = me
+    _set_uv(body, lambda c: ((c.x + c.y) * 0.8, min(0.845, max(0.0, (c.z - z0) / (z1 - z0) * 0.85))))
+    # rolled lip: rounded-rectangle ring tube, wobbling radius (bunched film), sits on the top edge, overhangs ~12 mm
+    rnd = random.Random(11); bm = bmesh.new(); cr = 0.035; N = 192; M = 8
+    ex, ey = hx + 0.002 - cr, hy + 0.002 - cr
+    path = []
+    L = 4 * (ex + ey) * 2 / 2 + 2 * math.pi * cr
+    for k in range(N):
+        s = k / N * L; segs = [(2 * ey, 'R'), (math.pi * cr / 2, 'c1'), (2 * ex, 'B'), (math.pi * cr / 2, 'c2'),
+                               (2 * ey, 'L'), (math.pi * cr / 2, 'c3'), (2 * ex, 'T'), (math.pi * cr / 2, 'c0')]
+        for ln, tag in segs:
+            if s <= ln: break
+            s -= ln
+        if tag == 'R': p, n = Vector((ex + cr, -ey + s, 0)), Vector((1, 0, 0))
+        elif tag == 'L': p, n = Vector((-ex - cr, ey - s, 0)), Vector((-1, 0, 0))
+        elif tag == 'B': p, n = Vector((ex - s, ey + cr, 0)), Vector((0, 1, 0))
+        elif tag == 'T': p, n = Vector((-ex + s, -ey - cr, 0)), Vector((0, -1, 0))
+        else:
+            c = {'c1': (ex, ey, 0), 'c2': (-ex, ey, 90), 'c3': (-ex, -ey, 180), 'c0': (ex, -ey, 270)}[tag]
+            a = R(c[2]) + s / cr; n = Vector((math.cos(a), math.sin(a), 0)); p = Vector((c[0], c[1], 0)) + n * cr
+        path.append((p, n, k / N))
+    ph = [rnd.uniform(0, 6.28) for _ in range(4)]
+    rings = []
+    for (p, n, t) in path:
+        w = 1 + 0.28 * math.sin(t * 2 * math.pi * 23 + ph[0]) + 0.16 * math.sin(t * 2 * math.pi * 57 + ph[1])
+        r = 0.013 * w
+        ctr = p + Vector((0, 0, z1 - 0.012)) + n * 0.004
+        ring = []
+        for j in range(M):
+            a = 2 * math.pi * j / M
+            ring.append(bm.verts.new(ctr + n * (math.cos(a) * r) + Vector((0, 0, math.sin(a) * r * 0.8))))
+        rings.append(ring)
+    for k in range(N):
+        A, B = rings[k], rings[(k + 1) % N]
+        for j in range(M):
+            bm.faces.new((A[j], A[(j + 1) % M], B[(j + 1) % M], B[j]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    lip = mk('film_lip', bm, F)
+    _set_uv(lip, lambda c: ((c.x - c.y) * 3.0, 0.86 + 0.13 * min(1.0, max(0.0, (c.z - (z1 - 0.03)) / 0.03))))
+    return [body, lip]
 
 PINE = ['#E6C690', '#DDB87E', '#D2AC70']; PINE_BLK = '#C99C62'
 BLUEW = ['#2272C4', '#1C67B6', '#2A7ACB']; BLUE_BLK = '#1B5EA6'
@@ -119,9 +180,9 @@ def load_asset(nm, layers, wrap, top_skip=(), pal=(PINE, PINE_BLK), refs=(), not
     top = PL_H + 0.0008 + layers * LH - 0.004
     nodes = {'pallet': 'pallet (merged), origin ground centre', 'load': 'cartons + tape + labels (merged); hide/show to load/unload'}
     if wrap:
-        f = join([film(0.128, top + 0.006)], 'film'); parent(f, root)
-        nodes['film'] = 'transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)'
-    finish(nm, dict(facing=PFACE, refs=list(refs), nodes=nodes, note=note, height_m=round(top + (0.006 if wrap else 0), 3)),
+        f = join(film(0.128, top + FILM_OFF), 'film'); parent(f, root)
+        nodes['film'] = 'stretch film: glossy translucent shell (material stretch_film: roughness 0.12, alpha 0.36-0.62 from the banded RGBA webp film_bands, blue-white tint, specular streaks) 10 mm off the cartons + bunched rolled lip overhanging the top edge; alphaMode BLEND, double-sided'
+    finish(nm, dict(facing=PFACE, refs=list(refs), nodes=nodes, note=note, height_m=round(top + (FILM_OFF + 0.004 if wrap else 0), 3)),
            shots=[('top', (0.6, -0.5, top - 0.1, 0.35), (1.0, -0.9, 0.6))])
 
 if want('pallet_load_wrapped'):

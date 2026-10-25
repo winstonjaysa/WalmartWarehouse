@@ -1,0 +1,36 @@
+PASS  handsOnGrip forklift  0
+PASS  seated/standing arm stretch <=1.0 forklift  [0.95, 0.95]
+PASS  handsOnGrip reachTruck  0
+PASS  seated/standing arm stretch <=1.0 reachTruck  [0.9, 0.97]
+PASS  handsOnGrip riderPalletTruck  0
+PASS  riderFeetOnDeck(<=1cm) riderPalletTruck  {'soleY': 0.151, 'deckTopY': 0.151, 'nShoes': 2, 'inside': True}
+PASS  riderFeetInsideFootprint riderPalletTruck  {'soleY': 0.151, 'deckTopY': 0.151, 'nShoes': 2, 'inside': True}
+PASS  seated/standing arm stretch <=1.0 riderPalletTruck  [0.92, 0.92]
+PASS  handsOnGrip riderPalletTruck close  0
+PASS  riderFeetOnDeck(<=1cm) riderPalletTruck close  {'soleY': 0.151, 'deckTopY': 0.151, 'nShoes': 2, 'inside': True}
+PASS  riderFeetInsideFootprint riderPalletTruck close  {'soleY': 0.151, 'deckTopY': 0.151, 'nShoes': 2, 'inside': True}
+PASS  seated/standing arm stretch <=1.0 riderPalletTruck close  [0.92, 0.92]
+PASS  handsOnGrip walkieStacker  0
+PASS  pull: gripping arm bent (stretch 0.8-0.97, elbow>15deg) walkieStacker  ([0.98, 0.82], [9.8, 69.9])
+PASS  pull: leans away from load (lean>0.05) walkieStacker  0.09
+PASS  handsOnGrip handPalletJack PULL  0
+PASS  pull: gripping arm bent (stretch 0.8-0.97, elbow>15deg) handPalletJack PULL  ([1.03, 0.91], [11.5, 49.4])
+PASS  pull: leans away from load (lean>0.05) handPalletJack PULL  0.1
+PASS  handsOnGrip handPalletJack PUSH  0
+PASS  push: both hands bent (stretch 0.8-0.97) handPalletJack PUSH  ([0.92, 0.93], [46, 42.3])
+PASS  push: pose pushing-tiller, walking (shuffle) handPalletJack PUSH  pushing-tiller
+PASS  handsOnGrip tugTrain  0
+PASS  seated/standing arm stretch <=1.0 tugTrain  [0.93, 0.93]
+PASS  handsOnGrip yardTractor  0
+PASS  seated/standing arm stretch <=1.0 yardTractor  [0.97, 0.97]
+PASS  handsOnGrip semiTruck  0
+PASS  seated/standing arm stretch <=1.0 semiTruck  [0.94, 0.94]
+PASS  modes: walkie auto=pull when moving -Z  
+PASS  auto switches pull->push when travel reverses (+Z)  {'autoSwitchToPush': 'push', 'pose': 'pushing-tiller', 'stride': 0.5, 'keepsWhenStopped': 'push', 'walkingStopped': False, 'forcedPull': 'pull', 'forcedPose': 'walking-tiller', 'detach': True, 'reattach': True, 'eyes': 2, 'smile': 1}
+PASS  push uses short shuffle stride (0.5)  0.5
+PASS  stopped: keeps last mode, stops walking  
+PASS  setOperatorMode(pull) forces pull  
+PASS  detach/reattach  
+PASS  face: 2 eyes + smile  (2, 1)
+PASS  zero console/page errors  []
+TOTAL 35 FAIL 0

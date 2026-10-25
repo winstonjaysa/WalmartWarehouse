@@ -2125,7 +2125,7 @@ export const SIZES = {
   forklift: { x: 1.4912, y: 2.3065, z: 3.568 }, // incl. 1.07 m forks; overhead guard 2.2 m
   autoStacker: { x: 1.036, y: 2.5, z: 2.838 },
   palletJack: { x: 0.548, y: 1.2665, z: 1.5349 },
-  riderPalletTruck: { x: 0.8, y: 1.4183, z: 2.475 },
+  riderPalletTruck: { x: 0.8, y: 1.4183, z: 2.5525 },
   walkieStacker: { x: 0.94, y: 1.78, z: 2.2649 },
   amr: { x: 0.836, y: 0.3479, z: 0.9451 },
   amrPod: { x: 0.99, y: 2.0125, z: 0.99 },

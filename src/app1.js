@@ -6,6 +6,7 @@ const {
   createSemiTruck, createYardTractor, createForklift, createAutoStacker, createPalletJack, createRiderPalletTruck,
   createAMR, createRobotArm, createWorker, createRackBay, getRackBayParts, createConveyor,
   createPalletLoad, createReachTruck, createTugTrain, createWalkieStacker, createOilDrum, createWireCage, createSackStack, createBollard, drive: mdlDrive, PALLET,
+  createHandPalletJack, createOperator, isManned,
 } = MODELS;
 
 const QS = new URLSearchParams(location.search);

@@ -18,7 +18,7 @@ const T = [
   ['forklift', 'forklift', 'seated · hands on wheel', [0, 1.25, -0.5], 55, 18, 4.2],
   ['reachTruck', 'reachTruck', 'standing side-stance', [0, 1.3, -0.9], 75, 16, 4.2],
   ['riderPalletTruck', 'riderPalletTruck', 'standing on platform', [0, 1.0, -0.8], 135, 18, 3.6],
-  ['riderPalletTruck close', 'riderPalletTruck', 'feet on deck · backrest', [0, 0.6, -1.2], 115, 14, 2.3],
+  ['riderPalletTruck close', 'riderPalletTruck', 'feet on deck · backrest', [0.1, 0.85, -1.2], 150, 16, 3.1],
   ['walkieStacker', 'walkieStacker', 'auto: pulling (tiller first)', [0, 1.0, -1.4], 120, 14, 4.6, { v: -0.9, steer: 0.0 }],
   ['handPalletJack PULL', 'handPalletJack', 'pull · lean away · elbow bend', [0, 0.85, -1.2], 110, 12, 3.2, { v: -1.0, steer: 0.0 }],
   ['handPalletJack PUSH', 'handPalletJack', 'push · both hands · shuffle', [0, 0.85, -0.8], 115, 14, 3.2, { v: 0.6, steer: 0.25 }],
@@ -59,7 +59,7 @@ window.__probe = () => tiles.filter((tl) => tl.objs[0].userData.operator).map((t
   const sc = op.userData.parts.armLeft.scale.y, sc2 = op.userData.parts.armRight.scale.y;
     let feet = null; if (tl.objs[0].name === 'riderPalletTruck') { const m = tl.objs[0], deck = new THREE.Box3().setFromObject(m.getObjectByName('antiSlipMat')), pl = new THREE.Box3().setFromObject(m.getObjectByName('riderPlatform'));
     const sh = []; op.traverse((o) => { let v = true; for (let q = o; q; q = q.parent) v = v && q.visible; if (o.name === 'shoe' && v) sh.push(new THREE.Box3().setFromObject(o)); });
-    feet = { ok: false, soleY: +Math.min(...sh.map((b) => b.min.y)).toFixed(4), deckTopY: +deck.max.y.toFixed(4), inside: sh.every((b) => b.min.x >= pl.min.x && b.max.x <= pl.max.x && b.min.z >= pl.min.z && b.max.z <= pl.max.z) }; }
+    feet = { soleY: +Math.min(...sh.map((b) => b.min.y)).toFixed(4), deckTopY: +deck.max.y.toFixed(4), nShoes: sh.length, inside: sh.every((b) => b.min.x >= pl.min.x && b.max.x <= pl.max.x && b.min.z >= pl.min.z && b.max.z <= pl.max.z) }; }
   const elb = ['armLeft', 'armRight'].map((n) => +(Math.PI - op.userData.parts[n].userData.elbow.quaternion.angleTo(new THREE.Quaternion()) ).toFixed(2));
   return { label: tl.label, mode: ud.getOperatorMode?.() ?? null, lean: +(op.userData.lean || 0).toFixed(3), stretch: op.userData.armStretch.map((x) => +x.toFixed(2)), elbowBendDeg: ['armLeft', 'armRight'].map((n) => +THREE.MathUtils.radToDeg(op.userData.parts[n].userData.elbow.quaternion.angleTo(new THREE.Quaternion())).toFixed(1)), feet, name: tl.objs[0].name, pose: op.userData.pose, handErr: +err.toFixed(4), armStretch: [+sc.toFixed(2), +sc2.toFixed(2)], walking: !!op.userData.walking, anchors: Object.keys(ud.anchors) }; });
 window.__tiles = tiles; window.__step(1 / 30, 1); window.__ready = true;
