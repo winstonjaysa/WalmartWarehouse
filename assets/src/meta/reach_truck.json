@@ -1,0 +1,44 @@
+{
+ "anchors": {
+  "anchor_stand": "floor pad centre of the stand-in cockpit (operator feet), child of body; face +Z"
+ },
+ "facing": "+Z (forks point toward +Z in glTF / three.js)",
+ "refs": [
+  "06_aisle_blue_racks.jpg",
+  "07_overhead_aisle_wire_decks.jpg",
+  "03_interior_orange_racks_mezzanine.jpg"
+ ],
+ "sides": "L/R = vehicle's own left/right: L = +X, R = -X",
+ "hierarchy": "reach_truck > body > {beacon, wheel_LL, wheel_LR, steer_drive > wheel_drive, caster > wheel_caster, reach > {reach_base, mast_outer > mast_inner > fork_carriage}}",
+ "rig": {
+  "drive": "move/rotate root; fixed axle = load wheels in the baselegs (z +0.90 m glTF); the single drive wheel (x=-0.25, z=-0.75 glTF) steers",
+  "steer": "rotate steer_drive about local Y, +-90 deg (reach trucks turn on the spot)",
+  "spin": "rotate wheel_* about local X; drive r=0.17, load wheels r=0.11, caster r=0.09",
+  "reach": "translate reach along local +Z (glTF) 0..0.60 m: the whole mast rolls forward along the baseleg rails",
+  "lift": "two-stage: fork_carriage +Y 0..1.30 m (free lift), then mast_inner +Y 0..1.85 m; max fork height 3.15 m above rest. carriage top 0.62 + free lift 1.30 = 1.92 < inner rail top 2.41; inner stage keeps 0.51 m overlap in the outer rails at full extension",
+  "caster": "caster yoke may swivel freely about Y (cosmetic)"
+ },
+ "nodes": {
+  "body": "chassis, operator compartment (stand-in, open to the vehicle-left side), overhead guard 2.26 m, baselegs",
+  "reach": "Empty at the mast foot on the rails (x=0, y=0.36, z=+0.12 glTF); translate +Z to reach",
+  "reach_base": "reach carriage plate + rollers (child of reach)",
+  "mast_outer": "outer uprights 2.45 m, child of reach",
+  "mast_inner": "inner stage, translate +Y",
+  "fork_carriage": "carriage + backrest + 2 forks 1.07 x 0.10 x 0.045 m, tapered tips; translate +Y",
+  "steer_drive": "drive-wheel yoke; origin at the axle centre (steer axis is vertical through it)",
+  "wheel_drive/wheel_LL/wheel_LR/wheel_caster": "origin exactly at axle centre; spin about local X",
+  "caster": "caster yoke, origin at axle centre",
+  "beacon": "emissive orange dome"
+ },
+ "qa": {
+  "min_z": -0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": 0.0
+ },
+ "blender_tris": 8620,
+ "file": "reach_truck.glb"
+}

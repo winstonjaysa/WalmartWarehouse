@@ -1,0 +1,38 @@
+{
+ "facing": "+Z = exterior/truck side (shelter, bumpers, lights); interior floor slab at 1.22 m runs toward -Z",
+ "refs": [
+  "02_exterior_docks_walmartcom_trailers.png",
+  "01_interior_dock_forklifts.jpg",
+  "15_iso_dock_cutaway_trucks.jpg"
+ ],
+ "dims": {
+  "opening_w_m": 2.7,
+  "opening_h_m": 3.0,
+  "dock_height_m": 1.22,
+  "wall_panel_m": [
+   4.2,
+   5.0,
+   0.25
+  ]
+ },
+ "hierarchy": "dock_door > dock_frame > {door_roll, leveler_lip}",
+ "rig": {
+  "door_roll": "origin at the curtain top (y=4.52 m) inside the head; roll up by scaling Y 1 -> 0.03 (or translate +Y up to 3.0 m, it hides behind the coil housing)",
+  "leveler_lip": "origin on the lip hinge at the leveler front edge; rotate about local X by -90 deg to deploy onto a trailer bed (rest = hanging/stored)",
+  "traffic_light": "materials light_red / light_green are emissive; swap emissiveIntensity to signal"
+ },
+ "nodes": {
+  "dock_frame": "wall panel with opening, interior slab, shelter pads, bumpers, guides, coil housing, leveler deck; origin on the ground at the exterior wall face, door centre"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 3480,
+ "file": "dock_door.glb"
+}

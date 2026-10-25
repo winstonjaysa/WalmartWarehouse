@@ -1,0 +1,34 @@
+{
+ "facing": "+Z = drop-gate side",
+ "refs": [
+  "14_iso_cutaway_orange_base.jpg",
+  "03_interior_orange_racks_mezzanine.jpg"
+ ],
+ "dims": {
+  "outer_m": [
+   1.2,
+   0.93,
+   1.0
+  ],
+  "pallet_footprint": "1.2 x 1.0 m, stackable 4-high (corner cups)"
+ },
+ "hierarchy": "cage > cage_body > gate",
+ "rig": {
+  "gate": "rotate gate about local X: 0 = closed, +90 deg = dropped open outward (+Z); origin on the bottom hinge axis"
+ },
+ "nodes": {
+  "cage_body": "base with feet, corner posts, 3 mesh walls; origin ground centre",
+  "gate": "front drop gate, origin on its hinge"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 3656,
+ "file": "cage.glb"
+}

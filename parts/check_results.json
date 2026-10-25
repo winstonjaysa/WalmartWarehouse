@@ -1,0 +1,5707 @@
+[
+ {
+  "name": "reachTruck",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.275,
+   4.13,
+   3.128
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "mast": [
+    [
+     0,
+     0.12,
+     0.3
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.12,
+     0.37
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     0.208,
+     0.63
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadWheel",
+    "axle": [
+     -0.57,
+     0.075,
+     1.2
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "loadWheel",
+    "axle": [
+     0.57,
+     0.075,
+     1.2
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.25,
+     0.17,
+     -0.95
+    ],
+    "radius": 0.17,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.36,
+     0.06,
+     -1.035
+    ],
+    "radius": 0.06,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.088,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     4,
+     4
+    ],
+    "carTopGap": 2.747
+   }
+  }
+ },
+ {
+  "name": "reachTruck",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.275,
+   5.0883,
+   3.128
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "mast": [
+    [
+     0,
+     0.12,
+     0.3
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.5992,
+     0.37
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     3.8163,
+     0.63
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadWheel",
+    "axle": [
+     -0.57,
+     0.075,
+     1.2
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "loadWheel",
+    "axle": [
+     0.57,
+     0.075,
+     1.2
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.25,
+     0.17,
+     -0.95
+    ],
+    "radius": 0.17,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.36,
+     0.06,
+     -1.035
+    ],
+    "radius": 0.06,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 2.738,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     3.5208,
+     3.5208
+    ],
+    "carTopGap": 0.097
+   }
+  }
+ },
+ {
+  "name": "reachTruck",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   3.2899,
+   4.13,
+   2.3429
+  ],
+  "groundOK": true,
+  "tol": 0.0003,
+  "pivots": {
+   "mast": [
+    [
+     17.2181,
+     0.12,
+     -0.7551
+    ]
+   ],
+   "innerMast": [
+    [
+     17.2814,
+     0.12,
+     -0.7252
+    ]
+   ],
+   "carriage": [
+    [
+     17.5164,
+     0.7997,
+     -0.6139
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadWheel",
+    "axle": [
+     17.7877,
+     0.075,
+     0.1452
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadWheel",
+    "axle": [
+     18.2754,
+     0.075,
+     -0.8852
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     16.1953,
+     0.17,
+     -1.5159
+    ],
+    "radius": 0.17,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     15.8553,
+     0.06,
+     -0.995
+    ],
+    "radius": 0.06,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.6797,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     4,
+     4
+    ],
+    "carTopGap": 2.1553
+   },
+   "pos": [
+    16.947,
+    0,
+    -0.8835
+   ],
+   "yaw": 1.1287
+  }
+ },
+ {
+  "name": "tugTrain",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.06,
+   2.2,
+   8.578
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.38,
+     0.2,
+     0.6
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.38,
+     0.2,
+     0.6
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.44,
+     0.2,
+     0.6
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.44,
+     0.2,
+     0.6
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.44,
+     0.22,
+     -0.55
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.44,
+     0.22,
+     -0.55
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -2.65
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -2.65
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -1.8
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -1.8
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -4.85
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -4.85
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -4
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -4
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -7.05
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -7.05
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -6.2
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -6.2
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.2,
+     0,
+     0,
+     0
+    ],
+    [
+     0.2,
+     0,
+     0,
+     0
+    ]
+   ]
+  }
+ },
+ {
+  "name": "tugTrain",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.06,
+   2.2,
+   8.578
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.38,
+     0.2,
+     0.6
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.38,
+     0.2,
+     0.6
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.44,
+     0.2,
+     0.6
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.44,
+     0.2,
+     0.6
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.44,
+     0.22,
+     -0.55
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.44,
+     0.22,
+     -0.55
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -2.65
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -2.65
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -1.8
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -1.8
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -4.85
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -4.85
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -4
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -4
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -0.43,
+     0.13,
+     -7.05
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     0.43,
+     0.13,
+     -7.05
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -0.38,
+     0.1,
+     -6.2
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     0.38,
+     0.1,
+     -6.2
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.2,
+     0,
+     0,
+     0
+    ],
+    [
+     0.2,
+     0,
+     0,
+     0
+    ]
+   ]
+  }
+ },
+ {
+  "name": "tugTrain",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   3.2933,
+   2.2,
+   7.4471
+  ],
+  "groundOK": true,
+  "tol": 0.00036,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.9594,
+     0.2,
+     -9.1666
+    ]
+   ],
+   "steerLeft": [
+    [
+     -1.3497,
+     0.2,
+     -9.8188
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.9473,
+     0.2,
+     -9.1079
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     -1.3656,
+     0.2,
+     -9.8766
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -1.9153,
+     0.22,
+     -8.5246
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -2.3672,
+     0.22,
+     -9.2797
+    ],
+    "radius": 0.22,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -2.873,
+     0.13,
+     -7.0164
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -3.6488,
+     0.13,
+     -7.3876
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -2.5632,
+     0.1,
+     -7.8128
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -3.2466,
+     0.1,
+     -8.139
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -2.8073,
+     0.13,
+     -5.1651
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -3.6531,
+     0.13,
+     -5.0094
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -3.0252,
+     0.1,
+     -5.9915
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -3.7696,
+     0.1,
+     -5.8537
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -1.7434,
+     0.13,
+     -3.5776
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "cartWheel",
+    "axle": [
+     -2.39,
+     0.13,
+     -3.0106
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -2.3501,
+     0.1,
+     -4.1776
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "casterWheel",
+    "axle": [
+     -2.9201,
+     0.1,
+     -3.6774
+    ],
+    "radius": 0.1,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.2,
+     0,
+     0,
+     -0.3374
+    ],
+    [
+     0.2,
+     0,
+     0,
+     -0.2699
+    ]
+   ],
+   "pos": [
+    -1.6693,
+    0,
+    -9.1846
+   ],
+   "yaw": 2.1101
+  }
+ },
+ {
+  "name": "palletLoadFull",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletLoadFull",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletLoadHalf",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.036,
+   0.75,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletLoadHalf",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.036,
+   0.75,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletLoadPartial",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.02,
+   1.184,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletLoadPartial",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.02,
+   1.184,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "caseStack",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.019,
+   1.04,
+   1.2239
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "caseStack",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.019,
+   1.04,
+   1.2239
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "caseFew",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.0392,
+   0.26,
+   0.8509
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "caseFew",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.0392,
+   0.26,
+   0.8509
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "semiTruck",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   3.2,
+   4.175,
+   22.13
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.93,
+     0.52,
+     9.75
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.93,
+     0.52,
+     9.75
+    ]
+   ],
+   "trailer": [
+    [
+     0,
+     1.16,
+     4.9
+    ]
+   ],
+   "landingGear": [
+    [
+     0,
+     0,
+     3.2
+    ]
+   ],
+   "handle": [
+    [
+     -0.9,
+     2.2,
+     -10.93
+    ],
+    [
+     -0.3,
+     2.2,
+     -10.93
+    ],
+    [
+     0.9,
+     2.2,
+     -10.93
+    ],
+    [
+     0.3,
+     2.2,
+     -10.93
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -1.05,
+     0.52,
+     9.75
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.05,
+     0.52,
+     9.75
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     -0.95,
+     0.52,
+     5.6
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     0.95,
+     0.52,
+     5.6
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     -0.95,
+     0.52,
+     4.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     0.95,
+     0.52,
+     4.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     -0.95,
+     0.52,
+     -8.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     0.95,
+     0.52,
+     -8.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     -0.95,
+     0.52,
+     -9.55
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     0.95,
+     0.52,
+     -9.55
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.52,
+     0,
+     0,
+     0
+    ],
+    [
+     0.52,
+     0,
+     0,
+     0
+    ]
+   ],
+   "kingpinErr": 0,
+   "trailerYaw": 0
+  }
+ },
+ {
+  "name": "semiTruck",
+  "phase": "animated",
+  "minY": 0.0001,
+  "size": [
+   3.2,
+   4.1749,
+   22.13
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.93,
+     0.52,
+     9.75
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.93,
+     0.52,
+     9.75
+    ]
+   ],
+   "trailer": [
+    [
+     0,
+     1.16,
+     4.9
+    ]
+   ],
+   "landingGear": [
+    [
+     0,
+     0,
+     3.2
+    ]
+   ],
+   "handle": [
+    [
+     -0.9,
+     2.2,
+     -10.93
+    ],
+    [
+     -0.3,
+     2.2,
+     -10.93
+    ],
+    [
+     0.9,
+     2.2,
+     -10.93
+    ],
+    [
+     0.3,
+     2.2,
+     -10.93
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -1.05,
+     0.52,
+     9.75
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.05,
+     0.52,
+     9.75
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     -0.95,
+     0.52,
+     5.6
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     0.95,
+     0.52,
+     5.6
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     -0.95,
+     0.52,
+     4.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     0.95,
+     0.52,
+     4.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     -0.95,
+     0.52,
+     -8.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     0.95,
+     0.52,
+     -8.3
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     -0.95,
+     0.52,
+     -9.55
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     0.95,
+     0.52,
+     -9.55
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0001
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.52,
+     0,
+     0,
+     0
+    ],
+    [
+     0.52,
+     0,
+     0,
+     0
+    ]
+   ],
+   "kingpinErr": 0,
+   "trailerYaw": 0
+  }
+ },
+ {
+  "name": "semiTruck",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   15.2909,
+   4.175,
+   19.0209
+  ],
+  "groundOK": true,
+  "tol": 0.00073,
+  "pivots": {
+   "steerRight": [
+    [
+     17.185,
+     0.52,
+     25.9818
+    ]
+   ],
+   "steerLeft": [
+    [
+     18.7018,
+     0.52,
+     24.9053
+    ]
+   ],
+   "trailer": [
+    [
+     15.1365,
+     1.16,
+     21.4883
+    ]
+   ],
+   "landingGear": [
+    [
+     14.0928,
+     -0.3,
+     20.1464
+    ]
+   ],
+   "handle": [
+    [
+     4.7073,
+     2.2,
+     9.5455
+    ],
+    [
+     5.1809,
+     2.2,
+     9.1771
+    ],
+    [
+     6.1282,
+     2.2,
+     8.4404
+    ],
+    [
+     5.6545,
+     2.2,
+     8.8087
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     17.0702,
+     0.52,
+     26.0169
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0005
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     18.8151,
+     0.52,
+     24.8658
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0.0006
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     14.7669,
+     0.52,
+     22.609
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     16.3163,
+     0.52,
+     21.5094
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     14.0145,
+     0.52,
+     21.5488
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelDrive",
+    "axle": [
+     15.564,
+     0.52,
+     20.4492
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     6.2825,
+     0.52,
+     11.6522
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     7.7823,
+     0.52,
+     10.4857
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     5.5151,
+     0.52,
+     10.6655
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelTrailer",
+    "axle": [
+     7.0149,
+     0.52,
+     9.499
+    ],
+    "radius": 0.52,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.52,
+     0,
+     0,
+     -0.3204
+    ],
+    [
+     0.52,
+     0,
+     0,
+     -0.282
+    ]
+   ],
+   "kingpinErr": 0,
+   "trailerYaw": 0.0439,
+   "pos": [
+    12.3006,
+    0,
+    17.4923
+   ],
+   "yaw": 0.6172
+  }
+ },
+ {
+  "name": "yardTractor",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   2.81,
+   3.2195,
+   5.655
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.9,
+     0.5,
+     1.95
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.9,
+     0.5,
+     1.95
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -1.02,
+     0.5,
+     1.95
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.02,
+     0.5,
+     1.95
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.92,
+     0.5,
+     -1.35
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.92,
+     0.5,
+     -1.35
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.5,
+     0,
+     0,
+     0
+    ],
+    [
+     0.5,
+     0,
+     0,
+     0
+    ]
+   ]
+  }
+ },
+ {
+  "name": "yardTractor",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   2.81,
+   3.2195,
+   5.655
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.9,
+     0.5,
+     1.95
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.9,
+     0.5,
+     1.95
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -1.02,
+     0.5,
+     1.95
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.02,
+     0.5,
+     1.95
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.92,
+     0.5,
+     -1.35
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.92,
+     0.5,
+     -1.35
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.5,
+     0,
+     0,
+     0
+    ],
+    [
+     0.5,
+     0,
+     0,
+     0
+    ]
+   ]
+  }
+ },
+ {
+  "name": "yardTractor",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   5.4817,
+   3.2195,
+   5.0491
+  ],
+  "groundOK": true,
+  "tol": 0.0007,
+  "pivots": {
+   "steerRight": [
+    [
+     20.4674,
+     0.5,
+     11.1244
+    ]
+   ],
+   "steerLeft": [
+    [
+     21.5895,
+     0.5,
+     9.717
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     20.3663,
+     0.5,
+     11.189
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     21.687,
+     0.5,
+     9.647
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     17.8746,
+     0.5,
+     9.0829
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0.0002
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     19.0217,
+     0.5,
+     7.6442
+    ],
+    "radius": 0.5,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "steer": [
+    [
+     0.5,
+     0,
+     0,
+     -0.3296
+    ],
+    [
+     0.5,
+     0,
+     0,
+     -0.2752
+    ]
+   ],
+   "pos": [
+    19.5037,
+    0,
+    9.2051
+   ],
+   "yaw": 0.8977
+  }
+ },
+ {
+  "name": "forklift",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.4912,
+   2.3065,
+   3.568
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.42,
+     0.26,
+     -1.23
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.42,
+     0.26,
+     -1.23
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.12,
+     0.43
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.12,
+     0.43
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.12,
+     0.5
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     0.115,
+     0.6
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.6,
+     0.33,
+     0.03
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.6,
+     0.33,
+     0.03
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.5,
+     0.26,
+     -1.23
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.5,
+     0.26,
+     -1.23
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": -0.005,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.26,
+     0,
+     0,
+     0
+    ],
+    [
+     0.26,
+     0,
+     0,
+     0
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     2.1,
+     2.1
+    ],
+    "carTopGap": 0.99
+   }
+  }
+ },
+ {
+  "name": "forklift",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.4912,
+   4.3326,
+   3.3876
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.42,
+     0.26,
+     -1.23
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.42,
+     0.26,
+     -1.23
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.12,
+     0.43
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.12,
+     0.43
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     1.1723,
+     0.4369
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     3.02,
+     0.4261
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.6,
+     0.33,
+     0.03
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.6,
+     0.33,
+     0.03
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.5,
+     0.26,
+     -1.23
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.5,
+     0.26,
+     -1.23
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.795,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.26,
+     0,
+     0,
+     0
+    ],
+    [
+     0.26,
+     0,
+     0,
+     0
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     1.0475,
+     1.0469
+    ],
+    "carTopGap": 0.1897
+   }
+  }
+ },
+ {
+  "name": "forklift",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   3.6182,
+   2.3065,
+   2.2188
+  ],
+  "groundOK": true,
+  "tol": 0.0005,
+  "pivots": {
+   "steerRight": [
+    [
+     0.2336,
+     0.26,
+     -9.2843
+    ]
+   ],
+   "steerLeft": [
+    [
+     -0.0584,
+     0.26,
+     -10.0719
+    ]
+   ],
+   "mastPivot": [
+    [
+     1.644,
+     0.12,
+     -10.2553
+    ]
+   ],
+   "mast": [
+    [
+     1.644,
+     0.12,
+     -10.2553
+    ]
+   ],
+   "innerMast": [
+    [
+     1.7095,
+     0.1242,
+     -10.2795
+    ]
+   ],
+   "carriage": [
+    [
+     1.8034,
+     0.1252,
+     -10.3144
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.4776,
+     0.33,
+     -9.5536
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     1.0604,
+     0.33,
+     -10.6787
+    ],
+    "radius": 0.33,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.2848,
+     0.26,
+     -9.2228
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0.0002
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.1052,
+     0.26,
+     -10.1368
+    ],
+    "radius": 0.26,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": -0.005,
+   "tineLocal": [
+    -0.25,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.26,
+     0,
+     0,
+     0.339
+    ],
+    [
+     0.26,
+     0,
+     0,
+     0.2688
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     2.0956,
+     2.095
+    ],
+    "carTopGap": 0.9883
+   },
+   "pos": [
+    1.2408,
+    0,
+    -10.1057
+   ],
+   "yaw": 1.9259
+  }
+ },
+ {
+  "name": "autoStacker",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.036,
+   2.5,
+   2.838
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.35,
+     0.18,
+     -1.15
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.35,
+     0.18,
+     -1.15
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.06,
+     -0.03
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.06,
+     -0.03
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.06,
+     0.04
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     0.115,
+     0.14
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.42,
+     0.2,
+     -0.2
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.42,
+     0.2,
+     -0.2
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.42,
+     0.18,
+     -1.15
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.42,
+     0.18,
+     -1.15
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.055,
+   "tineLocal": [
+    -0.24,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.18,
+     0,
+     0,
+     0
+    ],
+    [
+     0.18,
+     0,
+     0,
+     0
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     2,
+     2
+    ],
+    "carTopGap": 0.98
+   }
+  }
+ },
+ {
+  "name": "autoStacker",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.036,
+   3.72,
+   2.838
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerRight": [
+    [
+     -0.35,
+     0.18,
+     -1.15
+    ]
+   ],
+   "steerLeft": [
+    [
+     0.35,
+     0.18,
+     -1.15
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.06,
+     -0.03
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.06,
+     -0.03
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.885,
+     0.04
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     2.615,
+     0.14
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -0.42,
+     0.2,
+     -0.2
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     0.42,
+     0.2,
+     -0.2
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -0.42,
+     0.18,
+     -1.15
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     0.42,
+     0.18,
+     -1.15
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.905,
+   "tineLocal": [
+    -0.24,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.18,
+     0,
+     0,
+     0
+    ],
+    [
+     0.18,
+     0,
+     0,
+     0
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     1.175,
+     1.175
+    ],
+    "carTopGap": 0.13
+   }
+  }
+ },
+ {
+  "name": "autoStacker",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   2.3933,
+   2.5,
+   2.8972
+  ],
+  "groundOK": true,
+  "tol": 0.00034,
+  "pivots": {
+   "steerRight": [
+    [
+     -5.9203,
+     0.18,
+     -0.7397
+    ]
+   ],
+   "steerLeft": [
+    [
+     -6.5031,
+     0.18,
+     -1.1276
+    ]
+   ],
+   "mastPivot": [
+    [
+     -5.5911,
+     0.06,
+     -1.866
+    ]
+   ],
+   "mast": [
+    [
+     -5.5911,
+     0.06,
+     -1.866
+    ]
+   ],
+   "innerMast": [
+    [
+     -5.5524,
+     0.06,
+     -1.9243
+    ]
+   ],
+   "carriage": [
+    [
+     -5.497,
+     0.115,
+     -2.0076
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "wheelFront",
+    "axle": [
+     -5.3357,
+     0.2,
+     -1.4918
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelFront",
+    "axle": [
+     -6.035,
+     0.2,
+     -1.9572
+    ],
+    "radius": 0.2,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -5.8524,
+     0.18,
+     -0.7229
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "wheelRear",
+    "axle": [
+     -6.5695,
+     0.18,
+     -1.1497
+    ],
+    "radius": 0.18,
+    "centreErr": 0,
+    "bottom": 0.0001
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.055,
+   "tineLocal": [
+    -0.24,
+    0,
+    0
+   ],
+   "steer": [
+    [
+     0.18,
+     0,
+     0,
+     0.3441
+    ],
+    [
+     0.18,
+     0,
+     0,
+     0.2657
+    ]
+   ],
+   "mast": {
+    "stages": 2,
+    "overlaps": [
+     2,
+     2
+    ],
+    "carTopGap": 0.98
+   },
+   "pos": [
+    -5.5745,
+    0,
+    -1.891
+   ],
+   "yaw": 2.5544
+  }
+ },
+ {
+  "name": "palletJack",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.2665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.52,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "palletJack",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.2665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.52,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "palletJack",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   1.5531,
+   1.2665,
+   0.9848
+  ],
+  "groundOK": true,
+  "tol": 0.0002,
+  "pivots": {
+   "liftFrame": [
+    [
+     -1.7741,
+     0,
+     -8.1107
+    ]
+   ],
+   "steerTiller": [
+    [
+     -2.2352,
+     0.08,
+     -7.9174
+    ]
+   ],
+   "tiller": [
+    [
+     -2.2352,
+     0.52,
+     -7.9174
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.0919,
+     0.04,
+     -8.1907
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.2389,
+     0.04,
+     -8.5411
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.1967,
+     0.08,
+     -7.8714
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.2737,
+     0.08,
+     -7.9634
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   },
+   "pos": [
+    -1.7741,
+    0,
+    -8.1107
+   ],
+   "yaw": 1.9677
+  }
+ },
+ {
+  "name": "handPalletJack",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.2665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.52,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "handPalletJack",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.2665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.52,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "handPalletJack",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   1.5531,
+   1.2665,
+   0.9848
+  ],
+  "groundOK": true,
+  "tol": 0.0002,
+  "pivots": {
+   "liftFrame": [
+    [
+     -1.7741,
+     0,
+     -8.1107
+    ]
+   ],
+   "steerTiller": [
+    [
+     -2.2352,
+     0.08,
+     -7.9174
+    ]
+   ],
+   "tiller": [
+    [
+     -2.2352,
+     0.52,
+     -7.9174
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.0919,
+     0.04,
+     -8.1907
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.2389,
+     0.04,
+     -8.5411
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.1967,
+     0.08,
+     -7.8714
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.2737,
+     0.08,
+     -7.9634
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   },
+   "pos": [
+    -1.7741,
+    0,
+    -8.1107
+   ],
+   "yaw": 1.9677
+  }
+ },
+ {
+  "name": "handPalletJackRaised",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.3665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0.1,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.62,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "handPalletJackRaised",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.548,
+   1.3665,
+   1.5349
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0.1,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.08,
+     -0.5
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.62,
+     -0.5
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.19,
+     0.04,
+     0.66
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     0.06,
+     0.08,
+     -0.5
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   }
+  }
+ },
+ {
+  "name": "handPalletJackRaised",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   1.5531,
+   1.3665,
+   0.9848
+  ],
+  "groundOK": true,
+  "tol": 0.0002,
+  "pivots": {
+   "liftFrame": [
+    [
+     -1.7741,
+     0.1,
+     -8.1107
+    ]
+   ],
+   "steerTiller": [
+    [
+     -2.2352,
+     0.08,
+     -7.9174
+    ]
+   ],
+   "tiller": [
+    [
+     -2.2352,
+     0.62,
+     -7.9174
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.0919,
+     0.04,
+     -8.1907
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     -1.2389,
+     0.04,
+     -8.5411
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.1967,
+     0.08,
+     -7.8714
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0.0001
+   },
+   {
+    "name": "steerWheel",
+    "axle": [
+     -2.2737,
+     0.08,
+     -7.9634
+    ],
+    "radius": 0.08,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 2,
+    "tillerChild": true,
+    "axleY": 0.08,
+    "wheelR": 0.08
+   },
+   "pos": [
+    -1.7741,
+    0,
+    -8.1107
+   ],
+   "yaw": 1.9677
+  }
+ },
+ {
+  "name": "riderPalletTruck",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.8,
+   1.4183,
+   2.475
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.13,
+     -0.35
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.95,
+     -0.27
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     0,
+     0.13,
+     -0.35
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.2,
+     0.04,
+     0.9
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.001
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.2,
+     0.04,
+     0.9
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.001
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.13,
+    "wheelR": 0.13
+   }
+  }
+ },
+ {
+  "name": "riderPalletTruck",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.8,
+   1.4183,
+   2.475
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftFrame": [
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   "steerTiller": [
+    [
+     0,
+     0.13,
+     -0.35
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.95,
+     -0.27
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     0,
+     0.13,
+     -0.35
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.2,
+     0.04,
+     0.9
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.001
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.2,
+     0.04,
+     0.9
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.001
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.13,
+    "wheelR": 0.13
+   }
+  }
+ },
+ {
+  "name": "riderPalletTruck",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   2.5201,
+   1.4183,
+   1.1854
+  ],
+  "groundOK": true,
+  "tol": 0.00026,
+  "pivots": {
+   "liftFrame": [
+    [
+     0.7924,
+     0,
+     -9.2013
+    ]
+   ],
+   "steerTiller": [
+    [
+     0.4538,
+     0.13,
+     -9.1129
+    ]
+   ],
+   "tiller": [
+    [
+     0.5217,
+     0.95,
+     -9.1551
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.4538,
+     0.13,
+     -9.1129
+    ],
+    "radius": 0.13,
+    "centreErr": 0,
+    "bottom": 0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     1.7138,
+     0.04,
+     -9.235
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     1.6128,
+     0.04,
+     -9.6221
+    ],
+    "radius": 0.04,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.13,
+    "wheelR": 0.13
+   },
+   "pos": [
+    0.7924,
+    0,
+    -9.2013
+   ],
+   "yaw": 1.8261
+  }
+ },
+ {
+  "name": "walkieStacker",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.94,
+   1.78,
+   2.2649
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerTiller": [
+    [
+     0,
+     0.12,
+     -0.85
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.75,
+     -0.93
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.02,
+     -0.35
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.02,
+     -0.35
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     0.02,
+     -0.28
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     0.02,
+     -0.18
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.4,
+     0.045,
+     0.63
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.4,
+     0.045,
+     0.63
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0,
+     0.12,
+     -0.85
+    ],
+    "radius": 0.12,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0,
+   "tineLocal": [
+    -0.22,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 1,
+    "overlaps": [
+     1.75
+    ],
+    "carTopGap": 0.835
+   },
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.12,
+    "wheelR": 0.12
+   }
+  }
+ },
+ {
+  "name": "walkieStacker",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.94,
+   2.83,
+   2.2649
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "steerTiller": [
+    [
+     0,
+     0.12,
+     -0.85
+    ]
+   ],
+   "tiller": [
+    [
+     0,
+     0.75,
+     -0.93
+    ]
+   ],
+   "mastPivot": [
+    [
+     0,
+     0.02,
+     -0.35
+    ]
+   ],
+   "mast": [
+    [
+     0,
+     0.02,
+     -0.35
+    ]
+   ],
+   "innerMast": [
+    [
+     0,
+     1.07,
+     -0.28
+    ]
+   ],
+   "carriage": [
+    [
+     0,
+     1.82,
+     -0.18
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     -0.4,
+     0.045,
+     0.63
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     0.4,
+     0.045,
+     0.63
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0,
+     0.12,
+     -0.85
+    ],
+    "radius": 0.12,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0.75,
+   "tineLocal": [
+    -0.22,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 1,
+    "overlaps": [
+     0.7
+    ],
+    "carTopGap": 0.085
+   },
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.12,
+    "wheelR": 0.12
+   }
+  }
+ },
+ {
+  "name": "walkieStacker",
+  "phase": "driven",
+  "minY": 0,
+  "size": [
+   2.3118,
+   1.78,
+   0.9678
+  ],
+  "groundOK": true,
+  "tol": 0.00024,
+  "pivots": {
+   "steerTiller": [
+    [
+     7.0519,
+     0.12,
+     -9.7523
+    ]
+   ],
+   "tiller": [
+    [
+     6.9748,
+     0.75,
+     -9.7308
+    ]
+   ],
+   "mastPivot": [
+    [
+     7.5517,
+     0.02,
+     -9.738
+    ]
+   ],
+   "mast": [
+    [
+     7.5517,
+     0.02,
+     -9.738
+    ]
+   ],
+   "innerMast": [
+    [
+     7.6217,
+     0.02,
+     -9.736
+    ]
+   ],
+   "carriage": [
+    [
+     7.7216,
+     0.02,
+     -9.7332
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "loadRoller",
+    "axle": [
+     8.5199,
+     0.045,
+     -9.3102
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": 0.0003
+   },
+   {
+    "name": "loadRoller",
+    "axle": [
+     8.5427,
+     0.045,
+     -10.1099
+    ],
+    "radius": 0.045,
+    "centreErr": 0,
+    "bottom": 0.001
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     7.0519,
+     0.12,
+     -9.7523
+    ],
+    "radius": 0.12,
+    "centreErr": 0,
+    "bottom": 0
+   }
+  ],
+  "issues": [],
+  "joints": {
+   "carriageY": 0,
+   "tineLocal": [
+    -0.22,
+    0,
+    0
+   ],
+   "mast": {
+    "stages": 1,
+    "overlaps": [
+     1.75
+    ],
+    "carTopGap": 0.835
+   },
+   "tiller": {
+    "wheels": 1,
+    "tillerChild": true,
+    "axleY": 0.12,
+    "wheelR": 0.12
+   },
+   "pos": [
+    7.9015,
+    0,
+    -9.728
+   ],
+   "yaw": 1.5423
+  }
+ },
+ {
+  "name": "amr",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.836,
+   0.3479,
+   0.9451
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftPlate": [
+    [
+     0,
+     0.3,
+     0
+    ]
+   ],
+   "turntable": [
+    [
+     0,
+     0.32,
+     0
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     -0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": []
+ },
+ {
+  "name": "amr",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.836,
+   0.3479,
+   0.9451
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftPlate": [
+    [
+     0,
+     0.3,
+     0
+    ]
+   ],
+   "turntable": [
+    [
+     0,
+     0.32,
+     0
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     -0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": []
+ },
+ {
+  "name": "amrPod",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.99,
+   2.0125,
+   0.99
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftPlate": [
+    [
+     0,
+     0.3,
+     0
+    ]
+   ],
+   "turntable": [
+    [
+     0,
+     0.32,
+     0
+    ]
+   ],
+   "pod": [
+    [
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     -0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": []
+ },
+ {
+  "name": "amrPod",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.99,
+   2.0625,
+   0.99
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "liftPlate": [
+    [
+     0,
+     0.35,
+     0
+    ]
+   ],
+   "turntable": [
+    [
+     0,
+     0.37,
+     0
+    ]
+   ],
+   "pod": [
+    [
+     0,
+     0.05,
+     0
+    ]
+   ]
+  },
+  "wheels": [
+   {
+    "name": "driveWheel",
+    "axle": [
+     -0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   },
+   {
+    "name": "driveWheel",
+    "axle": [
+     0.39,
+     0.075,
+     0
+    ],
+    "radius": 0.075,
+    "centreErr": 0,
+    "bottom": -0.0
+   }
+  ],
+  "issues": []
+ },
+ {
+  "name": "robotArm",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.211,
+   1.6838,
+   1.0711
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "baseYaw": [
+    [
+     0,
+     0.18,
+     0
+    ]
+   ],
+   "shoulder": [
+    [
+     0,
+     0.68,
+     0
+    ]
+   ],
+   "elbow": [
+    [
+     -0.1687,
+     1.5538,
+     0.1339
+    ]
+   ],
+   "wrist": [
+    [
+     -0.705,
+     1.18,
+     0.5594
+    ]
+   ],
+   "gripper": [
+    [
+     -0.705,
+     1.05,
+     0.5594
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": [],
+  "joints": {
+   "L1": 0.9,
+   "L2": 0.78
+  }
+ },
+ {
+  "name": "robotArm",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.2451,
+   1.5638,
+   1.0982
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "baseYaw": [
+    [
+     0,
+     0.18,
+     0
+    ]
+   ],
+   "shoulder": [
+    [
+     0,
+     0.68,
+     0
+    ]
+   ],
+   "elbow": [
+    [
+     0.3844,
+     1.4344,
+     0.305
+    ]
+   ],
+   "wrist": [
+    [
+     0.7391,
+     0.7993,
+     0.5865
+    ]
+   ],
+   "gripper": [
+    [
+     0.7391,
+     0.6693,
+     0.5865
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": [],
+  "joints": {
+   "L1": 0.9,
+   "L2": 0.78
+  }
+ },
+ {
+  "name": "worker",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.6692,
+   1.835,
+   0.302
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "legLeft": [
+    [
+     -0.095,
+     0.9,
+     0
+    ]
+   ],
+   "legRight": [
+    [
+     0.095,
+     0.9,
+     0
+    ]
+   ],
+   "head": [
+    [
+     0,
+     1.66,
+     0
+    ]
+   ],
+   "armLeft": [
+    [
+     -0.235,
+     1.44,
+     0
+    ]
+   ],
+   "armRight": [
+    [
+     0.235,
+     1.44,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "worker",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.6634,
+   1.8427,
+   0.6134
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "legLeft": [
+    [
+     -0.095,
+     0.9077,
+     0.0025
+    ]
+   ],
+   "legRight": [
+    [
+     0.095,
+     0.9077,
+     -0.0025
+    ]
+   ],
+   "head": [
+    [
+     0,
+     1.6677,
+     0
+    ]
+   ],
+   "armLeft": [
+    [
+     -0.2349,
+     1.4477,
+     0.0061
+    ]
+   ],
+   "armRight": [
+    [
+     0.2349,
+     1.4477,
+     -0.0061
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "workerBlue",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.6692,
+   1.8047,
+   0.2997
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "legLeft": [
+    [
+     -0.095,
+     0.9,
+     0
+    ]
+   ],
+   "legRight": [
+    [
+     0.095,
+     0.9,
+     0
+    ]
+   ],
+   "head": [
+    [
+     0,
+     1.66,
+     0
+    ]
+   ],
+   "armLeft": [
+    [
+     -0.235,
+     1.44,
+     0
+    ]
+   ],
+   "armRight": [
+    [
+     0.235,
+     1.44,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "workerBlue",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.6499,
+   1.7876,
+   0.8976
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "legLeft": [
+    [
+     -0.0949,
+     0.8828,
+     0.0045
+    ]
+   ],
+   "legRight": [
+    [
+     0.0949,
+     0.8828,
+     -0.0045
+    ]
+   ],
+   "head": [
+    [
+     0,
+     1.6428,
+     0
+    ]
+   ],
+   "armLeft": [
+    [
+     -0.2347,
+     1.4228,
+     0.0112
+    ]
+   ],
+   "armRight": [
+    [
+     0.2347,
+     1.4228,
+     -0.0112
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "rackBay",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   2.96,
+   7.2725,
+   1.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "rackBay",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   2.96,
+   7.2725,
+   1.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "conveyor",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   1.04,
+   1.228,
+   4.07
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "conveyor",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   1.04,
+   1.228,
+   4.0696
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "pallet",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "pallet",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletPine",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.144,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletPine",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.144,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletBlueWood",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.144,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletBlueWood",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.144,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletSteel",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.152,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletSteel",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.02,
+   0.152,
+   1.22
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletWrapped",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletWrapped",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.036,
+   1.5,
+   1.236
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletTotes",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.02,
+   1.0665,
+   1.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "palletTotes",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.02,
+   1.0665,
+   1.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "tote",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.462,
+   0.378,
+   0.6985
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "tote",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.462,
+   0.378,
+   0.6985
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "toteOpen",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.458,
+   0.345,
+   0.6985
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "toteOpen",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.458,
+   0.345,
+   0.6985
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "toteCrate",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.43,
+   0.303,
+   0.626
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "toteCrate",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.43,
+   0.303,
+   0.626
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "sackStack",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.0223,
+   0.864,
+   1.2213
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "sackStack",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.0223,
+   0.864,
+   1.2213
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "wireCage",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   1.08,
+   1.0875,
+   1.28
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "dropGate": [
+    [
+     0,
+     0.12,
+     0.6
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "wireCage",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   1.08,
+   1.0875,
+   1.28
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "dropGate": [
+    [
+     0,
+     0.12,
+     0.6
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrum",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrum",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrumGreen",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrumGreen",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrumYellow",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "oilDrumYellow",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.615,
+   0.887,
+   0.615
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "dockDoor",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   4.2,
+   5.4,
+   6.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "curtain": [
+    [
+     0,
+     0,
+     -0.21
+    ]
+   ],
+   "roller": [
+    [
+     0,
+     4.62,
+     -0.41
+    ]
+   ],
+   "fanBlades": [
+    [
+     1.5843,
+     4.0323,
+     -0.6776
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": [],
+  "joints": {
+   "rollerAxleErr": 0
+  }
+ },
+ {
+  "name": "dockDoor",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   4.2,
+   5.4,
+   6.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "curtain": [
+    [
+     0,
+     0,
+     -0.21
+    ]
+   ],
+   "roller": [
+    [
+     0,
+     4.62,
+     -0.41
+    ]
+   ],
+   "fanBlades": [
+    [
+     1.5843,
+     4.0323,
+     -0.6776
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": [],
+  "joints": {
+   "rollerAxleErr": 0
+  }
+ },
+ {
+  "name": "bollard",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.352,
+   1.125,
+   0.352
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "bollard",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.352,
+   1.125,
+   0.352
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "bollardBlue",
+  "phase": "rest",
+  "minY": 0,
+  "size": [
+   0.352,
+   1.125,
+   0.352
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "bollardBlue",
+  "phase": "animated",
+  "minY": 0,
+  "size": [
+   0.352,
+   1.125,
+   0.352
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "mezzanine",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   9.8606,
+   4.1,
+   4.1
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "mezzanine",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   9.8606,
+   4.1,
+   4.1
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "hvac",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   3.99,
+   1.621,
+   1.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "handle": [
+    [
+     -1.03,
+     0.72,
+     -0.83
+    ],
+    [
+     -0.38,
+     0.72,
+     -0.83
+    ],
+    [
+     -1.03,
+     0.72,
+     0.83
+    ],
+    [
+     -0.38,
+     0.72,
+     0.83
+    ]
+   ],
+   "blades": [
+    [
+     0.45,
+     1.56,
+     0
+    ],
+    [
+     1.15,
+     1.56,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "hvac",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   3.99,
+   1.621,
+   1.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "handle": [
+    [
+     -1.03,
+     0.72,
+     -0.83
+    ],
+    [
+     -0.38,
+     0.72,
+     -0.83
+    ],
+    [
+     -1.03,
+     0.72,
+     0.83
+    ],
+    [
+     -0.38,
+     0.72,
+     0.83
+    ]
+   ],
+   "blades": [
+    [
+     0.45,
+     1.56,
+     0
+    ],
+    [
+     1.15,
+     1.56,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "lightPole",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.64,
+   9.07,
+   2.245
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "head": [
+    [
+     0,
+     8.66,
+     1.55
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "lightPole",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.64,
+   9.07,
+   2.245
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "head": [
+    [
+     0,
+     8.66,
+     1.55
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "lightPoleDouble",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   0.64,
+   9.07,
+   3.85
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "head": [
+    [
+     0,
+     8.66,
+     -1.55
+    ],
+    [
+     0,
+     8.66,
+     1.55
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "lightPoleDouble",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   0.64,
+   9.07,
+   3.85
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "head": [
+    [
+     0,
+     8.66,
+     -1.55
+    ],
+    [
+     0,
+     8.66,
+     1.55
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "tree",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   3.24,
+   4.815,
+   2.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "crown": [
+    [
+     0,
+     1.89,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "tree",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   3.2409,
+   4.8154,
+   2.7
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {
+   "crown": [
+    [
+     0,
+     1.89,
+     0
+    ]
+   ]
+  },
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "facade",
+  "phase": "rest",
+  "minY": -0.0,
+  "size": [
+   30.1,
+   12.8779,
+   6.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ },
+ {
+  "name": "facade",
+  "phase": "animated",
+  "minY": -0.0,
+  "size": [
+   30.1,
+   12.8779,
+   6.25
+  ],
+  "groundOK": true,
+  "tol": 0.0001,
+  "pivots": {},
+  "wheels": [],
+  "issues": []
+ }
+]

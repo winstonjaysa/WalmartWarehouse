@@ -1,0 +1,2587 @@
+{
+ "generated": "2026-10-25T04:39:29",
+ "units": "metres (1 unit = 1 m), real-world scale",
+ "up": "+Y",
+ "facing": "+Z = vehicle/asset front",
+ "left": "+X",
+ "origin": "ground centre of footprint at y=0 (unless noted in node_notes)",
+ "style": "clay/toy matte PBR",
+ "compression": {
+  "tool": "@gltf-transform/cli 4.5.1",
+  "steps": [
+   "prune --keep-leaves true --keep-attributes false --keep-solid-textures false",
+   "optimize --compress meshopt --texture-compress webp --flatten false --join false --instance false --simplify false --palette false --prune false"
+  ],
+  "extensions": [
+   "EXT_meshopt_compression",
+   "KHR_mesh_quantization",
+   "EXT_texture_webp",
+   "KHR_materials_emissive_strength"
+  ],
+  "decoder": "three/examples/jsm/libs/meshopt_decoder.module.js (MeshoptDecoder)"
+ },
+ "toneMapped_false_rule": "^(brand_|trailer_side|trailer_rear|mark53)|led|light_|beacon  (brand colours, livery decals, LEDs/beacons: set material.toneMapped=false so Walmart blue #0071CE / yellow #FFC220 render exact)",
+ "anchors_convention": "Empty nodes; +Z forward. anchor_seat = operator hip (H-point) on the seat top; anchor_stand = operator feet on the platform floor; anchor_tiller_grip = hand point on the handle. Parent the operator (e.g. worker.glb) to the anchor.",
+ "no_anchor": {
+  "amr": "autonomous mobile robot, no operator position",
+  "robot_arm": "stationary, not a vehicle"
+ },
+ "total_bytes": 1625616,
+ "count": 21,
+ "assets": [
+  {
+   "file": "amr.glb",
+   "bytes": 59704,
+   "bytes_raw": 367920,
+   "tris": 6180,
+   "draw_calls": 30,
+   "size_m": [
+    0.792,
+    0.364,
+    1.02
+   ],
+   "bbox_min": [
+    -0.396,
+    0,
+    -0.51
+   ],
+   "bbox_max": [
+    0.396,
+    0.364,
+    0.51
+   ],
+   "facing": "+Z (front bumper with the cyan strip; rear strip is red)",
+   "sides": null,
+   "hierarchy": "amr > body > {light_strip, lift_top, wheel_L, wheel_R, caster_FL > caster_wheel_FL, caster_FR > ..., caster_RL > ..., caster_RR > ...}",
+   "nodes": {
+    "caster_wheel_FL": [
+     0.27,
+     0.03,
+     0.33
+    ],
+    "caster_FL": [
+     0.27,
+     0.03,
+     0.35
+    ],
+    "caster_wheel_FR": [
+     -0.27,
+     0.03,
+     0.33
+    ],
+    "caster_FR": [
+     -0.27,
+     0.03,
+     0.35
+    ],
+    "caster_wheel_RL": [
+     0.27,
+     0.03,
+     -0.37
+    ],
+    "caster_RL": [
+     0.27,
+     0.03,
+     -0.35
+    ],
+    "caster_wheel_RR": [
+     -0.27,
+     0.03,
+     -0.37
+    ],
+    "caster_RR": [
+     -0.27,
+     0.03,
+     -0.35
+    ],
+    "lift_top": [
+     0,
+     0.312,
+     0
+    ],
+    "light_strip": [
+     0,
+     0.21,
+     0
+    ],
+    "wheel_L": [
+     0.29,
+     0.075,
+     0
+    ],
+    "wheel_R": [
+     -0.29,
+     0.075,
+     0
+    ],
+    "body": [
+     0,
+     0,
+     0
+    ],
+    "amr": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "drive": "differential: spin wheel_L / wheel_R about local X (r=0.075 m); turn in place by spinning them opposite",
+    "casters": "caster_* swivel about local Y (origin on the swivel axis, 0.02 m trail); caster_wheel_* spin about local X (r=0.03 m)",
+    "lift_top": "translate +Y 0..0.06 m to lift a pod; rotate about Y to counter-rotate the pod while the robot spins",
+    "light_strip": "emissive (amr_led_cyan front/sides, amr_led_red rear); set toneMapped=false and pulse emissiveIntensity"
+   },
+   "node_notes": {
+    "body": "chassis, origin ground centre",
+    "wheel_*": "origin on axle centre",
+    "lift_top": "origin at the lift base"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "amr_led_cyan",
+    "amr_led_red",
+    "brand_blue",
+    "brand_yellow"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": -0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": 0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg",
+    "18_topdown_warehouse_blue_stripe.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "cage.glb",
+   "bytes": 32716,
+   "bytes_raw": 228148,
+   "tris": 3656,
+   "draw_calls": 6,
+   "size_m": [
+    1.22,
+    0.93,
+    1.03
+   ],
+   "bbox_min": [
+    -0.61,
+    0,
+    -0.51
+   ],
+   "bbox_max": [
+    0.61,
+    0.93,
+    0.52
+   ],
+   "facing": "+Z = drop-gate side",
+   "sides": null,
+   "hierarchy": "cage > cage_body > gate",
+   "nodes": {
+    "gate": [
+     0,
+     0.15,
+     0.485
+    ],
+    "cage_body": [
+     0,
+     0,
+     0
+    ],
+    "cage": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "gate": "rotate gate about local X: 0 = closed, +90 deg = dropped open outward (+Z); origin on the bottom hinge axis"
+   },
+   "node_notes": {
+    "cage_body": "base with feet, corner posts, 3 mesh walls; origin ground centre",
+    "gate": "front drop gate, origin on its hinge"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_yellow"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg",
+    "03_interior_orange_racks_mezzanine.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "case_stack_loose.glb",
+   "bytes": 15408,
+   "bytes_raw": 68268,
+   "tris": 1008,
+   "draw_calls": 6,
+   "size_m": [
+    1.249,
+    0.874,
+    0.588
+   ],
+   "bbox_min": [
+    -0.622,
+    0,
+    -0.277
+   ],
+   "bbox_max": [
+    0.626,
+    0.874,
+    0.311
+   ],
+   "facing": "front labels face +Z",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "cases": [
+     0,
+     0,
+     0
+    ],
+    "case_stack_loose": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "cases": "six loose cartons stacked on the floor (merged); static prop: no moving parts"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "dock_door.glb",
+   "bytes": 36292,
+   "bytes_raw": 213088,
+   "tris": 3480,
+   "draw_calls": 14,
+   "size_m": [
+    4.2,
+    5.17,
+    3.01
+   ],
+   "bbox_min": [
+    -2.1,
+    0,
+    -2.65
+   ],
+   "bbox_max": [
+    2.1,
+    5.17,
+    0.36
+   ],
+   "facing": "+Z = exterior/truck side (shelter, bumpers, lights); interior floor slab at 1.22 m runs toward -Z",
+   "sides": null,
+   "hierarchy": "dock_door > dock_frame > {door_roll, leveler_lip}",
+   "nodes": {
+    "door_roll": [
+     0,
+     4.52,
+     -0.285
+    ],
+    "leveler_lip": [
+     0,
+     1.216,
+     0.053
+    ],
+    "dock_frame": [
+     0,
+     0,
+     0
+    ],
+    "dock_door": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "door_roll": "origin at the curtain top (y=4.52 m) inside the head; roll up by scaling Y 1 -> 0.03 (or translate +Y up to 3.0 m, it hides behind the coil housing)",
+    "leveler_lip": "origin on the lip hinge at the leveler front edge; rotate about local X by -90 deg to deploy onto a trailer bed (rest = hanging/stored)",
+    "traffic_light": "materials light_red / light_green are emissive; swap emissiveIntensity to signal"
+   },
+   "node_notes": {
+    "dock_frame": "wall panel with opening, interior slab, shelter pads, bumpers, guides, coil housing, leveler deck; origin on the ground at the exterior wall face, door centre"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_blue",
+    "brand_yellow",
+    "light_green",
+    "light_red"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "02_exterior_docks_walmartcom_trailers.png",
+    "01_interior_dock_forklifts.jpg",
+    "15_iso_dock_cutaway_trucks.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "drums.glb",
+   "bytes": 73852,
+   "bytes_raw": 750112,
+   "tris": 11040,
+   "draw_calls": 9,
+   "size_m": [
+    1.92,
+    0.88,
+    0.6
+   ],
+   "bbox_min": [
+    -0.96,
+    0,
+    -0.3
+   ],
+   "bbox_max": [
+    0.96,
+    0.88,
+    0.3
+   ],
+   "facing": "symmetric (rotate freely about Y); drums sit along X, 0.66 m apart",
+   "sides": null,
+   "hierarchy": "drums > {drum_blue, drum_green, drum_yellow}",
+   "nodes": {
+    "drum_blue": [
+     -0.66,
+     0,
+     0
+    ],
+    "drum_green": [
+     0,
+     0,
+     0
+    ],
+    "drum_yellow": [
+     0.66,
+     0,
+     0
+    ],
+    "drums": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "drum_blue/green/yellow": "one 205 L drum each, 0.58 m dia x 0.88 m, two red bands; origin at the bottom centre on the ground (clone + reposition individually)"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg",
+    "15_iso_dock_cutaway_trucks.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "forklift_counterbalance.glb",
+   "bytes": 203148,
+   "bytes_raw": 1577476,
+   "tris": 24528,
+   "draw_calls": 37,
+   "size_m": [
+    1.34,
+    2.318,
+    3.32
+   ],
+   "bbox_min": [
+    -0.67,
+    0,
+    -1.25
+   ],
+   "bbox_max": [
+    0.67,
+    2.318,
+    2.07
+   ],
+   "facing": "+Z (forks point toward +Z in glTF / three.js)",
+   "sides": "L/R are the vehicle's own left/right: L = +X, R = -X (vehicle faces +Z)",
+   "hierarchy": "forklift_counterbalance > body > {beacon, wheel_FL, wheel_FR, steer_RL > wheel_RL, steer_RR > wheel_RR, mast_tilt > mast_outer > mast_inner > fork_carriage > {fork_L, fork_R}}",
+   "nodes": {
+    "anchor_seat": [
+     0,
+     1.1881,
+     -0.33
+    ],
+    "beacon": [
+     0,
+     2.1631,
+     -0.8
+    ],
+    "fork_L": [
+     0.28,
+     0.0231,
+     1
+    ],
+    "fork_R": [
+     -0.28,
+     0.0231,
+     1
+    ],
+    "fork_carriage": [
+     0,
+     0.1281,
+     0.97
+    ],
+    "mast_inner": [
+     0,
+     0.1281,
+     0.875
+    ],
+    "mast_outer": [
+     0,
+     0.1281,
+     0.84
+    ],
+    "mast_tilt": [
+     0,
+     0.1281,
+     0.84
+    ],
+    "wheel_RL": [
+     0.44,
+     0.2681,
+     -0.82
+    ],
+    "steer_RL": [
+     0.33,
+     0.2681,
+     -0.82
+    ],
+    "wheel_RR": [
+     -0.44,
+     0.2681,
+     -0.82
+    ],
+    "steer_RR": [
+     -0.33,
+     0.2681,
+     -0.82
+    ],
+    "wheel_FL": [
+     0.46,
+     0.3281,
+     0.45
+    ],
+    "wheel_FR": [
+     -0.46,
+     0.3281,
+     0.45
+    ],
+    "body": [
+     0,
+     0.0081,
+     0
+    ],
+    "forklift_counterbalance": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_seat": {
+     "pivot_world": [
+      0,
+      1.1881,
+      -0.33
+     ],
+     "desc": "seat cushion top centre (operator hip point), child of body; face +Z"
+    }
+   },
+   "rig": {
+    "drive": "move/rotate body (or root); front axle (drive, y=-0.45 m in Blender = z +0.45 in glTF) is the fixed axle, rear axle steers (wheelbase 1.27 m)",
+    "steer": "rotate steer_RL/steer_RR about local Y, up to +-75 deg (rear-steer: positive yaw turns the truck the opposite way)",
+    "spin": "rotate wheel_* about local X; front r=0.32 m, rear r=0.26 m",
+    "tilt": "rotate mast_tilt about local X: about -3 deg (forward) .. +6 deg (back)",
+    "lift": "stage 1: translate fork_carriage +Y 0..1.0 m inside mast_inner (free lift); stage 2: translate mast_inner +Y 0..1.9 m (carriage rides along). Max fork height ~3.0 m"
+   },
+   "node_notes": {
+    "body": "static chassis, counterweight, overhead guard, seat, LPG tank; parent of all moving parts",
+    "mast_tilt": "Empty at the mast base hinge (x=0, y=0.12 m, z=+0.84 m glTF); rotate about X to tilt; parents mast_outer",
+    "steer_RL/steer_RR": "Empty on each rear kingpin (x=+-0.33, axle height 0.26 m); rotate about Y to steer; parent of wheel_RL/RR",
+    "beacon": "emissive orange dome, origin at its base on the rear roof rail (blink / scale)",
+    "wheel_FL/FR/RL/RR": "origin exactly at axle centre, spin about local X (RL/RR are children of steer_RL/RR)",
+    "mast_outer": "child of mast_tilt, origin coincident with the tilt hinge; fixed outer stage",
+    "mast_inner": "child of mast_outer, origin at its base; translate +Y up to ~1.9 m (telescoping stage)",
+    "fork_carriage": "child of mast_inner, origin at carriage bottom; translate +Y (lift)",
+    "fork_L/fork_R": "children of fork_carriage, origin at fork heel; translate X for side-shift / spread"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "beacon_orange"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": -0.00807,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": 0.00807
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "13_forklift_detail.jpg",
+    "08_forklift_racks_render.jpg",
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_bluewood.glb",
+   "bytes": 31064,
+   "bytes_raw": 214772,
+   "tris": 3552,
+   "draw_calls": 5,
+   "size_m": [
+    1.2,
+    0.145,
+    1
+   ],
+   "bbox_min": [
+    -0.6,
+    0,
+    -0.5
+   ],
+   "bbox_max": [
+    0.6,
+    0.145,
+    0.5
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_bluewood": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "single merged mesh (every plank, block and nail head), origin ground centre; static prop: no moving parts"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "11_pallet_blue_wood.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_jack.glb",
+   "bytes": 42380,
+   "bytes_raw": 221736,
+   "tris": 3560,
+   "draw_calls": 18,
+   "size_m": [
+    0.54,
+    1.346,
+    1.699
+   ],
+   "bbox_min": [
+    -0.27,
+    0,
+    -0.549
+   ],
+   "bbox_max": [
+    0.27,
+    1.346,
+    1.15
+   ],
+   "facing": "+Z (fork tips point toward +Z; the operator pulls from the tiller at -Z)",
+   "sides": "L = +X, R = -X (looking along the forks)",
+   "hierarchy": "pallet_jack > body > {wheel_load_L, wheel_load_R, tiller > {tiller_frame, tiller_handle, wheel_steer_L, wheel_steer_R}}",
+   "nodes": {
+    "tiller_frame": [
+     0,
+     0.1,
+     -0.32
+    ],
+    "anchor_tiller_grip": [
+     0,
+     1.3265,
+     -0.5289
+    ],
+    "tiller_handle": [
+     0,
+     0.62,
+     -0.38
+    ],
+    "wheel_steer_L": [
+     0.07,
+     0.1,
+     -0.32
+    ],
+    "wheel_steer_R": [
+     -0.07,
+     0.1,
+     -0.32
+    ],
+    "tiller": [
+     0,
+     0.1,
+     -0.32
+    ],
+    "wheel_load_L": [
+     0.19,
+     0.04,
+     1.03
+    ],
+    "wheel_load_R": [
+     -0.19,
+     0.04,
+     1.03
+    ],
+    "body": [
+     0,
+     0,
+     0
+    ],
+    "pallet_jack": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_tiller_grip": {
+     "pivot_world": [
+      0,
+      1.3265,
+      -0.5289
+     ],
+     "desc": "centre of the tiller loop grip (hand point), child of tiller_handle so it follows steer + pump arc"
+    }
+   },
+   "rig": {
+    "steer": "rotate tiller about local Y (+-90 deg); its origin is ON the steer axis at the steer-wheel axle centre (x=0, y=0.10, z=-0.32 glTF), so the handle and both steer wheels swing together",
+    "handle": "rotate tiller_handle about local X: 0 = 12 deg back (rest/towing); -60..+15 deg pumping arc",
+    "spin": "rotate wheel_* about local X; steer wheels r=0.10 m, load rollers r=0.04 m",
+    "lift": "translate body +Y 0..0.115 m (lowered 0.085 -> raised 0.200 m fork top) while keeping wheels on the floor (move the wheel nodes -Y by the same amount)"
+   },
+   "node_notes": {
+    "body": "forks 1.15 x 0.54 m overall (two 0.16 m channels), heel, back plate; origin on the ground at the fork heel centre",
+    "tiller": "Empty on the steer axis at axle height",
+    "tiller_frame": "pump, turntable, wheel yoke (turns with steering)",
+    "tiller_handle": "handle, origin at the hinge pin (0.62 m)",
+    "wheel_*": "origin on the axle centre"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "20_hand_pallet_pump_truck.jpg",
+    "01_interior_dock_forklifts.jpg",
+    "10_pallet_wood_stacked.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_load_half.glb",
+   "bytes": 52672,
+   "bytes_raw": 346644,
+   "tris": 5612,
+   "draw_calls": 12,
+   "size_m": [
+    1.216,
+    0.825,
+    1.016
+   ],
+   "bbox_min": [
+    -0.608,
+    0,
+    -0.508
+   ],
+   "bbox_max": [
+    0.608,
+    0.825,
+    0.508
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "film": [
+     0,
+     0,
+     0
+    ],
+    "load": [
+     0,
+     0,
+     0
+    ],
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_load_half": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "pallet (merged), origin ground centre",
+    "load": "cartons + tape + labels (merged); hide/show to load/unload",
+    "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_load_partial.glb",
+   "bytes": 53928,
+   "bytes_raw": 365228,
+   "tris": 5904,
+   "draw_calls": 11,
+   "size_m": [
+    1.202,
+    1.162,
+    1.001
+   ],
+   "bbox_min": [
+    -0.601,
+    0,
+    -0.5
+   ],
+   "bbox_max": [
+    0.601,
+    1.162,
+    0.501
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "load": [
+     0,
+     0,
+     0
+    ],
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_load_partial": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "pallet (merged), origin ground centre",
+    "load": "cartons + tape + labels (merged); hide/show to load/unload"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg",
+    "06_aisle_blue_racks.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_load_wrapped.glb",
+   "bytes": 66696,
+   "bytes_raw": 461916,
+   "tris": 7484,
+   "draw_calls": 12,
+   "size_m": [
+    1.216,
+    1.503,
+    1.016
+   ],
+   "bbox_min": [
+    -0.608,
+    0,
+    -0.508
+   ],
+   "bbox_max": [
+    0.608,
+    1.503,
+    0.508
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "film": [
+     0,
+     0,
+     0
+    ],
+    "load": [
+     0,
+     0,
+     0
+    ],
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_load_wrapped": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "pallet (merged), origin ground centre",
+    "load": "cartons + tape + labels (merged); hide/show to load/unload",
+    "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "01_interior_dock_forklifts.jpg",
+    "14_iso_cutaway_orange_base.jpg",
+    "03_interior_orange_racks_mezzanine.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_pine.glb",
+   "bytes": 31056,
+   "bytes_raw": 214760,
+   "tris": 3552,
+   "draw_calls": 5,
+   "size_m": [
+    1.2,
+    0.145,
+    1
+   ],
+   "bbox_min": [
+    -0.6,
+    0,
+    -0.5
+   ],
+   "bbox_max": [
+    0.6,
+    0.145,
+    0.5
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_pine": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "single merged mesh (every plank, block and nail head), origin ground centre; static prop: no moving parts"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "09_pallet_wood_euro.jpg",
+    "10_pallet_wood_stacked.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_stacker_auto.glb",
+   "bytes": 108268,
+   "bytes_raw": 697608,
+   "tris": 11280,
+   "draw_calls": 36,
+   "size_m": [
+    1.112,
+    2.303,
+    2.732
+   ],
+   "bbox_min": [
+    -0.556,
+    0,
+    -1.112
+   ],
+   "bbox_max": [
+    0.556,
+    2.303,
+    1.62
+   ],
+   "facing": "+Z (forks point toward +Z)",
+   "sides": null,
+   "hierarchy": "pallet_stacker_auto > body > {steer_drive > wheel_drive, caster_L > wheel_caster_L, caster_R > wheel_caster_R, light_strip, lidar, mast_outer > mast_inner > fork_carriage}",
+   "nodes": {
+    "anchor_tiller_grip": [
+     -0.215,
+     1.5,
+     -0.95
+    ],
+    "wheel_caster_L": [
+     0.4,
+     0.07,
+     -0.92
+    ],
+    "caster_L": [
+     0.4,
+     0.07,
+     -0.92
+    ],
+    "wheel_caster_R": [
+     -0.4,
+     0.07,
+     -0.92
+    ],
+    "caster_R": [
+     -0.4,
+     0.07,
+     -0.92
+    ],
+    "lidar": [
+     0,
+     2.2,
+     0.09
+    ],
+    "light_strip": [
+     0,
+     0.38,
+     -0.35
+    ],
+    "fork_carriage": [
+     0,
+     0,
+     0.51
+    ],
+    "mast_inner": [
+     0,
+     0,
+     0.42
+    ],
+    "mast_outer": [
+     0,
+     0,
+     0.42
+    ],
+    "wheel_drive": [
+     0,
+     0.15,
+     -0.62
+    ],
+    "steer_drive": [
+     0,
+     0.15,
+     -0.62
+    ],
+    "body": [
+     0,
+     0,
+     0
+    ],
+    "pallet_stacker_auto": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_tiller_grip": {
+     "pivot_world": [
+      -0.215,
+      1.5,
+      -0.95
+     ],
+     "desc": "centre of the manual-mode push handle on the compute tower (hand point; walk-behind), child of body"
+    }
+   },
+   "rig": {
+    "drive": "move/rotate body (or root); rear drive wheel steers like a forklift rear axle; the fixed axle is the fork-side load rollers / mast legs (z +0.42 m glTF)",
+    "steer": "rotate steer_drive about local Y (+-90 deg); casters caster_L/R swivel freely about Y (point them along the velocity)",
+    "spin": "rotate wheel_drive (r 0.15 m) / wheel_caster_L/R (r 0.07 m) about local X",
+    "lift": "two-stage: (1) free lift - translate fork_carriage +Y 0..1.30 m (carriage frame stays inside the inner rails: top 1.92 < rail top 1.96); (2) translate mast_inner +Y 0..1.60 m (keeps 0.30 m overlap in the outer rails, lift rod stays in its cylinder). Max fork height 2.90 m; lift only when speed < 0.05 m/s"
+   },
+   "node_notes": {
+    "body": "chassis + orange shell + tower, origin ground centre of chassis",
+    "steer_drive": "drive-wheel yoke; origin at the drive axle centre (x=0, y=0.15, z=-0.62 glTF) on the vertical steer axis; rotate about Y",
+    "wheel_drive": "child of steer_drive, origin at axle centre, spin about X",
+    "caster_L/R": "swivel yokes, origin at caster axle centre on the swivel axis; wheel_caster_L/R children spin about X",
+    "light_strip": "emissive cyan perimeter strip (material strip_cyan) - recolour/blink",
+    "lidar": "sensor arch + top lidar puck; origin at puck centre - spin about Y",
+    "mast_outer": "child of body, fixed outer uprights + lift cylinder; origin at mast foot on the ground (x=0, z=+0.42 glTF)",
+    "mast_inner": "child of mast_outer, inner uprights + crosshead + chains + lift rod; origin at mast foot; translate +Y 0..1.60 m",
+    "fork_carriage": "child of mast_inner; carriage, backrest, guide rollers, 2 tines (1.07 m x 0.12 x 0.06 m, tapered tips); origin at the fork heel on the ground; translate +Y 0..1.30 m (free lift)"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "beacon_blue",
+    "brand_blue",
+    "brand_yellow"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "01_interior_dock_forklifts.jpg",
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "pallet_steel.glb",
+   "bytes": 27352,
+   "bytes_raw": 222872,
+   "tris": 3852,
+   "draw_calls": 2,
+   "size_m": [
+    1.2,
+    0.144,
+    1
+   ],
+   "bbox_min": [
+    -0.6,
+    0,
+    -0.5
+   ],
+   "bbox_max": [
+    0.6,
+    0.144,
+    0.5
+   ],
+   "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+   "sides": null,
+   "hierarchy": null,
+   "nodes": {
+    "pallet": [
+     0,
+     0,
+     0
+    ],
+    "pallet_steel": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "pallet": "single merged mesh, origin ground centre; static prop: no moving parts"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "12_pallet_blue_steel.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "rack_bay.glb",
+   "bytes": 39500,
+   "bytes_raw": 346024,
+   "tris": 5688,
+   "draw_calls": 12,
+   "size_m": [
+    2.94,
+    6,
+    1.145
+   ],
+   "bbox_min": [
+    -1.47,
+    0,
+    -0.572
+   ],
+   "bbox_max": [
+    1.47,
+    6,
+    0.572
+   ],
+   "facing": "+Z = aisle (pick) face; beams run along X",
+   "sides": null,
+   "hierarchy": "rack_bay > {upright_frame_L, upright_frame_R, beam_level_1, beam_level_2, beam_level_3}",
+   "nodes": {
+    "beam_level_1": [
+     0,
+     1.6,
+     0
+    ],
+    "beam_level_2": [
+     0,
+     3.1,
+     0
+    ],
+    "beam_level_3": [
+     0,
+     4.6,
+     0
+    ],
+    "upright_frame_L": [
+     1.395,
+     0,
+     0
+    ],
+    "upright_frame_R": [
+     -1.395,
+     0,
+     0
+    ],
+    "rack_bay": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "tiling": "for a run of N bays, clone the whole bay every 2.79 m along X and hide upright_frame_R on all but the last bay (frames are shared)",
+    "levels": "beam_level_* origins are at the beam top (pallet seat) height on the bay centre-line; translate Y to re-space levels"
+   },
+   "node_notes": {
+    "upright_frame_L/R": "two uprights + Z-bracing + base plates + yellow column guards; origin at the frame centre on the ground",
+    "beam_level_N": "front+back orange step beams with connectors and a galvanised wire deck; origin at the beam top"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_yellow"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "06_aisle_blue_racks.jpg",
+    "07_overhead_aisle_wire_decks.jpg",
+    "03_interior_orange_racks_mezzanine.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "reach_truck.glb",
+   "bytes": 89944,
+   "bytes_raw": 538752,
+   "tris": 8620,
+   "draw_calls": 36,
+   "size_m": [
+    1.254,
+    2.5,
+    2.65
+   ],
+   "bbox_min": [
+    -0.627,
+    0,
+    -1.33
+   ],
+   "bbox_max": [
+    0.627,
+    2.5,
+    1.32
+   ],
+   "facing": "+Z (forks point toward +Z in glTF / three.js)",
+   "sides": "L/R = vehicle's own left/right: L = +X, R = -X",
+   "hierarchy": "reach_truck > body > {beacon, wheel_LL, wheel_LR, steer_drive > wheel_drive, caster > wheel_caster, reach > {reach_base, mast_outer > mast_inner > fork_carriage}}",
+   "nodes": {
+    "anchor_stand": [
+     0.33,
+     0.306,
+     -0.87
+    ],
+    "beacon": [
+     -0.45,
+     2.29,
+     -1.15
+    ],
+    "wheel_caster": [
+     0.35,
+     0.09,
+     -1.05
+    ],
+    "caster": [
+     0.35,
+     0.09,
+     -1.05
+    ],
+    "fork_carriage": [
+     0,
+     0,
+     0.21
+    ],
+    "mast_inner": [
+     0,
+     0,
+     0.12
+    ],
+    "mast_outer": [
+     0,
+     0,
+     0.12
+    ],
+    "reach_base": [
+     0,
+     0.36,
+     0.12
+    ],
+    "reach": [
+     0,
+     0.36,
+     0.12
+    ],
+    "wheel_drive": [
+     -0.25,
+     0.17,
+     -0.75
+    ],
+    "steer_drive": [
+     -0.25,
+     0.17,
+     -0.75
+    ],
+    "wheel_LL": [
+     0.52,
+     0.11,
+     0.9
+    ],
+    "wheel_LR": [
+     -0.52,
+     0.11,
+     0.9
+    ],
+    "body": [
+     0,
+     0,
+     0
+    ],
+    "reach_truck": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_stand": {
+     "pivot_world": [
+      0.33,
+      0.306,
+      -0.87
+     ],
+     "desc": "floor pad centre of the stand-in cockpit (operator feet), child of body; face +Z"
+    }
+   },
+   "rig": {
+    "drive": "move/rotate root; fixed axle = load wheels in the baselegs (z +0.90 m glTF); the single drive wheel (x=-0.25, z=-0.75 glTF) steers",
+    "steer": "rotate steer_drive about local Y, +-90 deg (reach trucks turn on the spot)",
+    "spin": "rotate wheel_* about local X; drive r=0.17, load wheels r=0.11, caster r=0.09",
+    "reach": "translate reach along local +Z (glTF) 0..0.60 m: the whole mast rolls forward along the baseleg rails",
+    "lift": "two-stage: fork_carriage +Y 0..1.30 m (free lift), then mast_inner +Y 0..1.85 m; max fork height 3.15 m above rest. carriage top 0.62 + free lift 1.30 = 1.92 < inner rail top 2.41; inner stage keeps 0.51 m overlap in the outer rails at full extension",
+    "caster": "caster yoke may swivel freely about Y (cosmetic)"
+   },
+   "node_notes": {
+    "body": "chassis, operator compartment (stand-in, open to the vehicle-left side), overhead guard 2.26 m, baselegs",
+    "reach": "Empty at the mast foot on the rails (x=0, y=0.36, z=+0.12 glTF); translate +Z to reach",
+    "reach_base": "reach carriage plate + rollers (child of reach)",
+    "mast_outer": "outer uprights 2.45 m, child of reach",
+    "mast_inner": "inner stage, translate +Y",
+    "fork_carriage": "carriage + backrest + 2 forks 1.07 x 0.10 x 0.045 m, tapered tips; translate +Y",
+    "steer_drive": "drive-wheel yoke; origin at the axle centre (steer axis is vertical through it)",
+    "wheel_drive/wheel_LL/wheel_LR/wheel_caster": "origin exactly at axle centre; spin about local X",
+    "caster": "caster yoke, origin at axle centre",
+    "beacon": "emissive orange dome"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "beacon_orange"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": -0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": 0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "06_aisle_blue_racks.jpg",
+    "07_overhead_aisle_wire_decks.jpg",
+    "03_interior_orange_racks_mezzanine.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "robot_arm.glb",
+   "bytes": 66812,
+   "bytes_raw": 499420,
+   "tris": 8352,
+   "draw_calls": 18,
+   "size_m": [
+    0.6,
+    1.54,
+    1.135
+   ],
+   "bbox_min": [
+    -0.3,
+    0,
+    -0.3
+   ],
+   "bbox_max": [
+    0.3,
+    1.54,
+    0.835
+   ],
+   "facing": "+Z (forearm reaches toward +Z at rest)",
+   "sides": null,
+   "hierarchy": "robot_arm > {arm_pedestal, arm_base > arm_j1 > arm_j2 > arm_j3 > gripper > {finger_L, finger_R}}",
+   "nodes": {
+    "finger_L": [
+     0.065,
+     1.138,
+     0.75
+    ],
+    "finger_R": [
+     -0.065,
+     1.138,
+     0.75
+    ],
+    "gripper": [
+     0,
+     1.25,
+     0.75
+    ],
+    "arm_j3": [
+     0,
+     1.41,
+     0.75
+    ],
+    "arm_j2": [
+     0,
+     1.41,
+     0
+    ],
+    "arm_j1": [
+     0,
+     0.66,
+     0
+    ],
+    "arm_base": [
+     0,
+     0.38,
+     0
+    ],
+    "arm_pedestal": [
+     0,
+     0,
+     0
+    ],
+    "robot_arm": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "arm_base": "yaw about local Y; origin on the vertical axis at y=0.38 (top of pedestal)",
+    "arm_j1": "shoulder pitch about local X; origin on the shoulder axis (0, 0.66, 0)",
+    "arm_j2": "elbow pitch about local X; origin on the elbow axis (0, 1.41, 0)",
+    "arm_j3": "wrist pitch about local X; origin on the wrist axis (0, 1.41, 0.75)",
+    "gripper": "roll about local Y; origin at the tool flange (0, 1.25, 0.75)",
+    "finger_L/R": "translate along local X: open +-0.03 m (L +X, R -X); origin at the finger root"
+   },
+   "node_notes": {
+    "arm_pedestal": "static"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_blue"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "tug_cart_train.glb",
+   "bytes": 186328,
+   "bytes_raw": 1587992,
+   "tris": 23992,
+   "draw_calls": 84,
+   "size_m": [
+    1.16,
+    2.076,
+    10.09
+   ],
+   "bbox_min": [
+    -0.58,
+    0,
+    -9.07
+   ],
+   "bbox_max": [
+    0.58,
+    2.076,
+    1.02
+   ],
+   "facing": "+Z (tug drives toward +Z; the carts trail toward -Z)",
+   "sides": "L/R = vehicle's own left/right: L = +X, R = -X",
+   "hierarchy": "tug_cart_train > {tug > {tug_beacon, tug_steer_FL > tug_wheel_FL, tug_steer_FR > tug_wheel_FR, tug_wheel_RL, tug_wheel_RR, tug_hitch}, cartN_body > {cartN_steer > {cartN_wheel_FL, cartN_wheel_FR, cartN_drawbar > cartN_eye}, cartN_wheel_RL, cartN_wheel_RR, cartN_hitch}} for N = 1..3",
+   "nodes": {
+    "cart1_hitch": [
+     0,
+     0.33,
+     -3.7
+    ],
+    "cart1_eye": [
+     0,
+     0.33,
+     -1.05
+    ],
+    "cart1_drawbar": [
+     0,
+     0.33,
+     -1.5
+    ],
+    "cart1_wheel_FL": [
+     0.5,
+     0.15,
+     -1.9
+    ],
+    "cart1_wheel_FR": [
+     -0.5,
+     0.15,
+     -1.9
+    ],
+    "cart1_steer": [
+     0,
+     0.15,
+     -1.9
+    ],
+    "cart1_wheel_RL": [
+     0.5,
+     0.15,
+     -3.25
+    ],
+    "cart1_wheel_RR": [
+     -0.5,
+     0.15,
+     -3.25
+    ],
+    "cart1_body": [
+     0,
+     0,
+     -1.9
+    ],
+    "cart2_hitch": [
+     0,
+     0.33,
+     -6.35
+    ],
+    "cart2_eye": [
+     0,
+     0.33,
+     -3.7
+    ],
+    "cart2_drawbar": [
+     0,
+     0.33,
+     -4.15
+    ],
+    "cart2_wheel_FL": [
+     0.5,
+     0.15,
+     -4.55
+    ],
+    "cart2_wheel_FR": [
+     -0.5,
+     0.15,
+     -4.55
+    ],
+    "cart2_steer": [
+     0,
+     0.15,
+     -4.55
+    ],
+    "cart2_wheel_RL": [
+     0.5,
+     0.15,
+     -5.9
+    ],
+    "cart2_wheel_RR": [
+     -0.5,
+     0.15,
+     -5.9
+    ],
+    "cart2_body": [
+     0,
+     0,
+     -4.55
+    ],
+    "cart3_hitch": [
+     0,
+     0.33,
+     -9
+    ],
+    "cart3_eye": [
+     0,
+     0.33,
+     -6.35
+    ],
+    "cart3_drawbar": [
+     0,
+     0.33,
+     -6.8
+    ],
+    "cart3_wheel_FL": [
+     0.5,
+     0.15,
+     -7.2
+    ],
+    "cart3_wheel_FR": [
+     -0.5,
+     0.15,
+     -7.2
+    ],
+    "cart3_steer": [
+     0,
+     0.15,
+     -7.2
+    ],
+    "cart3_wheel_RL": [
+     0.5,
+     0.15,
+     -8.55
+    ],
+    "cart3_wheel_RR": [
+     -0.5,
+     0.15,
+     -8.55
+    ],
+    "cart3_body": [
+     0,
+     0,
+     -7.2
+    ],
+    "anchor_seat": [
+     0,
+     0.9,
+     -0.69
+    ],
+    "tug_beacon": [
+     0.35,
+     2.035,
+     -0.8
+    ],
+    "tug_hitch": [
+     0,
+     0.33,
+     -1.05
+    ],
+    "tug_wheel_FL": [
+     0.42,
+     0.2,
+     0.6
+    ],
+    "tug_steer_FL": [
+     0.34,
+     0.2,
+     0.6
+    ],
+    "tug_wheel_FR": [
+     -0.42,
+     0.2,
+     0.6
+    ],
+    "tug_steer_FR": [
+     -0.34,
+     0.2,
+     0.6
+    ],
+    "tug_wheel_RL": [
+     0.42,
+     0.2,
+     -0.6
+    ],
+    "tug_wheel_RR": [
+     -0.42,
+     0.2,
+     -0.6
+    ],
+    "tug": [
+     0,
+     0,
+     0
+    ],
+    "tug_cart_train": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_seat": {
+     "pivot_world": [
+      0,
+      0.9,
+      -0.69
+     ],
+     "desc": "seat cushion top centre (driver hip point), child of tug; face +Z"
+    }
+   },
+   "rig": {
+    "tug_drive": "move/rotate tug (Ackermann, wheelbase 1.2 m, track 0.84 m); fixed rear axle at z -0.60 glTF",
+    "tug_steer": "rotate tug_steer_FL/FR about local Y +-40 deg (kingpin origin at x +-0.34, axle height)",
+    "spin": "rotate *_wheel_* about local X; tug r=0.20 m, carts r=0.15 m",
+    "coupling": "each cartN_eye must coincide with the hitch in front (tug_hitch for cart1, cart(N-1)_hitch otherwise). Simple follower: per frame, place cartN_body so its rear axle trails the eye, then yaw cartN_steer so cartN_drawbar points at the leading hitch",
+    "cart_steer": "cartN_steer = front turntable (Ackermann-free \"fifth wheel\" steering) - rotate about local Y; origin on the king bolt at axle height",
+    "drawbar": "cartN_drawbar hinges at the front axle clevis - rotate about local X to raise / lower (rest = horizontal, eye at hitch height 0.33 m)",
+    "hitch_spacing_m": {
+     "tug_hitch": -1.05,
+     "cart1_hitch": -3.7,
+     "cart2_hitch": -6.35,
+     "cart3_hitch": -9.0
+    }
+   },
+   "node_notes": {
+    "tug": "tow tractor body, seat, steering wheel, canopy (2.0 m), rear pin hitch",
+    "tug_hitch": "Empty at the tug pin coupler (x=0, y=0.33, z=-1.050 glTF)",
+    "cartN_body": "platform cart 2.0 x 1.1 m, deck 0.48 m, stake sides; origin on the ground under the turntable king bolt",
+    "cartN_steer": "front turntable + front axle; origin at the king bolt (axle height 0.15 m)",
+    "cartN_drawbar": "drawbar, origin on its hinge (front clevis)",
+    "cartN_eye": "Empty at the drawbar eye centre (couples to the leading hitch)",
+    "cartN_hitch": "Empty at the cart rear pin coupler",
+    "tug_steer_FL/FR": "Empty on each tug front kingpin, parent of the wheel"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "beacon_orange",
+    "brand_blue",
+    "brand_yellow"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "01_interior_dock_forklifts.jpg",
+    "15_iso_dock_cutaway_trucks.jpg",
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "walmart_facade.glb",
+   "bytes": 65408,
+   "bytes_raw": 358944,
+   "tris": 5206,
+   "draw_calls": 13,
+   "size_m": [
+    32.04,
+    13.499,
+    4.331
+   ],
+   "bbox_min": [
+    -16.02,
+    0,
+    -0.419
+   ],
+   "bbox_max": [
+    16.02,
+    13.499,
+    3.912
+   ],
+   "facing": "+Z = street/parking side; the wall back face is 0.4 m behind the origin (toward -Z)",
+   "sides": null,
+   "hierarchy": "walmart_facade > {facade, bollards}",
+   "nodes": {
+    "bollards": [
+     0,
+     0,
+     3.8
+    ],
+    "facade": [
+     0,
+     0,
+     0
+    ],
+    "walmart_facade": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": null,
+   "node_notes": {
+    "facade": "tilt-up panel wall with base band, joints, blue spark tower (logo decal), blue band, glazed entrance, canopy, Pickup sign, W06 service door; origin at ground on the front wall line, centre",
+    "bollards": "9 yellow bollards 1.05 m in front of the canopy"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_blue",
+    "brand_facade_logo",
+    "brand_sign_pickup",
+    "brand_yellow"
+   ],
+   "textures": 3,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "EXT_texture_webp",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 12,
+    "open_by_node": {
+     "facade": 12
+    },
+    "open_samples": [
+     [
+      -10.3,
+      -0.306,
+      8.875
+     ],
+     [
+      -8.5,
+      -0.306,
+      6.4
+     ],
+     [
+      -6.7,
+      -0.306,
+      8.875
+     ],
+     [
+      -8.5,
+      -0.306,
+      11.35
+     ],
+     [
+      12.8,
+      -0.123,
+      6.925
+     ],
+     [
+      14.0,
+      -0.123,
+      6.53
+     ],
+     [
+      15.2,
+      -0.123,
+      6.925
+     ],
+     [
+      14.0,
+      -0.123,
+      7.32
+     ]
+    ],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": -0.0001,
+    "animMinY": null
+   },
+   "imgref": [
+    "05_facade_logo_parking.jpg",
+    "16_supercentre_facade.webp",
+    "17_supercentre_entrance_bollards.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "walmart_truck.glb",
+   "bytes": 255992,
+   "bytes_raw": 1729332,
+   "tris": 24482,
+   "draw_calls": 62,
+   "size_m": [
+    3.08,
+    4.15,
+    22.125
+   ],
+   "bbox_min": [
+    -1.54,
+    0,
+    -11.115
+   ],
+   "bbox_max": [
+    1.54,
+    4.15,
+    11.01
+   ],
+   "facing": "+Z (cab front toward +Z); total length ~22.0 m, trailer box 16.15 x 2.6 x 2.85 m (top at 4.10 m)",
+   "sides": "L/R are the vehicle's own left/right: L = +X, R = -X",
+   "hierarchy": "walmart_truck > tractor > {steer_FL > wheel_FL, steer_FR > wheel_FR, wheel_RL1/RR1/RL2/RR2, trailer > {landing_gear, trailer_wheel_*, trailer_door_L/R}}",
+   "nodes": {
+    "anchor_seat": [
+     0.55,
+     1.95,
+     7.55
+    ],
+    "wheel_FL": [
+     1.04,
+     0.52,
+     9.65
+    ],
+    "steer_FL": [
+     0.9,
+     0.52,
+     9.65
+    ],
+    "wheel_FR": [
+     -1.04,
+     0.52,
+     9.65
+    ],
+    "steer_FR": [
+     -0.9,
+     0.52,
+     9.65
+    ],
+    "landing_gear": [
+     0,
+     0,
+     2.4
+    ],
+    "trailer_door_L": [
+     1.24,
+     1.39,
+     -11
+    ],
+    "trailer_door_R": [
+     -1.24,
+     1.39,
+     -11
+    ],
+    "trailer_wheel_L1": [
+     0.86,
+     0.52,
+     -8.3
+    ],
+    "trailer_wheel_L2": [
+     0.86,
+     0.52,
+     -9.55
+    ],
+    "trailer_wheel_R1": [
+     -0.86,
+     0.52,
+     -8.3
+    ],
+    "trailer_wheel_R2": [
+     -0.86,
+     0.52,
+     -9.55
+    ],
+    "trailer": [
+     0,
+     1.22,
+     4.15
+    ],
+    "wheel_RL1": [
+     0.86,
+     0.52,
+     4.8
+    ],
+    "wheel_RL2": [
+     0.86,
+     0.52,
+     3.5
+    ],
+    "wheel_RR1": [
+     -0.86,
+     0.52,
+     4.8
+    ],
+    "wheel_RR2": [
+     -0.86,
+     0.52,
+     3.5
+    ],
+    "tractor": [
+     0,
+     0,
+     4.15
+    ],
+    "walmart_truck": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": {
+    "anchor_seat": {
+     "pivot_world": [
+      0.55,
+      1.95,
+      7.55
+     ],
+     "desc": "driver H-point (vehicle-left/+X seat, US LHD), child of tractor; face +Z"
+    }
+   },
+   "rig": {
+    "drive": "move/rotate the tractor node (or root) on the ground; tractor origin = ground point under the fifth wheel = centre of the rear tandem (bicycle-model rear axle)",
+    "steer": "rotate steer_FL/steer_FR about local Y (+ = turn toward +X/vehicle left), typical max +-35 deg; Ackermann: inner wheel more",
+    "spin": "rotate wheel_* about local X; angle = distance / 0.52 m (tyre radius)",
+    "articulate": "rotate trailer about local Y (its origin is exactly on the kingpin at the fifth-wheel plate top)",
+    "landing_gear": "translate landing_gear +Y by 0..0.25 m to retract the legs (pads off the ground)",
+    "wheelbase": {
+     "tractor_front_to_tandem_centre_m": 5.5,
+     "kingpin_to_trailer_tandem_centre_m": 13.075,
+     "track_front_m": 2.08
+    }
+   },
+   "node_notes": {
+    "tractor": "origin on the ground directly under the kingpin/fifth wheel (= rear tandem centre); drive node",
+    "trailer": "child of tractor; origin EXACTLY at the kingpin on the fifth-wheel plate top (y=1.22 m, 4.15 m behind the front of the overall origin): rotate about Y to articulate",
+    "landing_gear": "child of trailer; inner legs + sand pads; origin on the ground between the pads; translate +Y to raise",
+    "steer_FL/steer_FR": "children of tractor; Empty on the steering kingpin axis (x=+-0.90, at axle height 0.52 m), rotate about local Y to steer",
+    "wheel_FL/FR": "children of steer_FL/FR; origin exactly at the hub/axle centre, spin about local X",
+    "wheel_RL1/RR1/RL2/RR2": "tractor rear dual wheels, children of tractor, origin at axle centre, spin about local X",
+    "trailer_wheel_L1/R1/L2/R2": "trailer dual wheels, children of trailer, spin about local X",
+    "trailer_door_L/R": "children of trailer, origin on the outer hinge line at door bottom: rotate about Y to swing open (L: negative angle opens outward, R: positive)"
+   },
+   "animations": [],
+   "materials_toneMapped_false": [
+    "brand_blue",
+    "brand_cab_logo",
+    "brand_cab_spark",
+    "mark53",
+    "trailer_rear",
+    "trailer_side"
+   ],
+   "textures": 5,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "EXT_texture_webp",
+    "KHR_materials_emissive_strength",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": 0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 52,
+    "open_by_node": {
+     "tractor": 16,
+     "trailer": 16,
+     "trailer_door_L": 4,
+     "trailer_door_R": 16
+    },
+    "open_samples": [
+     [
+      -1.242,
+      -6.01,
+      1.99
+     ],
+     [
+      -1.242,
+      -6.525,
+      1.68
+     ],
+     [
+      -1.242,
+      -7.04,
+      1.99
+     ],
+     [
+      -1.242,
+      -6.525,
+      2.3
+     ],
+     [
+      -1.242,
+      -6.21,
+      3.17
+     ],
+     [
+      -1.242,
+      -6.52,
+      2.86
+     ],
+     [
+      -1.242,
+      -6.83,
+      3.17
+     ],
+     [
+      -1.242,
+      -6.52,
+      3.48
+     ]
+    ],
+    "ground_shift": -0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": null
+   },
+   "imgref": [
+    "02_exterior_docks_walmartcom_trailers.png",
+    "15_iso_dock_cutaway_trucks.jpg"
+   ],
+   "notes": null
+  },
+  {
+   "file": "worker.glb",
+   "bytes": 87096,
+   "bytes_raw": 1022320,
+   "tris": 9576,
+   "draw_calls": 10,
+   "size_m": [
+    0.539,
+    1.745,
+    0.342
+   ],
+   "bbox_min": [
+    -0.27,
+    0,
+    -0.164
+   ],
+   "bbox_max": [
+    0.27,
+    1.745,
+    0.178
+   ],
+   "facing": "+Z (face/toes toward +Z)",
+   "sides": null,
+   "hierarchy": "worker > worker_rig (Armature, 21 bones) > worker_body (SkinnedMesh, rigid 1-bone weights)",
+   "nodes": {
+    "head": [
+     0,
+     1.48,
+     0
+    ],
+    "neck": [
+     0,
+     1.36,
+     0
+    ],
+    "hand_L": [
+     0.235,
+     0.84,
+     0
+    ],
+    "forearm_L": [
+     0.222,
+     1.09,
+     0
+    ],
+    "upper_arm_L": [
+     0.2,
+     1.36,
+     0
+    ],
+    "hand_R": [
+     -0.235,
+     0.84,
+     0
+    ],
+    "forearm_R": [
+     -0.222,
+     1.09,
+     0
+    ],
+    "upper_arm_R": [
+     -0.2,
+     1.36,
+     0
+    ],
+    "chest": [
+     0,
+     1.2,
+     0
+    ],
+    "spine": [
+     0,
+     1.02,
+     0
+    ],
+    "foot_L": [
+     0.1,
+     0.095,
+     0
+    ],
+    "shin_L": [
+     0.1,
+     0.5,
+     0
+    ],
+    "thigh_L": [
+     0.1,
+     0.93,
+     0
+    ],
+    "foot_R": [
+     -0.1,
+     0.095,
+     0
+    ],
+    "shin_R": [
+     -0.1,
+     0.5,
+     0
+    ],
+    "thigh_R": [
+     -0.1,
+     0.93,
+     0
+    ],
+    "hips": [
+     0,
+     0.93,
+     0
+    ],
+    "worker_body": [
+     0,
+     0,
+     0
+    ],
+    "worker_rig": [
+     0,
+     0,
+     0
+    ],
+    "worker": [
+     0,
+     0,
+     0
+    ]
+   },
+   "anchors": null,
+   "rig": {
+    "bones": [
+     "hips",
+     "spine",
+     "chest",
+     "neck",
+     "head",
+     "upper_arm_L",
+     "forearm_L",
+     "hand_L",
+     "upper_arm_R",
+     "forearm_R",
+     "hand_R",
+     "thigh_L",
+     "shin_L",
+     "foot_L",
+     "thigh_R",
+     "shin_R",
+     "foot_R"
+    ],
+    "skinning": "every vertex weighted 1.0 to one bone (rigid toy segments) -> cheap, no candy-wrapping",
+    "Walk": "1.0 s loop (31 frames @30fps), in place; drive root at ~1.35 m/s (stride 0.67 m, 2 steps/cycle) to avoid foot slide",
+    "Idle": "2.0 s loop (61 frames @30fps): breathing, head look, arm sway",
+    "anim_qa": {
+     "walk_lowest_vertex_m": [
+      -0.0,
+      0.0
+     ],
+     "idle_lowest_vertex_m": [
+      -0.0,
+      -0.0
+     ]
+    }
+   },
+   "node_notes": {
+    "worker": "origin ground centre between feet",
+    "hips": "bone at y=0.93"
+   },
+   "animations": [
+    {
+     "name": "Walk",
+     "duration_s": 1.033
+    },
+    {
+     "name": "Idle",
+     "duration_s": 2.033
+    }
+   ],
+   "materials_toneMapped_false": [
+    "brand_blue"
+   ],
+   "textures": 0,
+   "extensions": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+   ],
+   "qa_blender": {
+    "min_z": -0.0,
+    "zfight_faces": 0,
+    "zfight_samples": [],
+    "open_edges": 0,
+    "open_by_node": {},
+    "open_samples": [],
+    "ground_shift": 0.0
+   },
+   "check_threejs": {
+    "pass": true,
+    "minY": 0,
+    "animMinY": {
+     "Walk": [
+      -0.0011,
+      0.0038
+     ],
+     "Idle": [
+      0.0002,
+      0.0002
+     ]
+    }
+   },
+   "imgref": [
+    "01_interior_dock_forklifts.jpg",
+    "14_iso_cutaway_orange_base.jpg"
+   ],
+   "notes": null
+  }
+ ]
+}

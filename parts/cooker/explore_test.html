@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset="utf-8"><title>explore test</title></head>
+<body style="margin:0;background:#cfd6de;overflow:hidden">
+<div id="wrap" style="position:relative;width:1280px;height:720px"></div>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as Signs from './signs.js';
+import * as Tour from './tour.js';
+const W = document.getElementById('wrap');
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(1280, 720); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace; W.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color(0xe9eef4);
+s.add(new THREE.HemisphereLight(0xf4f8ff, 0xb9c3cf, 1.25)); const d = new THREE.DirectionalLight(0xffffff, 1.6); d.position.set(60, 120, 80); s.add(d);
+const M = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 });
+const g = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M(0xc9ced4)); g.rotation.x = -Math.PI / 2; s.add(g);
+const fl = new THREE.Mesh(new THREE.BoxGeometry(100, 1.2, 62), M(0xdfe3e8)); fl.position.y = 0.6; s.add(fl);
+const box = (w, h, dd, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, dd), M(c)); m.position.set(x, y, z); s.add(m); return m; };
+box(100, 12, 0.4, 0xf2f3f5, 0, 7.2, -31); box(0.4, 12, 62, 0xf2f3f5, -50, 7.2, 0); box(100, 4.5, 0.4, 0xf2f3f5, 0, 3.45, 31); box(0.4, 4.5, 62, 0xf2f3f5, 50, 3.45, 0);
+for (let i = 0; i < 8; i++) for (let j = 0; j < 5; j++) box(1.2, 10, 24, 0x0071ce, -46 + i * 5.4, 6.2, 2); // racks
+box(26, 0.6, 3, 0x8f969f, 35, 6.2, -16.5); // sorter
+// dummy moving targets
+const cols = { gate: 0xffc220, yard: 0x041e42, receiving: 0xe8590c, reserve: 0x2f9e44, crossdock: 0x9c36b5, replen: 0x1971c2, pick: 0xf03e3e, sorter: 0x0c8599, wrap: 0xffc220, shipping: 0xe8590c, depart: 0x041e42 };
+const T = {};
+for (const [id, p] of Object.entries(Tour.STAGE_POS)) { if (id === 'home') continue; const m = box(2.2, 1.6, 3.2, cols[id] ?? 0x555555, p[0], p[1] + 0.8, p[2]); m.userData.base = p; T[id] = m; }
+let simT = 0;
+function moveTargets(dt) { simT += dt; let k = 0; for (const [id, m] of Object.entries(T)) { const b = m.userData.base, w = 0.25 + 0.03 * k++;
+  m.position.set(b[0] + 4 * Math.cos(simT * w) + (Math.random() - 0.5) * 0.3, b[1] + 0.8 + (Math.random() - 0.5) * 0.15, b[2] + 4 * Math.sin(simT * w) + (Math.random() - 0.5) * 0.3); m.rotation.y = -simT * w; } }
+const signs = Signs.create(s, { floorY: 1.2, ceiling: 12.6 });
+const cam = new THREE.PerspectiveCamera(28, 1280 / 720, 1, 3000); cam.position.set(118, 150, 205);
+const controls = new OrbitControls(cam, r.domElement); controls.target.set(-4, 0, 4); controls.enableDamping = true; controls.maxPolarAngle = 1.32; controls.minDistance = 8; controls.update();
+let captionText = ''; const ui = { setCaption: (t) => { captionText = t; } };
+const changes = [], caps = []; let stopped = 0;
+const getTarget = (id) => T[id] || (Tour.STAGE_POS[id] ? new THREE.Vector3(...Tour.STAGE_POS[id]) : null);
+const getFacts = (id) => [{ label: 'Active', value: String(3 + Math.floor(simT) % 4) }, { label: 'Cases/hr', value: (1200 + Math.floor(simT * 7) % 300).toLocaleString() }, { label: 'Stage', value: id }];
+// frame stepper with continuity metrics
+const trace = { n: 0, nan: false, maxD: 0, maxA: 0, prev: null, prevD: null, maxLookD: 0, prevL: null };
+function frame(dt, render) {
+  moveTargets(dt); controls.update(); Tour.update(dt); Tour.explore.update(dt); Signs.update(dt);
+  const p = cam.position.clone(), L = controls.target.clone();
+  if (![p.x, p.y, p.z, L.x, L.y, L.z, cam.quaternion.x, cam.quaternion.w].every(Number.isFinite)) trace.nan = true;
+  if (trace.prev) { const dv = p.clone().sub(trace.prev); trace.maxD = Math.max(trace.maxD, dv.length()); if (trace.prevD) { const a = dv.clone().sub(trace.prevD).length(); if (a > trace.maxA) { trace.maxA = a; trace.at = trace.n; } } trace.prevD = dv; }
+  if (trace.prevL) trace.maxLookD = Math.max(trace.maxLookD, L.distanceTo(trace.prevL));
+  trace.prev = p; trace.prevL = L; trace.n++;
+  if (render) r.render(s, cam);
+}
+window.__frames = (n, render = false) => { for (let i = 0; i < n; i++) frame(1 / 30, render && i === n - 1); return { ...Tour.explore.getState(), enabled: controls.enabled }; };
+window.__resetTrace = () => { const o = { nan: trace.nan, maxD: +trace.maxD.toFixed(3), maxA: +trace.maxA.toFixed(3), maxLookD: +trace.maxLookD.toFixed(3), n: trace.n, at: trace.at }; Object.assign(trace, { nan: false, maxD: 0, maxA: 0, maxLookD: 0, prevD: null, n: 0 }); return o; };
+window.__key = (key) => window.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+window.__wheelC = (dy) => { const e = new WheelEvent('wheel', { deltaY: dy, bubbles: true, cancelable: true }); W.dispatchEvent(e); return e.defaultPrevented; };
+window.__wheel = (dy) => { const e = new WheelEvent('wheel', { deltaY: dy, bubbles: true, cancelable: true }); r.domElement.dispatchEvent(e); return e.defaultPrevented; };
+window.__goTo = (id) => Tour.explore.goTo(id);
+window.__startExplore = () => { Tour.explore.start(cam, controls, { getTarget, getFacts, signs: Signs, ui, container: W }); };
+window.__info = () => ({ changes: changes.slice(), caption: captionText, stopped, hl: [...(signs.getSigns ? signs.getSigns().keys() : [])].length, dom: !!W.querySelector('.gf-explore'), dots: W.querySelectorAll('.gf-explore button').length, caps: caps.length, capStages: caps.map((c) => c.stage).join(','), fov: cam.fov });
+window.__startTour = () => Tour.start(cam, controls, getTarget, { ui, signs: Signs });
+window.__stopTour = () => Tour.stop();
+window.__stopExplore = () => Tour.explore.stop();
+window.__api = { tour: Object.keys(Tour), explore: Object.getOwnPropertyNames(Object.getPrototypeOf(Tour.explore)) };
+Tour.explore.onChange((e) => changes.push(e.id ?? ('released:' + e.released)));
+Tour.explore.onStop(() => stopped++);
+Tour.onCaption((c) => caps.push(c));
+r.render(s, cam);
+window.__ready = true;
+</script></body></html>

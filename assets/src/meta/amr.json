@@ -1,0 +1,38 @@
+{
+ "facing": "+Z (front bumper with the cyan strip; rear strip is red)",
+ "refs": [
+  "14_iso_cutaway_orange_base.jpg",
+  "18_topdown_warehouse_blue_stripe.jpg"
+ ],
+ "dims": {
+  "footprint_m": [
+   0.78,
+   0.98
+  ],
+  "body_height_m": 0.3,
+  "lift_stroke_m": 0.06
+ },
+ "hierarchy": "amr > body > {light_strip, lift_top, wheel_L, wheel_R, caster_FL > caster_wheel_FL, caster_FR > ..., caster_RL > ..., caster_RR > ...}",
+ "rig": {
+  "drive": "differential: spin wheel_L / wheel_R about local X (r=0.075 m); turn in place by spinning them opposite",
+  "casters": "caster_* swivel about local Y (origin on the swivel axis, 0.02 m trail); caster_wheel_* spin about local X (r=0.03 m)",
+  "lift_top": "translate +Y 0..0.06 m to lift a pod; rotate about Y to counter-rotate the pod while the robot spins",
+  "light_strip": "emissive (amr_led_cyan front/sides, amr_led_red rear); set toneMapped=false and pulse emissiveIntensity"
+ },
+ "nodes": {
+  "body": "chassis, origin ground centre",
+  "wheel_*": "origin on axle centre",
+  "lift_top": "origin at the lift base"
+ },
+ "qa": {
+  "min_z": -0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": 0.0
+ },
+ "blender_tris": 6180,
+ "file": "amr.glb"
+}

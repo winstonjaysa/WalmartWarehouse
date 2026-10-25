@@ -1,0 +1,67 @@
+<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><title>QA blocker checks B19-B25</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<pre id="out">running…</pre>
+<script type="module">
+import * as THREE from 'three';
+import { createReachTruck, createForklift, createAutoStacker, createWalkieStacker, createPallet, createSemiTruck, createTugTrain, createPalletJack, drive } from './models.js';
+const R = []; const ok = (id, pass, info) => R.push({ id, pass: !!pass, info });
+const W = new THREE.Vector3(), scene = new THREE.Scene();
+const stageInfo = (m) => { m.updateMatrixWorld(true); const P = m.userData.parts, car = P.carriage; const st = []; let o = P.innerMast; while (o) { st.push(o); o = o.children.find((c) => /^innerMast/.test(c.name)); }
+  const H0 = m.userData.parts.mast.getObjectByName('outerRail').geometry.parameters?.height; return { st, car }; };
+// ---- B19 reach truck 9.2 m
+{ const m = createReachTruck({ autoLift: false }); scene.add(m); const u = m.userData;
+  u.setForkHeight(9.2, true); m.updateMatrixWorld(true);
+  const outer = u.parts.mast, rails = []; outer.traverse((c) => { if (c.name === 'outerRail' || c.name === 'innerRail') rails.push(c); });
+  const railTop = Math.max(...rails.map((c) => new THREE.Box3().setFromObject(c).max.y));
+  const br = new THREE.Box3().setFromObject(u.parts.carriage.getObjectByName('backrest')).max.y;
+  // per-stage overlap: rail length inside the stage below
+  const stages = []; let o = u.parts.innerMast; while (o) { stages.push(o.position.y); o = o.children.find((c) => /^innerMast/.test(c.name)); }
+  const H0 = 4.0, overl = stages.map((y) => H0 - y);
+  ok('B19 maxForkHeight >= 9.2', u.maxForkHeight >= 9.2 && Math.abs(u.getForkHeight() - 9.2) < 1e-9, { maxForkHeight: u.maxForkHeight, h: u.getForkHeight(), forkBottomY: +u.getForkBottomY().toFixed(4) });
+  ok('B19 reaches beam 8.75 (+ entry clearance)', u.getForkBottomY() >= 8.75 + 0.05, { forkBottomY: +u.getForkBottomY().toFixed(3) });
+  ok('B19 carriage inside rails at full lift', br <= railTop + 1e-6 && overl.every((v) => v >= 0.4 - 1e-6), { backrestTop: +br.toFixed(3), railTop: +railTop.toFixed(3), stageOverlaps: overl.map((v) => +v.toFixed(3)) });
+}
+// ---- B20 trapezoid lift: |v| <= 0.5 m/s, exact landing, no exponential creep
+for (const [name, f] of [['forklift', createForklift], ['reachTruck', createReachTruck], ['autoStacker', createAutoStacker], ['walkieStacker', createWalkieStacker]]) {
+  const m = f({ autoLift: false }); const u = m.userData, dt = 1 / 60; const tgt = Math.min(1.6, u.maxForkHeight ?? 1.6); u.setForkHeight(0.0, true); u.setForkHeight(tgt);
+  let h = u.getForkHeight(), vmax = 0, amax = 0, aLand = 0, vPrev = 0, n = 0;
+  while (n++ < 2000) { u.update(dt, n * dt); const h2 = u.getForkHeight(), v = (h2 - h) / dt; vmax = Math.max(vmax, Math.abs(v)); const a = Math.abs(v - vPrev) / dt; vPrev = v; h = h2; if (u.isForkSettled()) { aLand = a; break; } amax = Math.max(amax, a); }
+  ok(`B20 ${name} lift profile`, vmax <= 0.5 + 1e-9 && h === tgt && amax <= 0.5 + 1e-6 && aLand <= 0.5 + 1e-6, { target: tgt, final: h, exact: h === tgt, seconds: +(n * dt).toFixed(2), vmax: +vmax.toFixed(4), amaxCruise: +amax.toFixed(3), landingFrameDecel: +aLand.toFixed(3), maxStepPerFrame60: +(vmax * dt).toFixed(4) });
+}
+// ---- B21 carried load seated on the tine tops (+ actual pallet deck-underside measured by ray)
+{ const pal = createPallet({ load: 'none' }); pal.updateMatrixWorld(true); const rc = new THREE.Raycaster(new THREE.Vector3(0.25, 0.06, 0), new THREE.Vector3(0, 1, 0));
+  const hits = rc.intersectObject(pal, true); const deckUnder = hits.length ? hits[0].point.y : null;
+  const rc2 = new THREE.Raycaster(new THREE.Vector3(0.25, 0.06, 0), new THREE.Vector3(0, -1, 0)); const h2 = rc2.intersectObject(pal, true); const bottomTop = h2.length ? h2[0].point.y : 0;
+  for (const vv of ['pine','steel','blueWood']) { const pp = createPallet({ load: 'none', variant: vv }); pp.updateMatrixWorld(true); const hh = new THREE.Raycaster(new THREE.Vector3(0.25, 0.052, 0.8), new THREE.Vector3(0, 0, -1)).intersectObject(pp, true); const hh2 = new THREE.Raycaster(new THREE.Vector3(0.25, 0.109, 0.8), new THREE.Vector3(0, 0, -1)).intersectObject(pp, true); ok(`B23 ${vv} pallet: tine path at entry height is clear`, !hh.length && !hh2.length, { hitsBottom: hh.length, hitsTop: hh2.length }); }
+  ok('B21 pallet pocket band (ray at fork x=0.25)', deckUnder !== null && Math.abs(deckUnder - 0.122) < 0.002, { deckUnderside: deckUnder && +deckUnder.toFixed(4), bottomBoardTop: +bottomTop.toFixed(4) });
+  for (const [name, f] of [['forklift', createForklift], ['reachTruck', createReachTruck], ['autoStacker', createAutoStacker]]) {
+    const m = f({ autoLift: false, load: true }); m.position.set(3, 0.4, -2); m.rotation.y = 0.7; scene.add(m); const u = m.userData; u.setForkHeight(1.0, true); m.updateMatrixWorld(true);
+    const L = u.parts.load, pb = L.getWorldPosition(W).y, top = u.getForkTopY(); const err = pb + 0.122 - top;
+    ok(`B21 ${name} load seated on tine top`, Math.abs(err) <= 0.002, { palletBottomY: +pb.toFixed(4), forkTopY: +top.toFixed(4), seatErr_m: +err.toFixed(4) });
+    u.setForkHeight(0, true); m.updateMatrixWorld(true); ok(`B21 ${name} laden min height keeps pallet off floor`, L.getWorldPosition(W).y >= m.position.y - 1e-6, { h: u.getForkHeight(), palletBottomRelVeh: +(L.getWorldPosition(W).y - m.position.y).toFixed(4) });
+    scene.remove(m);
+  }
+}
+// ---- B23 pocket entry + setForkBottomY round-trip in world space (vehicle elevated + yawed)
+for (const [name, f] of [['forklift', createForklift], ['reachTruck', createReachTruck], ['autoStacker', createAutoStacker], ['walkieStacker', createWalkieStacker]]) {
+  const m = f({ autoLift: false }); m.position.set(-4, 1.2, 5); m.rotation.y = -1.1; scene.add(m); const u = m.userData;
+  const pal = createPallet({}); pal.position.set(0, 1.3, 0); scene.add(pal); pal.updateMatrixWorld(true);
+  const py = u.getForkPocketY(pal); u.setForkBottomY(py, true); const fb = u.getForkBottomY(), ft = u.getForkTopY();
+  ok(`B23 ${name} pocket entry`, Math.abs(fb - py) < 1e-4 && fb - 1.3 >= 0.022 + 0.02 && ft - 1.3 <= 0.122 - 0.01, { pocketY: +py.toFixed(4), forkBottomY: +fb.toFixed(4), forkTopY: +ft.toFixed(4), clearBelow: +(fb - 1.3 - 0.022).toFixed(4), clearAbove: +(1.3 + 0.122 - ft).toFixed(4) });
+  u.setForkTopY(u.seatForkTopY(2.0), true); ok(`B23 ${name} seat helper`, Math.abs(u.getForkTopY() - 2.122) < 1e-4, { forkTopY: +u.getForkTopY().toFixed(4) }); scene.remove(m, pal);
+}
+// ---- B25 per-wheel Ackermann, rearSteer flag, rate-limited setSteer
+for (const [name, f, rear] of [['forklift', createForklift, true], ['reachTruck', createReachTruck, true], ['autoStacker', createAutoStacker, true], ['semiTruck', createSemiTruck, false], ['tugTrain', createTugTrain, false], ['palletJack', createPalletJack, true]]) {
+  const m = f({ autoLift: false }); const u = m.userData, dt = 1 / 60;
+  u.setSteer(0, true); u.setSteer(0.5); u.update(dt, 0); const s1 = u.steer; let n = 1; while (u.steer !== u.steerTarget && n < 600) { u.update(dt, n * dt); n++; }
+  const ack = u.ackermann(0.4); u.setSteer(0.4, true); const got = u.getWheelSteer();
+  const multi = ack.angles.length >= 2, ackOK = !multi || (Math.abs(ack.inner) > Math.abs(ack.outer) + 1e-4 && got.every((a, i) => Math.abs(a - ack.angles[i]) < 1e-9));
+  ok(`B25 ${name} steer`, u.rearSteer === rear && Math.abs(s1 - u.steerRate * dt) < 1e-9 && ackOK, { rearSteer: u.rearSteer, steerRate: u.steerRate, firstStep: +s1.toFixed(5), framesTo0p5: n, ackermann04: { inner: +ack.inner.toFixed(4), outer: +ack.outer.toFixed(4) }, wheels: got.map((a) => +a.toFixed(4)) });
+}
+// drive() follows the rate-limited wheel angle (no instantaneous steer jumps)
+{ const m = createForklift({ autoLift: false }); const u = m.userData; let maxD = 0, prev = u.steer; for (let i = 0; i < 120; i++) { drive(m, 1 / 60, 1.0, i < 60 ? 0.7 : -0.7); maxD = Math.max(maxD, Math.abs(u.steer - prev)); prev = u.steer; }
+  ok('B25 drive() steer slew', maxD <= u.steerRate / 60 + 1e-9, { maxSteerStepPerFrame: +maxD.toFixed(5), limit: +(u.steerRate / 60).toFixed(5) }); }
+const fails = R.filter((x) => !x.pass).length;
+document.getElementById('out').textContent = R.map((x) => `${x.pass ? 'PASS' : 'FAIL'} ${x.id} ${JSON.stringify(x.info)}`).join('\n') + `\nTOTAL ${R.length} FAIL ${fails}`;
+window.__qa = { R, fails, done: true };
+</script>

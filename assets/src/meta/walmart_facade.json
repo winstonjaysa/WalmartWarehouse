@@ -1,0 +1,84 @@
+{
+ "facing": "+Z = street/parking side; the wall back face is 0.4 m behind the origin (toward -Z)",
+ "refs": [
+  "05_facade_logo_parking.jpg",
+  "16_supercentre_facade.webp",
+  "17_supercentre_entrance_bollards.jpg"
+ ],
+ "dims": {
+  "wall_m": [
+   32.0,
+   12.0,
+   0.4
+  ],
+  "tower_m": [
+   4.199999999999999,
+   13.5,
+   0.7
+  ],
+  "entrance_glazing_m": [
+   6.0,
+   4.5
+  ],
+  "canopy_depth_m": 3.0
+ },
+ "hierarchy": "walmart_facade > {facade, bollards}",
+ "nodes": {
+  "facade": "tilt-up panel wall with base band, joints, blue spark tower (logo decal), blue band, glazed entrance, canopy, Pickup sign, W06 service door; origin at ground on the front wall line, centre",
+  "bollards": "9 yellow bollards 1.05 m in front of the canopy"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 12,
+  "open_by_node": {
+   "facade": 12
+  },
+  "open_samples": [
+   [
+    -10.3,
+    -0.306,
+    8.875
+   ],
+   [
+    -8.5,
+    -0.306,
+    6.4
+   ],
+   [
+    -6.7,
+    -0.306,
+    8.875
+   ],
+   [
+    -8.5,
+    -0.306,
+    11.35
+   ],
+   [
+    12.8,
+    -0.123,
+    6.925
+   ],
+   [
+    14.0,
+    -0.123,
+    6.53
+   ],
+   [
+    15.2,
+    -0.123,
+    6.925
+   ],
+   [
+    14.0,
+    -0.123,
+    7.32
+   ]
+  ],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 5206,
+ "file": "walmart_facade.glb"
+}

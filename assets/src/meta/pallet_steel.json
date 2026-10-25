@@ -1,0 +1,20 @@
+{
+ "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+ "refs": [
+  "12_pallet_blue_steel.jpg"
+ ],
+ "nodes": {
+  "pallet": "single merged mesh, origin ground centre; static prop: no moving parts"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 3852,
+ "file": "pallet_steel.glb"
+}

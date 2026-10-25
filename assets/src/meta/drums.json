@@ -1,0 +1,22 @@
+{
+ "facing": "symmetric (rotate freely about Y); drums sit along X, 0.66 m apart",
+ "refs": [
+  "14_iso_cutaway_orange_base.jpg",
+  "15_iso_dock_cutaway_trucks.jpg"
+ ],
+ "hierarchy": "drums > {drum_blue, drum_green, drum_yellow}",
+ "nodes": {
+  "drum_blue/green/yellow": "one 205 L drum each, 0.58 m dia x 0.88 m, two red bands; origin at the bottom centre on the ground (clone + reposition individually)"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 11040,
+ "file": "drums.glb"
+}

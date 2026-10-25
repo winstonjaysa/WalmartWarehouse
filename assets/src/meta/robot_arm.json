@@ -1,0 +1,35 @@
+{
+ "facing": "+Z (forearm reaches toward +Z at rest)",
+ "refs": [
+  "14_iso_cutaway_orange_base.jpg"
+ ],
+ "dims": {
+  "height_m": 1.54,
+  "reach_m": 0.75,
+  "shoulder_y_m": 0.66,
+  "elbow_y_m": 1.41
+ },
+ "hierarchy": "robot_arm > {arm_pedestal, arm_base > arm_j1 > arm_j2 > arm_j3 > gripper > {finger_L, finger_R}}",
+ "rig": {
+  "arm_base": "yaw about local Y; origin on the vertical axis at y=0.38 (top of pedestal)",
+  "arm_j1": "shoulder pitch about local X; origin on the shoulder axis (0, 0.66, 0)",
+  "arm_j2": "elbow pitch about local X; origin on the elbow axis (0, 1.41, 0)",
+  "arm_j3": "wrist pitch about local X; origin on the wrist axis (0, 1.41, 0.75)",
+  "gripper": "roll about local Y; origin at the tool flange (0, 1.25, 0.75)",
+  "finger_L/R": "translate along local X: open +-0.03 m (L +X, R -X); origin at the finger root"
+ },
+ "nodes": {
+  "arm_pedestal": "static"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 8352,
+ "file": "robot_arm.glb"
+}

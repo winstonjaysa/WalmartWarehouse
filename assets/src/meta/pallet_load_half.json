@@ -1,0 +1,23 @@
+{
+ "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+ "refs": [
+  "14_iso_cutaway_orange_base.jpg"
+ ],
+ "nodes": {
+  "pallet": "pallet (merged), origin ground centre",
+  "load": "cartons + tape + labels (merged); hide/show to load/unload",
+  "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+ },
+ "note": "half-height load on a blue (CHEP-style) pallet, 2 layers, wrapped; total ~0.83 m",
+ "height_m": 0.825,
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "ground_shift": -0.0
+ },
+ "blender_tris": 5612,
+ "file": "pallet_load_half.glb"
+}

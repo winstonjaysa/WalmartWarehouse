@@ -1,0 +1,41 @@
+{
+ "facing": "+Z = aisle (pick) face; beams run along X",
+ "refs": [
+  "06_aisle_blue_racks.jpg",
+  "07_overhead_aisle_wire_decks.jpg",
+  "03_interior_orange_racks_mezzanine.jpg"
+ ],
+ "hierarchy": "rack_bay > {upright_frame_L, upright_frame_R, beam_level_1, beam_level_2, beam_level_3}",
+ "dims": {
+  "clear_span_m": 2.7,
+  "overall_width_m": 2.88,
+  "frame_depth_m": 1.07,
+  "frame_height_m": 6.0,
+  "beam_tops_m": [
+   1.6,
+   3.1,
+   4.6
+  ],
+  "bay_pitch_m": 2.79,
+  "pallets_per_level": "2 x 1.2 m (1.0 m deep) pallets"
+ },
+ "rig": {
+  "tiling": "for a run of N bays, clone the whole bay every 2.79 m along X and hide upright_frame_R on all but the last bay (frames are shared)",
+  "levels": "beam_level_* origins are at the beam top (pallet seat) height on the bay centre-line; translate Y to re-space levels"
+ },
+ "nodes": {
+  "upright_frame_L/R": "two uprights + Z-bracing + base plates + yellow column guards; origin at the frame centre on the ground",
+  "beam_level_N": "front+back orange step beams with connectors and a galvanised wire deck; origin at the beam top"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 5688,
+ "file": "rack_bay.glb"
+}

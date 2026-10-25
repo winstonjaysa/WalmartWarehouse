@@ -1,0 +1,37 @@
+{
+ "anchors": {
+  "anchor_tiller_grip": "centre of the tiller loop grip (hand point), child of tiller_handle so it follows steer + pump arc"
+ },
+ "facing": "+Z (fork tips point toward +Z; the operator pulls from the tiller at -Z)",
+ "refs": [
+  "20_hand_pallet_pump_truck.jpg",
+  "01_interior_dock_forklifts.jpg",
+  "10_pallet_wood_stacked.jpg"
+ ],
+ "sides": "L = +X, R = -X (looking along the forks)",
+ "hierarchy": "pallet_jack > body > {wheel_load_L, wheel_load_R, tiller > {tiller_frame, tiller_handle, wheel_steer_L, wheel_steer_R}}",
+ "rig": {
+  "steer": "rotate tiller about local Y (+-90 deg); its origin is ON the steer axis at the steer-wheel axle centre (x=0, y=0.10, z=-0.32 glTF), so the handle and both steer wheels swing together",
+  "handle": "rotate tiller_handle about local X: 0 = 12 deg back (rest/towing); -60..+15 deg pumping arc",
+  "spin": "rotate wheel_* about local X; steer wheels r=0.10 m, load rollers r=0.04 m",
+  "lift": "translate body +Y 0..0.115 m (lowered 0.085 -> raised 0.200 m fork top) while keeping wheels on the floor (move the wheel nodes -Y by the same amount)"
+ },
+ "nodes": {
+  "body": "forks 1.15 x 0.54 m overall (two 0.16 m channels), heel, back plate; origin on the ground at the fork heel centre",
+  "tiller": "Empty on the steer axis at axle height",
+  "tiller_frame": "pump, turntable, wheel yoke (turns with steering)",
+  "tiller_handle": "handle, origin at the hinge pin (0.62 m)",
+  "wheel_*": "origin on the axle centre"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 3560,
+ "file": "pallet_jack.glb"
+}

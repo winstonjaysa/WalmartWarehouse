@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>camera.js test</title><link rel="icon" href="data:,">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--panel:rgba(255,255,255,.72);--panel-inset:rgba(4,30,66,.04);--border:rgba(4,30,66,.09);--text:#0b1526;--text-2:#4a5568;--muted-bg:rgba(4,30,66,.06);
+ --blur:saturate(170%) blur(18px);--shadow:0 1px 2px rgba(4,30,66,.05),0 8px 24px -6px rgba(4,30,66,.12);--font:system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace;--brand:#0071CE}
+html,body{margin:0;height:100%;overflow:hidden;background:#e9eef5;font-family:var(--font)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#viewDock{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:6px;border-radius:14px;
+ background:var(--panel);backdrop-filter:var(--blur);border:1px solid var(--border);box-shadow:var(--shadow)}
+#viewDock .seg button{height:30px;min-width:44px;border:0;border-radius:7px;background:transparent;font-weight:600;color:var(--text-2);cursor:pointer}
+#viewDock .seg button[aria-checked="true"]{background:var(--brand);color:#fff}
+#readout{position:fixed;left:16px;top:16px;padding:8px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--border);font:600 13px var(--mono);color:var(--text)}
+</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="readout">dist —</div>
+<nav id="viewDock" aria-label="View controls"><div class="seg" role="radiogroup" aria-label="View mode">
+ <button type="button" role="radio" aria-checked="false" data-v="2d">2D</button><button type="button" role="radio" aria-checked="true" data-v="3d">3D</button></div></nav>
+<script type="module">
+import * as THREE from 'three';
+import * as Cam from './camera.js';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe9eef5);
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(30, 50, 20); scene.add(sun);
+const grid = new THREE.GridHelper(120, 60, 0x9aa8bc, 0xc6cfdc); scene.add(grid);
+const racks = [];
+const mat = new THREE.MeshStandardMaterial({ color: 0x0071ce, roughness: .6 }), mat2 = new THREE.MeshStandardMaterial({ color: 0xffc220, roughness: .5 });
+for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) {
+  const g = new THREE.Group(); g.name = `rack-${r}-${c}`;
+  const box = new THREE.Mesh(new THREE.BoxGeometry(2, 4 + (c % 3), 6), (r + c) % 4 ? mat : mat2);
+  box.position.y = box.geometry.parameters.height / 2; g.add(box);
+  g.position.set((c - 2.5) * 6, 0, (r - 1.5) * 10); scene.add(g); racks.push(g);
+}
+const cam = Cam.create({ camera, domElement: renderer.domElement, scene,
+  home: { position: new THREE.Vector3(40, 35, 45), target: new THREE.Vector3(0, 0, 0) }, pickables: racks });
+window.cam = cam; window.racks = racks; window.THREE = THREE; window.camera = camera;
+document.querySelectorAll('#viewDock .seg button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('#viewDock .seg button').forEach((x) => x.setAttribute('aria-checked', x === b));
+  cam.setMode(b.dataset.v);
+}));
+const readout = document.getElementById('readout');
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+let last = performance.now();
+renderer.setAnimationLoop((t) => {
+  const dt = (t - last) / 1000; last = t;
+  Cam.update(dt);
+  readout.textContent = `dist ${cam.getDistance().toFixed(2)} · ${cam.getMode()}`;
+  renderer.render(scene, camera);
+});
+window.__ready = true;
+</script></body></html>

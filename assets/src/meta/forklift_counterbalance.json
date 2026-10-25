@@ -1,0 +1,42 @@
+{
+ "anchors": {
+  "anchor_seat": "seat cushion top centre (operator hip point), child of body; face +Z"
+ },
+ "facing": "+Z (forks point toward +Z in glTF / three.js)",
+ "refs": [
+  "13_forklift_detail.jpg",
+  "08_forklift_racks_render.jpg",
+  "14_iso_cutaway_orange_base.jpg"
+ ],
+ "sides": "L/R are the vehicle's own left/right: L = +X, R = -X (vehicle faces +Z)",
+ "hierarchy": "forklift_counterbalance > body > {beacon, wheel_FL, wheel_FR, steer_RL > wheel_RL, steer_RR > wheel_RR, mast_tilt > mast_outer > mast_inner > fork_carriage > {fork_L, fork_R}}",
+ "rig": {
+  "drive": "move/rotate body (or root); front axle (drive, y=-0.45 m in Blender = z +0.45 in glTF) is the fixed axle, rear axle steers (wheelbase 1.27 m)",
+  "steer": "rotate steer_RL/steer_RR about local Y, up to +-75 deg (rear-steer: positive yaw turns the truck the opposite way)",
+  "spin": "rotate wheel_* about local X; front r=0.32 m, rear r=0.26 m",
+  "tilt": "rotate mast_tilt about local X: about -3 deg (forward) .. +6 deg (back)",
+  "lift": "stage 1: translate fork_carriage +Y 0..1.0 m inside mast_inner (free lift); stage 2: translate mast_inner +Y 0..1.9 m (carriage rides along). Max fork height ~3.0 m"
+ },
+ "nodes": {
+  "body": "static chassis, counterweight, overhead guard, seat, LPG tank; parent of all moving parts",
+  "mast_tilt": "Empty at the mast base hinge (x=0, y=0.12 m, z=+0.84 m glTF); rotate about X to tilt; parents mast_outer",
+  "steer_RL/steer_RR": "Empty on each rear kingpin (x=+-0.33, axle height 0.26 m); rotate about Y to steer; parent of wheel_RL/RR",
+  "beacon": "emissive orange dome, origin at its base on the rear roof rail (blink / scale)",
+  "wheel_FL/FR/RL/RR": "origin exactly at axle centre, spin about local X (RL/RR are children of steer_RL/RR)",
+  "mast_outer": "child of mast_tilt, origin coincident with the tilt hinge; fixed outer stage",
+  "mast_inner": "child of mast_outer, origin at its base; translate +Y up to ~1.9 m (telescoping stage)",
+  "fork_carriage": "child of mast_inner, origin at carriage bottom; translate +Y (lift)",
+  "fork_L/fork_R": "children of fork_carriage, origin at fork heel; translate X for side-shift / spread"
+ },
+ "qa": {
+  "min_z": -0.00807,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": 0.00807
+ },
+ "blender_tris": 24528,
+ "file": "forklift_counterbalance.glb"
+}

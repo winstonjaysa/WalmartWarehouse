@@ -1,0 +1,334 @@
+{
+ "walmart_truck": {
+  "size": [
+   null,
+   4.15,
+   22.0
+  ],
+  "nodes": [
+   "walmart_truck",
+   "tractor",
+   "trailer",
+   "wheel_FL",
+   "wheel_FR",
+   "wheel_RL1",
+   "wheel_RR1",
+   "wheel_RL2",
+   "wheel_RR2",
+   "trailer_wheel_L1",
+   "trailer_wheel_R1",
+   "trailer_wheel_L2",
+   "trailer_wheel_R2",
+   "trailer_door_L",
+   "trailer_door_R",
+   "steer_FL",
+   "steer_FR",
+   "landing_gear",
+   "anchor_seat"
+  ]
+ },
+ "forklift_counterbalance": {
+  "size": [
+   null,
+   2.2,
+   3.5
+  ],
+  "nodes": [
+   "forklift_counterbalance",
+   "body",
+   "beacon",
+   "wheel_FL",
+   "wheel_FR",
+   "wheel_RL",
+   "wheel_RR",
+   "mast_outer",
+   "mast_inner",
+   "fork_carriage",
+   "fork_L",
+   "fork_R",
+   "steer_RL",
+   "steer_RR",
+   "mast_tilt",
+   "anchor_seat"
+  ]
+ },
+ "pallet_stacker_auto": {
+  "nodes": [
+   "pallet_stacker_auto",
+   "body",
+   "light_strip",
+   "lidar",
+   "steer_drive",
+   "wheel_drive",
+   "caster_L",
+   "caster_R",
+   "wheel_caster_L",
+   "wheel_caster_R",
+   "mast_outer",
+   "mast_inner",
+   "fork_carriage",
+   "anchor_tiller_grip"
+  ]
+ },
+ "amr": {
+  "nodes": [
+   "caster_wheel_FL",
+   "caster_FL",
+   "caster_wheel_FR",
+   "caster_FR",
+   "caster_wheel_RL",
+   "caster_RL",
+   "caster_wheel_RR",
+   "caster_RR",
+   "lift_top",
+   "light_strip",
+   "wheel_L",
+   "wheel_R",
+   "body",
+   "amr"
+  ]
+ },
+ "cage": {
+  "nodes": [
+   "gate",
+   "cage_body",
+   "cage"
+  ]
+ },
+ "case_stack_loose": {
+  "nodes": [
+   "cases",
+   "case_stack_loose"
+  ]
+ },
+ "dock_door": {
+  "nodes": [
+   "door_roll",
+   "leveler_lip",
+   "dock_frame",
+   "dock_door"
+  ],
+  "size": [
+   4.2,
+   5.0,
+   null
+  ]
+ },
+ "drums": {
+  "nodes": [
+   "drum_blue",
+   "drum_green",
+   "drum_yellow",
+   "drums"
+  ],
+  "size": [
+   null,
+   0.88,
+   0.58
+  ]
+ },
+ "pallet_bluewood": {
+  "nodes": [
+   "pallet_bluewood",
+   "pallet"
+  ],
+  "size": [
+   1.2,
+   0.144,
+   1.0
+  ]
+ },
+ "pallet_jack": {
+  "nodes": [
+   "tiller_frame",
+   "tiller_handle",
+   "wheel_steer_L",
+   "wheel_steer_R",
+   "tiller",
+   "wheel_load_L",
+   "wheel_load_R",
+   "body",
+   "pallet_jack",
+   "anchor_tiller_grip"
+  ]
+ },
+ "pallet_load_half": {
+  "nodes": [
+   "film",
+   "load",
+   "pallet",
+   "pallet_load_half"
+  ]
+ },
+ "pallet_load_partial": {
+  "nodes": [
+   "load",
+   "pallet",
+   "pallet_load_partial"
+  ]
+ },
+ "pallet_load_wrapped": {
+  "nodes": [
+   "film",
+   "load",
+   "pallet",
+   "pallet_load_wrapped"
+  ],
+  "size": [
+   null,
+   1.5,
+   null
+  ]
+ },
+ "pallet_pine": {
+  "nodes": [
+   "pallet_pine",
+   "pallet"
+  ],
+  "size": [
+   1.2,
+   0.144,
+   1.0
+  ]
+ },
+ "pallet_steel": {
+  "nodes": [
+   "pallet_steel",
+   "pallet"
+  ],
+  "size": [
+   1.2,
+   0.144,
+   1.0
+  ]
+ },
+ "rack_bay": {
+  "nodes": [
+   "beam_level_1",
+   "beam_level_2",
+   "beam_level_3",
+   "upright_frame_L",
+   "upright_frame_R",
+   "rack_bay"
+  ],
+  "size": [
+   null,
+   6.0,
+   null
+  ]
+ },
+ "reach_truck": {
+  "nodes": [
+   "beacon",
+   "wheel_caster",
+   "caster",
+   "fork_carriage",
+   "mast_inner",
+   "mast_outer",
+   "reach_base",
+   "reach",
+   "wheel_drive",
+   "steer_drive",
+   "wheel_LL",
+   "wheel_LR",
+   "body",
+   "reach_truck",
+   "anchor_stand"
+  ]
+ },
+ "robot_arm": {
+  "nodes": [
+   "finger_L",
+   "finger_R",
+   "gripper",
+   "arm_j3",
+   "arm_j2",
+   "arm_j1",
+   "arm_base",
+   "arm_pedestal",
+   "robot_arm"
+  ]
+ },
+ "tug_cart_train": {
+  "nodes": [
+   "cart1_hitch",
+   "cart1_eye",
+   "cart1_drawbar",
+   "cart1_wheel_FL",
+   "cart1_wheel_FR",
+   "cart1_steer",
+   "cart1_wheel_RL",
+   "cart1_wheel_RR",
+   "cart1_body",
+   "cart2_hitch",
+   "cart2_eye",
+   "cart2_drawbar",
+   "cart2_wheel_FL",
+   "cart2_wheel_FR",
+   "cart2_steer",
+   "cart2_wheel_RL",
+   "cart2_wheel_RR",
+   "cart2_body",
+   "cart3_hitch",
+   "cart3_eye",
+   "cart3_drawbar",
+   "cart3_wheel_FL",
+   "cart3_wheel_FR",
+   "cart3_steer",
+   "cart3_wheel_RL",
+   "cart3_wheel_RR",
+   "cart3_body",
+   "tug_beacon",
+   "tug_hitch",
+   "tug_wheel_FL",
+   "tug_steer_FL",
+   "tug_wheel_FR",
+   "tug_steer_FR",
+   "tug_wheel_RL",
+   "tug_wheel_RR",
+   "tug",
+   "tug_cart_train",
+   "anchor_seat"
+  ]
+ },
+ "walmart_facade": {
+  "nodes": [
+   "bollards",
+   "facade",
+   "walmart_facade"
+  ]
+ },
+ "worker": {
+  "nodes": [
+   "head",
+   "neck",
+   "hand_L",
+   "forearm_L",
+   "upper_arm_L",
+   "hand_R",
+   "forearm_R",
+   "upper_arm_R",
+   "chest",
+   "spine",
+   "foot_L",
+   "shin_L",
+   "thigh_L",
+   "foot_R",
+   "shin_R",
+   "thigh_R",
+   "hips",
+   "worker_body",
+   "worker_rig",
+   "worker"
+  ],
+  "animations": [
+   "Walk",
+   "Idle"
+  ],
+  "size": [
+   null,
+   1.75,
+   null
+  ]
+ }
+}

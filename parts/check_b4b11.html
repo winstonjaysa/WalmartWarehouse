@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="icon" href="data:,">
+<script type="importmap">{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }</script></head><body>
+<script type="module">
+window.__errors = []; addEventListener('error', (e) => window.__errors.push(String(e.message)));
+import * as THREE from 'three';
+import { MODELS } from './models.js';
+const R = []; const ok = (n, c, d) => R.push((c ? 'PASS ' : 'FAIL ') + n + ' ' + JSON.stringify(d));
+const box = (o) => new THREE.Box3().setFromObject(o);
+for (const n of ['autoStacker', 'walkieStacker', 'forklift', 'reachTruck']) {
+  const g = MODELS[n](); g.updateMatrixWorld(true); const P = g.userData.parts, ud = g.userData;
+  const stages = P.innerStages || (() => { const a = []; let s = P.innerMast; while (s) { a.push(s); s = s.children.find((c) => c.name.startsWith('innerMast')); } return a; })();
+  ud.setForkHeight ? ud.setForkHeight(99, true) : ud.setLift?.(1); for (let i = 0; i < 2000; i++) ud.update(1 / 30, i / 30); g.updateMatrixWorld(true);
+  const rails = (o) => o.children.filter((c) => /Rail$/.test(c.name) && c.name !== 'outerRailX');
+  const top = stages[stages.length - 1], tr = box(rails(top)[0]), car = P.carriage, cb = box(car.getObjectByName('backrest')), cp = box(car.getObjectByName('carriagePlate'));
+  const ov = []; let par = P.mast; for (const s of stages) { const pb = box(rails(par)[0]), sb = box(rails(s)[0]); ov.push(+(Math.min(pb.max.y, sb.max.y) - Math.max(pb.min.y, sb.min.y)).toFixed(3)); par = s; }
+  const forkH = ud.getForkHeight?.() ?? null;
+  ok(`B4 ${n} stages`, stages.length >= 1, { stages: stages.length, forkH });
+  ok(`B4 ${n} stage overlap>=0.35m at max`, Math.min(...ov) >= 0.35, { overlaps: ov });
+  ok(`B4 ${n} carriage on top-stage rails at max`, cp.min.y >= tr.min.y - 0.01 && cp.max.y <= tr.max.y + 0.01, { plate: [+cp.min.y.toFixed(3), +cp.max.y.toFixed(3)], rail: [+tr.min.y.toFixed(3), +tr.max.y.toFixed(3)], backrestTop: +cb.max.y.toFixed(3) });
+}
+// B11 semi livery
+const s = MODELS.semiTruck(); s.updateMatrixWorld(true); const names = {}; s.traverse((o) => { if (o.name) names[o.name] = (names[o.name] || 0) + 1; });
+const cab = s.getObjectByName('cabBody'), cm = cab.material; ok('B11 cab livery blue #0071CE, toneMapped false', cm.color.getHex() === 0x0071ce && cm.toneMapped === false, { hex: cm.color.getHexString(), tm: cm.toneMapped });
+ok('B11 door spark x2', names.doorSpark === 2, names.doorSpark); ok('B11 door wordmark x2', names.doorWordmark === 2, names.doorWordmark);
+const dm = []; s.traverse((o) => { if (/door(Spark|Wordmark)|cabWordmark/.test(o.name)) dm.push(o.material.toneMapped); }); ok('B11 brand decals toneMapped false', dm.every((x) => x === false), dm);
+const fails = R.filter((r) => r.startsWith('FAIL')).length; R.push(`TOTAL ${R.length} FAIL ${fails} ERRS ${JSON.stringify(window.__errors)}`); window.__res = R.join('\n');
+</script></body></html>

@@ -1,0 +1,18 @@
+<!doctype html><html><body style="margin:0;background:#cfd6de">
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as Signs from './signs.js';
+const r=new THREE.WebGLRenderer({antialias:true});r.setSize(1280,720);r.toneMapping=THREE.ACESFilmicToneMapping;r.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(r.domElement);
+const s=new THREE.Scene();s.background=new THREE.Color(0xdfe6ee);
+s.add(new THREE.HemisphereLight(0xffffff,0x8899aa,1.2));const d=new THREE.DirectionalLight(0xffffff,1.6);d.position.set(30,60,40);s.add(d);
+const f=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshStandardMaterial({color:0xcfd3d8,roughness:.9}));f.rotation.x=-Math.PI/2;f.position.y=1.2;s.add(f);
+const mode=new URLSearchParams(location.search).get('v')||'a';
+const sys=Signs.create(s,{floorY:1.2,ceiling:12.6});
+Signs.addSign('TEST BACK',[0,7.2,0],0,{sub:'BACK SIDE CHECK'});
+for(let i=0;i<60;i++)Signs.update(1/30);
+const c=new THREE.PerspectiveCamera(45,16/9,0.1,500);
+const views={a:[[-26,9,48],[-26,6,15]],b:[[0,7.2,-14],[0,7.2,0]],c:[[0,7.2,14],[0,7.2,0]],d:[[-30,6,24],[-30,4.5,31]],e:[[30,30,-50],[20,6,-15]],g:[[85,8,85],[90,4,55]]};
+const [p,t]=views[mode];c.position.set(...p);c.lookAt(...t);r.render(s,c);
+window.__info={n:sys.getSigns().size,dims:[...sys.getSigns()].slice(0,3).map(([k,g])=>[k,g.userData.width.toFixed(2),g.userData.height.toFixed(2)]),api:Object.keys(Signs)};window.__ready=true;
+</script></body></html>

@@ -1,0 +1,14 @@
+node_modules/
+qa/tools/node_modules/
+qa/runs/
+qa/snapshots/
+qa/patched/
+frames/
+preview/frames/
+r3/
+li/
+z/
+*.mp4
+!parts/motion_demo.mp4
+*.blend1
+__pycache__/

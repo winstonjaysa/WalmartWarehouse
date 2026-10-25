@@ -1,0 +1,15 @@
+PASS lowered fork top 0.085 0.085
+PASS pump(3,0.1) raises 0.1 {"rise":0.09999999999999999,"strokes":3,"minAngle":-1.23}
+PASS pump done ""
+PASS lift capped 0.12 0.12
+PASS release lowers to 0 {"lift":0,"lever":0.43770432489871836}
+PASS tiller+wheels yaw together -0.6
+PASS grip anchor [0.117,1.241,-0.671]
+PASS palletJack alias compat ""
+PASS rollers spin ""
+PASS tote stackHeight {"sh":0.379,"np":0.09,"size":{"x":0.462,"y":0.379,"z":0.6920000000000001}}
+PASS tote flat bottom y=0 -1.1920930909070648e-10
+PASS getToteGeometry cached ""
+PASS instanced 3
+PASS crate variant compat ""
+TOTAL 14 FAIL 0 ERRS []

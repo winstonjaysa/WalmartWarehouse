@@ -1,0 +1,80 @@
+<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><title>model checks</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<pre id="out">running…</pre>
+<script type="module">
+// Automated geometry checks for every MODELS entry: ground contact, size, pivots, wheel/axle centring, NaN normals, degenerate parts.
+import * as THREE from 'three';
+import { MODELS, SIZES, drive } from './models.js';
+// driven phase: wheels rolled to arbitrary angles, so the 64-facet lathe tyre's lowest vertex can sit up to r(1-cos(pi/64)) above y=0
+const facetTol = (m) => { let t = 0; m.traverse((o) => { if (o.userData.radius) t = Math.max(t, o.userData.radius * (1 - Math.cos(Math.PI / 64))); }); return EPS + t; };
+const EPS = 1e-4, demo = { semiTruck: { speed: 3 }, forklift: { autoLift: true, load: true }, autoStacker: { autoLift: true, load: true }, worker: { walking: true }, workerBlue: { walking: true }, conveyor: { totes: 3 } };
+const PIVOTS = /^(steerTiller|tiller|steerLeft|steerRight|trailer|landingGear|outerMast|innerMast|baseYaw|shoulder|elbow|wrist|gripper|mastPivot|mast|outer|inner|innerChannel|carriage|liftFrame|liftPlate|handle|tiller|legLeft|legRight|armLeft|armRight|head|roller|curtain|fanBlades|blades|crown|pod|dropGate|turntable)$/;
+const r = (v) => +v.toFixed(4), v3 = (p) => [r(p.x), r(p.y), r(p.z)];
+const res = [];
+// precise world box of *rendered* geometry only (hidden objects, e.g. slats parked inside the door hood, are skipped)
+function visBox(root) { const b = new THREE.Box3(), t = new THREE.Box3();
+  root.traverseVisible((c) => { if (c.isMesh || c.isLine || c.isPoints) { const kids = c.children; c.children = []; t.setFromObject(c, true); c.children = kids; b.union(t); } }); return b; }
+function inspect(name, m, phase) {
+  m.updateMatrixWorld(true);
+  const box = visBox(m), size = box.getSize(new THREE.Vector3());
+  const o = { name, phase, minY: r(box.min.y), size: v3(size), groundOK: Math.abs(box.min.y) <= (phase === 'driven' ? facetTol(m) : EPS), tol: phase === 'driven' ? +facetTol(m).toFixed(5) : EPS, pivots: {}, wheels: [], issues: [] };
+  m.traverse((c) => {
+    if (c.isMesh) { const n = c.geometry.attributes.normal; if (n) for (let i = 0; i < n.count; i += 7) if (!Number.isFinite(n.getX(i))) { o.issues.push('NaN normal in ' + (c.name || c.parent?.name)); break; }
+      if (!c.geometry.attributes.normal) o.issues.push('no normals: ' + c.name); }
+    if (c !== m && PIVOTS.test(c.name)) { const p = c.getWorldPosition(new THREE.Vector3()); (o.pivots[c.name] ||= []).push(v3(p)); }
+    if (c.userData.radius && c !== m) { // wheel: geometry must be centred on its own origin (axle) and rest on ground
+      const wb = new THREE.Box3().setFromObject(c, true), p = c.getWorldPosition(new THREE.Vector3());
+      const inv = c.matrixWorld.clone().invert(), lb = new THREE.Box3(); c.traverse((q) => { if (q.isMesh) { const gb = (q.geometry.boundingBox || (q.geometry.computeBoundingBox(), q.geometry.boundingBox)).clone(); lb.union(gb.applyMatrix4(inv.clone().multiply(q.matrixWorld))); } });
+      const lc = lb.getCenter(new THREE.Vector3()), dy = lc.y, dz = lc.z, rad = c.userData.radius * c.getWorldScale(new THREE.Vector3()).y;
+      const w = { name: c.name, axle: v3(p), radius: r(rad), centreErr: r(Math.hypot(dy, dz)), bottom: r(wb.min.y) };
+      if (w.centreErr > 1e-3) o.issues.push(`${c.name} off-axle by ${w.centreErr}`);
+      if (Math.abs(p.y - rad) > 2e-3 && Math.abs(wb.min.y) > 2e-3) w.note = 'not on ground (raised/forked wheel?)';
+      o.wheels.push(w);
+    }
+  });
+  if (!o.groundOK) o.issues.push(`min.y = ${o.minY}`);
+  // joint sanity: robot-arm link lengths must equal L1/L2 in every pose; fork tines must hang from the carriage origin (heel)
+  const pv = (n) => { const x = m.getObjectByName(n); return x && x.getWorldPosition(new THREE.Vector3()); };
+  if (name === 'robotArm') { const L1 = pv('shoulder').distanceTo(pv('elbow')), L2 = pv('elbow').distanceTo(pv('wrist')); o.joints = { L1: r(L1), L2: r(L2) };
+    if (Math.abs(L1 - 0.9) > 1e-4 || Math.abs(L2 - 0.78) > 1e-4) o.issues.push('arm link length drift'); }
+  const car = m.getObjectByName('carriage'), tine = m.getObjectByName('forkLeft');
+  if (car && tine && tine.parent === car) { o.joints = { carriageY: r(car.position.y), tineLocal: v3(tine.position) }; if (Math.abs(tine.position.y) > 1e-6 || Math.abs(tine.position.z) > 1e-6) o.issues.push('fork heel not at carriage origin'); }
+  // steer pivots: kingpin at axle height (= wheel radius) and the wheel axle exactly on the kingpin's local X axis
+  m.traverse((c) => { if (/^steer(Left|Right)$/.test(c.name) && c.userData.wheel) { const w = c.userData.wheel, p = c.getWorldPosition(new THREE.Vector3()), wp = w.getWorldPosition(new THREE.Vector3());
+    (o.joints ||= {}).steer = (o.joints.steer || []).concat([[r(p.y), r(w.position.y), r(w.position.z), r(c.rotation.y)]]);
+    if (Math.abs(p.y - wp.y) > 1e-4 || Math.abs(w.position.y) > 1e-6 || Math.abs(w.position.z) > 1e-6) o.issues.push('wheel not on kingpin axis'); } });
+  const tp = m.getObjectByName('trailer'), fw = m.getObjectByName('fifthWheel');
+  if (tp && fw && m.name === 'semiTruck') { const kp = tp.getWorldPosition(new THREE.Vector3()), fb = new THREE.Box3().setFromObject(fw, true), top = new THREE.Vector3((fb.min.x + fb.max.x) / 2, fb.max.y, (fb.min.z + fb.max.z) / 2);
+    const e = kp.distanceTo(top); (o.joints ||= {}).kingpinErr = r(e); o.joints.trailerYaw = r(tp.rotation.y); if (e > 1e-3) o.issues.push('kingpin off fifth-wheel'); }
+  { const im = []; m.traverse((x) => { if (/^innerMast\d*$/.test(x.name)) im.push(x); }); const carr = m.getObjectByName('carriage');
+    if (im.length && carr) { const topSt = im[im.length - 1], bs = (o2) => new THREE.Box3().setFromObject(o2, true); m.updateMatrixWorld(true);
+      const outerTop = bs(im[0].parent).max.y; const tops = im.map((x) => { const rails = x.children.filter((c2) => c2.name === 'innerRail'); const b = new THREE.Box3(); rails.forEach((rr) => b.union(bs(rr))); return b; });
+      const outerRails = im[0].parent.children.filter((c2) => c2.name === 'outerRail'); const ob = new THREE.Box3(); outerRails.forEach((rr) => ob.union(bs(rr)));
+      const lower = [ob, ...tops]; const overlaps = tops.map((b, i) => r(lower[i].max.y - b.min.y));
+      const cb = new THREE.Box3(); ['carriagePlate'].forEach((nm) => cb.union(bs(carr.getObjectByName(nm)))); const brb = bs(carr.getObjectByName('backrest'));
+      const carTopGap = r(tops[tops.length - 1].max.y - Math.max(cb.max.y, brb.max.y - 0.06));
+      (o.joints ||= {}).mast = { stages: im.length, overlaps, carTopGap };
+      if (overlaps.some((v) => v < 0.3)) o.issues.push('mast stage overlap < 0.3 m'); if (carTopGap < -1e-3) o.issues.push('carriage runs off the top of the inner rails'); } }
+  const ts = m.getObjectByName('steerTiller'); if (ts) { const tl = ts.getObjectByName('tiller') || ts.getObjectByName('handle'); const ws = ts.children.filter((c) => c.userData.radius);
+    (o.joints ||= {}).tiller = { wheels: ws.length, tillerChild: !!tl, axleY: r(ts.position.y), wheelR: ws[0] && ws[0].userData.radius };
+    if (!tl || !ws.length) o.issues.push('tiller/steer wheel not in steer group'); if (ws.some((w) => Math.abs(w.position.y) > 1e-6 || Math.abs(w.position.z) > 1e-6)) o.issues.push('steer wheel off steer axis');
+    if (ws[0] && Math.abs(ts.getWorldPosition(new THREE.Vector3()).y - ws[0].userData.radius) > 1e-3 && phase === 'rest') o.issues.push('steer axis not at axle height'); }
+  const rol = m.getObjectByName('roller'); if (rol) { const c = new THREE.Box3().setFromObject(rol.getObjectByName('coil'), true).getCenter(new THREE.Vector3()); const d = c.distanceTo(pv('roller')); o.joints = { rollerAxleErr: r(d) }; if (d > 1e-3) o.issues.push('roller coil off axle'); }
+  const S = SIZES[name]; if (S && phase === 'rest') { const d = Math.max(Math.abs(S.x - size.x), Math.abs(S.y - size.y), Math.abs(S.z - size.z)); if (d > 0.06) o.issues.push(`SIZES mismatch ${d.toFixed(2)} m`); }
+  return o;
+}
+for (const [name, f] of Object.entries(MODELS)) {
+  try {
+    const m = f(demo[name] || {}); res.push(inspect(name, m, 'rest'));
+    let t = 0; for (let i = 0; i < 150; i++) { t += 1 / 30; m.userData.update?.(1 / 30, t); } // 5 s of animation
+    if (m.userData.setOpen) { m.userData.setOpen(1); for (let i = 0; i < 120; i++) { t += 1 / 30; m.userData.update(1 / 30, t); } }
+    if (m.userData.setForkHeight) { m.userData.setForkHeight(m.userData.maxForkHeight ?? 2.5); for (let i = 0; i < 150; i++) { t += 1 / 30; m.userData.update(1 / 30, t); } }
+    const a = inspect(name, m, 'animated'); res.push(a);
+    if (m.userData.kin) { const sc = new THREE.Scene(); sc.add(m); m.userData.setForkHeight?.(0); m.userData.setLandingGear?.(1);
+      for (let i = 0; i < 240; i++) { t += 1 / 30; drive(m, 1 / 30, 3, i < 120 ? 0.45 : -0.3); m.userData.update(1 / 30, t); }
+      const d = inspect(name, m, 'driven'); const box = visBox(m); d.joints = { ...(d.joints || {}), pos: v3(m.position), yaw: r(m.rotation.y) }; res.push(d); sc.remove(m); }
+  } catch (e) { res.push({ name, phase: 'build', issues: ['THROW ' + e.message], groundOK: false }); }
+}
+window.__check = res;
+document.getElementById('out').textContent = res.map((o) => `${o.groundOK && !o.issues.length ? 'PASS' : 'FAIL'} ${o.name} [${o.phase}] minY=${o.minY} size=${o.size} ${o.joints ? JSON.stringify(o.joints) : ''} ${o.issues.join('; ')}`).join('\n');
+</script>

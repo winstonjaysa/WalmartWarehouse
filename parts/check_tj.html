@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf-8><link rel=icon href="data:,"><script type=importmap>{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<script type=module>
+import * as THREE from 'three';
+import { createHandPalletJack, createPalletJack, createTote, getToteGeometry, createToteInstanced, TOTE } from './models.js';
+const R = [], ok = (n, c, d) => R.push((c ? 'PASS ' : 'FAIL ') + n + ' ' + JSON.stringify(d ?? ''));
+try {
+  const j = createHandPalletJack(), u = j.userData, run = (s) => { for (let i = 0; i < s * 60; i++) u.update(1 / 60, i / 60); };
+  const y0 = u.getForkTopY(); ok('lowered fork top 0.085', Math.abs(y0 - 0.085) < 1e-3, y0);
+  u.pump(3, 0.1); let minA = 0, n = 0, prev = u.ang, dn = false; for (let i = 0; i < 4 * 60; i++) { u.update(1 / 60, 0); minA = Math.min(minA, u.ang); if (u.ang < prev - 1e-4 && !dn) { dn = true; n++; } if (u.ang > prev + 1e-4) dn = false; prev = u.ang; }
+  const y1 = u.getForkTopY(); ok('pump(3,0.1) raises 0.1', Math.abs(y1 - y0 - 0.1) < 2e-3, { rise: y1 - y0, strokes: n, minAngle: minA });
+  ok('pump done', !u.isPumping());
+  u.pump(4, 0.1); run(4); ok('lift capped 0.12', Math.abs(u.getLift() - 0.12) < 1e-3, u.getLift());
+  u.release(); run(0.3); const lv = j.getObjectByName('liftLever').rotation.z; run(1.6); ok('release lowers to 0', u.getLift() < 1e-4 && lv > 0.2, { lift: u.getLift(), lever: lv });
+  u.setSteer(0.6); run(1); j.updateMatrixWorld(true);
+  const ts = j.getObjectByName('steerTiller'); ok('tiller+wheels yaw together', Math.abs(Math.abs(ts.rotation.y) - 0.6) < 0.02 && ts.getObjectByName('tiller') && ts.getObjectByName('steerWheel'), ts.rotation.y);
+  const a = u.anchors.tillerGrip, p = a.getWorldPosition(new THREE.Vector3()); ok('grip anchor', a === u.gripAnchor && p.y > 0.95 && p.y < 1.35, p.toArray().map((v) => +v.toFixed(3)));
+  const pj = createPalletJack(); ok('palletJack alias compat', pj.name === 'palletJack' && pj.userData.setLift && pj.userData.setHandleAngle && pj.userData.parts.pump && pj.userData.anchors.tillerGrip);
+  const w0 = j.userData.parts.loadRollers[0].rotation.x; u.setSpeed(1); run(0.5); ok('rollers spin', j.userData.parts.loadRollers[0].rotation.x !== w0);
+  const t = createTote(); ok('tote stackHeight', Math.abs(t.userData.stackHeight - 0.379) < 1e-3 && t.userData.nestPitch === 0.09, { sh: t.userData.stackHeight, np: t.userData.nestPitch, size: t.userData.size });
+  const bb = new THREE.Box3().setFromObject(t); ok('tote flat bottom y=0', Math.abs(bb.min.y) < 1e-4, bb.min.y);
+  const G = getToteGeometry({ color: 'black' }); ok('getToteGeometry cached', G === getToteGeometry({ color: 'black' }) && G.body.geometry.isBufferGeometry && G.lid.geometry.isBufferGeometry);
+  const I = createToteInstanced(50); ok('instanced', I.children.length === 3 && I.children.every((m) => m.isInstancedMesh && m.count === 50), I.children.length);
+  const tc = createTote({ variant: 'crate' }); ok('crate variant compat', tc.userData.variant === 'crate');
+} catch (e) { R.push('FAIL exception ' + e.stack); }
+window.__res = R; window.__ready = true;
+</script>

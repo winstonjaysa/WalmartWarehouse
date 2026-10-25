@@ -1,0 +1,18 @@
+PASS B4 autoStacker stages {"stages":2,"forkH":2.6}
+PASS B4 autoStacker stage overlap>=0.35m at max {"overlaps":[1.175,1.175]}
+PASS B4 autoStacker carriage on top-stage rails at max {"plate":[2.725,3.105],"rail":[1.71,3.71],"backrestTop":3.64}
+PASS B4 walkieStacker stages {"stages":1,"forkH":1.8}
+PASS B4 walkieStacker stage overlap>=0.35m at max {"overlaps":[0.7]}
+PASS B4 walkieStacker carriage on top-stage rails at max {"plate":[1.93,2.31],"rail":[1.07,2.82],"backrestTop":2.795}
+PASS B4 forklift stages {"stages":2,"forkH":3}
+PASS B4 forklift stage overlap>=0.35m at max {"overlaps":[1.05,1.05]}
+PASS B4 forklift carriage on top-stage rails at max {"plate":[3.125,3.505],"rail":[2.22,4.32],"backrestTop":4.19}
+PASS B4 reachTruck stages {"stages":2,"forkH":9.2}
+PASS B4 reachTruck stage overlap>=0.35m at max {"overlaps":[0.775,0.775]}
+PASS B4 reachTruck carriage on top-stage rails at max {"plate":[9.418,9.798],"rail":[6.57,10.57],"backrestTop":10.533}
+PASS B11 cab livery blue #0071CE, toneMapped false {"hex":"0071ce","tm":false}
+PASS B11 door spark x2 2
+PASS B11 door wordmark x2 2
+PASS B11 brand decals toneMapped false [false,false,false,false,false,false]
+TOTAL 16 FAIL 0 ERRS []
+console []

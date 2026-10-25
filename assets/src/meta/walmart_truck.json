@@ -1,0 +1,92 @@
+{
+ "anchors": {
+  "anchor_seat": "driver H-point (vehicle-left/+X seat, US LHD), child of tractor; face +Z"
+ },
+ "facing": "+Z (cab front toward +Z); total length ~22.0 m, trailer box 16.15 x 2.6 x 2.85 m (top at 4.10 m)",
+ "sides": "L/R are the vehicle's own left/right: L = +X, R = -X",
+ "refs": [
+  "02_exterior_docks_walmartcom_trailers.png",
+  "15_iso_dock_cutaway_trucks.jpg"
+ ],
+ "hierarchy": "walmart_truck > tractor > {steer_FL > wheel_FL, steer_FR > wheel_FR, wheel_RL1/RR1/RL2/RR2, trailer > {landing_gear, trailer_wheel_*, trailer_door_L/R}}",
+ "rig": {
+  "drive": "move/rotate the tractor node (or root) on the ground; tractor origin = ground point under the fifth wheel = centre of the rear tandem (bicycle-model rear axle)",
+  "steer": "rotate steer_FL/steer_FR about local Y (+ = turn toward +X/vehicle left), typical max +-35 deg; Ackermann: inner wheel more",
+  "spin": "rotate wheel_* about local X; angle = distance / 0.52 m (tyre radius)",
+  "articulate": "rotate trailer about local Y (its origin is exactly on the kingpin at the fifth-wheel plate top)",
+  "landing_gear": "translate landing_gear +Y by 0..0.25 m to retract the legs (pads off the ground)",
+  "wheelbase": {
+   "tractor_front_to_tandem_centre_m": 5.5,
+   "kingpin_to_trailer_tandem_centre_m": 13.075,
+   "track_front_m": 2.08
+  }
+ },
+ "nodes": {
+  "tractor": "origin on the ground directly under the kingpin/fifth wheel (= rear tandem centre); drive node",
+  "trailer": "child of tractor; origin EXACTLY at the kingpin on the fifth-wheel plate top (y=1.22 m, 4.15 m behind the front of the overall origin): rotate about Y to articulate",
+  "landing_gear": "child of trailer; inner legs + sand pads; origin on the ground between the pads; translate +Y to raise",
+  "steer_FL/steer_FR": "children of tractor; Empty on the steering kingpin axis (x=+-0.90, at axle height 0.52 m), rotate about local Y to steer",
+  "wheel_FL/FR": "children of steer_FL/FR; origin exactly at the hub/axle centre, spin about local X",
+  "wheel_RL1/RR1/RL2/RR2": "tractor rear dual wheels, children of tractor, origin at axle centre, spin about local X",
+  "trailer_wheel_L1/R1/L2/R2": "trailer dual wheels, children of trailer, spin about local X",
+  "trailer_door_L/R": "children of trailer, origin on the outer hinge line at door bottom: rotate about Y to swing open (L: negative angle opens outward, R: positive)"
+ },
+ "texture": "trailer_side.png (Walmart + spark + com), trailer_rear.png, mark53.png embedded",
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 52,
+  "open_by_node": {
+   "tractor": 16,
+   "trailer": 16,
+   "trailer_door_L": 4,
+   "trailer_door_R": 16
+  },
+  "open_samples": [
+   [
+    -1.242,
+    -6.01,
+    1.99
+   ],
+   [
+    -1.242,
+    -6.525,
+    1.68
+   ],
+   [
+    -1.242,
+    -7.04,
+    1.99
+   ],
+   [
+    -1.242,
+    -6.525,
+    2.3
+   ],
+   [
+    -1.242,
+    -6.21,
+    3.17
+   ],
+   [
+    -1.242,
+    -6.52,
+    2.86
+   ],
+   [
+    -1.242,
+    -6.83,
+    3.17
+   ],
+   [
+    -1.242,
+    -6.52,
+    3.48
+   ]
+  ],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 24482,
+ "file": "walmart_truck.glb"
+}

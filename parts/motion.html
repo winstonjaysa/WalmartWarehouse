@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><link rel="icon" href="data:,"><title>Walmart DC — motion demo</title>
+<style>
+  html,body{margin:0;height:100%;background:#eef2f7;overflow:hidden;font-family:"Noto Sans","DejaVu Sans",sans-serif}
+  #cap{position:absolute;left:18px;bottom:16px;background:#041E42e6;color:#fff;font-size:15px;font-weight:600;padding:7px 14px;border-radius:12px;box-shadow:0 2px 6px #0003}
+  #cap b{color:#FFC220;font-weight:700;margin-right:8px}
+  #cap small{display:block;color:#cfe3f7;font-weight:500;font-size:12px;margin-top:2px}
+  #title{position:absolute;left:18px;top:12px;color:#041E42;font-weight:700;font-size:15px}
+  #title span{color:#0071CE}
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head><body>
+<div id="title">Walmart DC <span>motion demo</span></div>
+<div id="cap"></div>
+<script type="module">
+window.__errors = []; window.addEventListener('error', (e) => window.__errors.push(String(e.message)));
+import * as THREE from 'three';
+import { createForklift, createSemiTruck, createPalletJack, createWorker, createRackBay, createDockDoor, createPalletLoad,
+  createReachTruck, createTugTrain, createBollard, drive, PALETTE } from './models.js';
+
+const q = new URLSearchParams(location.search);
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xeef2f7); scene.fog = new THREE.Fog(0xeef2f7, 90, 200);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9c4d2, 1.35));
+const sun = new THREE.DirectionalLight(0xffffff, 2.1); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.radius = 4; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
+scene.add(sun, sun.target);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshStandardMaterial({ color: 0xe3e8ef, roughness: 0.95 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const grid = new THREE.GridHelper(400, 400, 0xd3dae3, 0xd8dee6); grid.position.y = 0.002; scene.add(grid);
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 500);
+const capEl = document.getElementById('cap');
+const V = (x, y, z) => new THREE.Vector3(x, y, z), clamp01 = (x) => Math.min(1, Math.max(0, x)), ease = (x) => { x = clamp01(x); return x * x * (3 - 2 * x); };
+const lerp = THREE.MathUtils.lerp;
+const lanePaint = (x, z, w, d, ry = 0, c = PALETTE.spark) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2 }));
+  m.rotation.set(-Math.PI / 2, 0, ry); m.position.set(x, 0.003, z); m.receiveShadow = true; scene.add(m); return m; };
+
+/* ---------------- generic action runner (same script drives a hidden ghost and the visible model) ---------------- */
+function runner(m, actions, hooks = {}) {
+  const ud = m.userData; let i = 0, t = 0, s = 0, from = 0;
+  // fork follower: identical profile to models.js makeMast.step (B20) -> |v| <= 0.5 m/s, lands exactly; applied with snap
+  const hasFork = typeof ud.getForkHeight === 'function', h0 = hasFork ? ud.getForkHeight() : 0;
+  const F = { h: h0, v: 0, target: h0, vmax: 0.5, acc: 0.5, maxV: 0 };
+  const forkStep = (dt) => { if (!hasFork) return; const d = F.target - F.h, ad = Math.abs(d);
+    if (ad <= 1e-3 && Math.abs(F.v) <= F.acc * dt * 2) { F.h = F.target; F.v = 0; ud.setForkHeight(F.h, true); return; }
+    const aT = F.acc * dt, vB = Math.sqrt(2 * F.acc * ad + 0.25 * aT * aT) - 0.5 * aT;
+    const vDes = Math.sign(d) * Math.min(F.vmax, vB); F.v += Math.max(-aT, Math.min(aT, vDes - F.v));
+    const dh = F.v * dt; if (Math.sign(dh) === Math.sign(d) && Math.abs(dh) >= ad) { F.h = F.target; F.v = 0; } else F.h += dh;
+    F.maxV = Math.max(F.maxV, Math.abs(F.v)); ud.setForkHeight(F.h, true); };
+  const settled = () => F.h === F.target && F.v === 0;
+  const begin = () => { t = 0; s = 0; const a = actions[i]; if (!a) return;
+    if (a.k === 'fork') from = ud.getForkHeight(); if (a.k === 'tilt') from = ud.tilt ?? 0; if (a.k === 'steer') from = ud.steer ?? 0; };
+  begin();
+  return { get done() { return i >= actions.length; }, get i() { return i; }, F,
+    step(dt) {
+      forkStep(dt);
+      while (i < actions.length) {
+        const a = actions[i];
+        if (a.k === 'mark') { hooks[a.name]?.(); i++; begin(); continue; }
+        if (a.k === 'drive') {
+          const rem = a.d - s, acc = a.a ?? 1.4; let spd = Math.min(a.v, 0.2 + acc * t, Math.sqrt(2 * acc * rem) + 0.05);
+          let ds = spd * dt; if (ds >= rem) ds = rem; s += ds; t += dt;
+          if (a.lift != null && s / a.d >= (a.liftFrom ?? 0)) F.target = a.lift;   // start a capped lift/lower part-way through the drive
+          drive(m, dt, Math.sign(a.dir ?? 1) * ds / dt, a.steer ?? 0);
+          if (s >= a.d - 1e-9) { i++; begin(); } return;
+        }
+        ud.speed = 0; t += dt; const u = ease(t / a.dur);
+        if (a.k === 'fork' || a.k === 'forkWait') { if (a.k === 'fork') F.target = a.to; if (settled() && t >= (a.dur ?? 0) - 1e-9) { i++; begin(); } return; }
+        if (a.k === 'tilt') ud.setMastTilt(lerp(from, a.to, u), true);
+        if (a.k === 'steer') ud.setSteer(lerp(from, a.to, u), true);
+        if (t >= a.dur - 1e-9) { i++; begin(); } return;
+      }
+    } };
+}
+const DT = 1 / 30, SUB = 4;
+
+/* ================= SHOT A: forklift pick -> reverse turn -> rack stack (area origin 0,0) ================= */
+const A0 = V(0, 0, 0);
+const fl = createForklift({ autoLift: false, load: false }); scene.add(fl); fl.position.copy(A0);
+const ghostScene = new THREE.Scene(), gfl = createForklift({ autoLift: false, load: false }); ghostScene.add(gfl); gfl.position.copy(A0);
+// fork geometry: tine bottom offset vs commanded fork height, tine thickness
+function tineInfo(f) { f.userData.setForkHeight(0, true); f.userData.setMastTilt(0, true); f.updateMatrixWorld(true);
+  // blade only (exclude the vertical shank): vertices more than 0.25 m ahead of the heel, in carriage space
+  const car = f.userData.parts.carriage, inv = car.matrixWorld.clone().invert(), v = new THREE.Vector3(); let lo = 1e9, hi = -1e9, y0 = 1e9;
+  f.userData.parts.forkTines.forEach((t) => t.traverse((o) => { if (!o.isMesh) return; const pa = o.geometry.attributes.position, mm = inv.clone().multiply(o.matrixWorld);
+    for (let i = 0; i < pa.count; i++) { v.fromBufferAttribute(pa, i).applyMatrix4(mm); if (v.z > 0.25) { lo = Math.min(lo, v.y); hi = Math.max(hi, v.y); } } }));
+  const wy = car.localToWorld(new THREE.Vector3(0, lo, 0.5)).y; return { off: wy, t: hi - lo }; }
+const TI = tineInfo(gfl); tineInfo(fl);
+const POCKET = fl.userData.palletPocket, OPEN_HI = POCKET.hi, ENTRY = fl.userData.forkPocketY, DECK = 1.55 + 0.006;
+const hEntry = ENTRY - TI.off, hAttach = OPEN_HI - TI.t - TI.off;
+const hDeposit = DECK - (TI.t - OPEN_HI) - TI.t - TI.off + TI.t;   // pallet bottom = tineBottom + t - 0.122  ->  tineBottom = DECK - t + 0.122
+const hDep = DECK - TI.t + OPEN_HI - TI.off, hApproach = hDep + 0.1, hCarry = hAttach + 0.12;
+const L = fl.userData.kin.L, STEER = 0.6, ARC = (Math.PI / 2) * L / Math.tan(STEER);
+const scriptA = [
+  { k: 'wait', dur: 0.22 },
+  { k: 'drive', d: 2.7, v: 2.4, a: 2.2 }, { k: 'mark', name: 'pick' },
+  { k: 'fork', to: hAttach }, { k: 'mark', name: 'attach' }, { k: 'fork', to: hCarry }, { k: 'tilt', to: 0.05, dur: 0.22 },
+  { k: 'steer', to: STEER, dur: 0.45 },
+  { k: 'drive', d: ARC, v: 2.0, dir: -1, steer: STEER, a: 2.2, lift: hApproach, liftFrom: 0 },
+  { k: 'steer', to: 0, dur: 0.45 },
+  { k: 'drive', d: 3.0, v: 2.2, a: 2.0 }, { k: 'tilt', to: 0, dur: 0.22 }, { k: 'forkWait' },
+  { k: 'drive', d: 1.3, v: 1.1, a: 1.6 }, { k: 'mark', name: 'deposit' },
+  { k: 'fork', to: hDep }, { k: 'mark', name: 'detach' }, { k: 'fork', to: hDep - 0.05 },
+  { k: 'drive', d: 1.7, v: 1.2, dir: -1, a: 1.6, lift: 0.12, liftFrom: 0.5 },
+  { k: 'wait', dur: 0.5 },
+];
+// ghost dry run: where must pallet A and the rack slot be?
+gfl.userData.setForkHeight(hEntry, true);
+const dummy = new THREE.Object3D(); ghostScene.add(dummy); const PAL_Z = 0.64;
+const ghostPath = []; let pickPose = null, depPose = null, depYaw = 0;
+{ const r = runner(gfl, scriptA, {
+    pick: () => { gfl.updateMatrixWorld(true); const car = gfl.userData.parts.carriage; const p = car.localToWorld(V(0, 0, PAL_Z)); p.y = 0;
+      dummy.position.copy(p); dummy.rotation.set(0, gfl.rotation.y, 0); dummy.updateMatrixWorld(true); pickPose = { p: p.clone(), yaw: gfl.rotation.y }; },
+    attach: () => { gfl.updateMatrixWorld(true); gfl.userData.parts.carriage.attach(dummy); },
+    deposit: () => { gfl.updateMatrixWorld(true); depPose = dummy.getWorldPosition(V(0, 0, 0)); depYaw = gfl.rotation.y; } });
+  let n = 0; while (!r.done && n++ < 20000) { for (let k = 0; k < SUB; k++) r.step(DT / SUB); ghostPath.push(gfl.position.clone()); } }
+const durA = ghostPath.length * DT;
+// pallet A at the pick pose
+const palA = createPalletLoad({ variant: 'full', height: 1.2, seed: 41 }); palA.position.copy(pickPose.p); palA.rotation.y = pickPose.yaw; scene.add(palA);
+// rack: its +Z (aisle face) points back at the forklift; slot x = +0.695
+const rackYaw = depYaw + Math.PI, SLOT_X = 2.7 / 4 + 0.02;
+const rackPos = depPose.clone().sub(V(SLOT_X, 0, 0).applyAxisAngle(V(0, 1, 0), rackYaw)); rackPos.y = 0;
+const rack = createRackBay({ fill: false, seed: 3 }); rack.position.copy(rackPos); rack.rotation.y = rackYaw; scene.add(rack);
+const rackX = V(1, 0, 0).applyAxisAngle(V(0, 1, 0), rackYaw), rackF = V(0, 0, 1).applyAxisAngle(V(0, 1, 0), rackYaw);
+const decor = (bay, lx, y, opt) => { const p = createPalletLoad(opt); p.position.copy(bay.position).addScaledVector(rackX, lx); p.position.y = y; p.rotation.y = rackYaw; scene.add(p); return p; };
+decor(rack, -SLOT_X, 0, { variant: 'half', height: 1.1, seed: 5 }); decor(rack, SLOT_X, 0, { variant: 'cases', height: 1.0, seed: 6 });
+decor(rack, -SLOT_X, DECK, { variant: 'full', height: 1.2, seed: 7 }); decor(rack, -SLOT_X, 3.1 + 0.006, { variant: 'half', height: 1.0, seed: 8 });
+decor(rack, SLOT_X, 3.1 + 0.006, { variant: 'partial', height: 1.1, seed: 9 }); decor(rack, SLOT_X, 4.65 + 0.006, { variant: 'full', height: 1.2, seed: 10 });
+for (const k of [-1, 1, 2]) { const b = createRackBay({ seed: 20 + k, frames: 'left' }); b.position.copy(rackPos).addScaledVector(rackX, k * 2.8 + (k > 0 ? 0 : 0)); b.rotation.y = rackYaw; if (k === -1) b.position.addScaledVector(rackX, 0); scene.add(b); }
+// aisle paint + background reach truck working the next bays
+lanePaint(...(() => { const c = rackPos.clone().addScaledVector(rackF, 0.75); return [c.x, c.z]; })(), 11.5, 0.08, -rackYaw);
+const rt = createReachTruck({ load: true, autoLift: true }); rt.position.copy(rackPos).addScaledVector(rackX, 5.6).addScaledVector(rackF, 3.6); rt.rotation.y = rackYaw + Math.PI; scene.add(rt);
+const flRun = (() => { fl.userData.setForkHeight(hEntry, true); return runner(fl, scriptA, {
+  attach: () => { fl.updateMatrixWorld(true); fl.userData.parts.carriage.attach(palA); },
+  detach: () => { fl.updateMatrixWorld(true); scene.attach(palA); window.__seatErr = palA.position.y - DECK; } }); })();
+const pathBox = new THREE.Box3().setFromPoints([...ghostPath, rackPos]); const pathC = pathBox.getCenter(V(0, 0, 0));
+
+/* ================= SHOT B: tractor-trailer turns, then reverses into dock door (area origin 90,0) ================= */
+const B0 = V(90, 0, 0);
+const doors = [-1, 0, 1].map((k) => { const d = createDockDoor({ label: 'D' + (12 + k), open: 0 }); d.position.set(B0.x + k * 4.2, 0, B0.z); scene.add(d); return d; });
+const dock = doors[1];
+const bldg = new THREE.Mesh(new THREE.BoxGeometry(40, 5.4, 18), new THREE.MeshStandardMaterial({ color: 0xdcd6c8, roughness: 0.9 })); bldg.position.set(B0.x, 2.7, B0.z - 9.15 - 0.15); bldg.castShadow = bldg.receiveShadow = true; scene.add(bldg);
+for (const k of [-2, 2]) { const s = createDockDoor({ label: 'D' + (12 + k) }); s.position.set(B0.x + k * 4.2, 0, B0.z); scene.add(s); }
+const extraWall = new THREE.Mesh(new THREE.BoxGeometry(40 - 21, 5.4, 0.3), new THREE.MeshStandardMaterial({ color: 0xdcd6c8, roughness: 0.9 }));
+for (const s of [-1, 1]) { const w = extraWall.clone(); w.position.set(B0.x + s * (10.5 + 9.5), 2.7, B0.z); w.castShadow = w.receiveShadow = true; scene.add(w); }
+for (let k = -2; k <= 2; k++) lanePaint(B0.x + k * 4.2 + 2.1, B0.z + 9, 0.12, 18);
+const truck = createSemiTruck({ speed: 0 }); scene.add(truck); truck.updateMatrixWorld(true);
+const tb = new THREE.Box3().setFromObject(truck); const DOCK_Z = B0.z + 0.32 - tb.min.z;
+const tk = truck.userData.kin, tWheels = [...tk.tractorWheels, ...tk.trailerWheels];
+const snapT = () => ({ x: truck.position.x, z: truck.position.z, yaw: truck.rotation.y, tr: truck.userData.trailerAngle, st: truck.userData.steer, w: tWheels.map((w) => w.rotation.x) });
+function recordDrive(segs, sign) { const rec = [snapT()]; let s = 0; rec[0].s = 0;
+  for (const g of segs) { const n = Math.ceil(g.d / 0.04); for (let i = 0; i < n; i++) { drive(truck, 0.02, sign * (g.d / n) / 0.02, g.steer(i / n)); s += g.d / n; const o = snapT(); o.s = s; rec.push(o); } } return rec; }
+truck.position.set(B0.x, 0, DOCK_Z); truck.rotation.y = 0; truck.userData.setTrailerAngle(0); truck.userData.setSteer(0);
+// forward pull-out from the dock (played back time-reversed = exact reverse-in with the trailer leading)
+const recA = recordDrive([{ d: 3, steer: () => 0 }, { d: 2.5, steer: (u) => 0.45 * u }, { d: 8, steer: () => 0.45 }, { d: 2.5, steer: (u) => 0.45 * (1 - u) }, { d: 4, steer: () => 0 }], 1);
+// from that pose, back up with opposite lock (played back reversed = the forward turn-in before reversing)
+const recB = recordDrive([{ d: 1, steer: (u) => -0.15 * u }, { d: 3, steer: () => -0.15 }, { d: 1, steer: (u) => -0.15 * (1 - u) }], -1);
+function applyRec(rec, s) { let lo = 0, hi = rec.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (rec[m].s <= s) lo = m; else hi = m; }
+  const a = rec[lo], b = rec[hi], u = b.s > a.s ? clamp01((s - a.s) / (b.s - a.s)) : 0;
+  truck.position.set(lerp(a.x, b.x, u), 0, lerp(a.z, b.z, u)); truck.rotation.y = lerp(a.yaw, b.yaw, u);
+  truck.userData.setTrailerAngle(lerp(a.tr, b.tr, u), true); truck.userData.setSteer(lerp(a.st, b.st, u), true); tWheels.forEach((w, i) => { w.rotation.x = lerp(a.w[i], b.w[i], u); }); }
+function profile(D, vmax, acc) { const ta = vmax / acc, da = 0.5 * acc * ta * ta; let T, f;
+  if (2 * da >= D) { const t1 = Math.sqrt(D / acc); T = 2 * t1; f = (t) => t < t1 ? 0.5 * acc * t * t : D - 0.5 * acc * (T - t) ** 2; }
+  else { const tc = (D - 2 * da) / vmax; T = 2 * ta + tc; f = (t) => t < ta ? 0.5 * acc * t * t : t < ta + tc ? da + vmax * (t - ta) : D - 0.5 * acc * (T - t) ** 2; }
+  return { T, s: (t) => f(Math.min(T, Math.max(0, t))), v: (t) => t <= 0 || t >= T ? 0 : Math.min(vmax, acc * t, acc * (T - t)) }; }
+const DA = recA[recA.length - 1].s, DB = recB[recB.length - 1].s;
+const pB = profile(DB, 5.2, 2.6), pA = profile(DA, 5.5, 2.4), PAUSE_B = 0.25;
+const durB = 0.3 + pB.T + PAUSE_B + pA.T + 0.6;
+function truckAt(t) {   // shot-local time
+  const t1 = t - 0.3;
+  if (t1 < pB.T) { applyRec(recB, DB - pB.s(t1)); truck.userData.setSpeed(pB.v(t1)); return 'turn'; }
+  const t2 = t1 - pB.T - PAUSE_B;
+  if (t2 < 0) { applyRec(recA, DA); truck.userData.setSpeed(0); return 'shift'; }
+  applyRec(recA, DA - pA.s(t2)); truck.userData.setSpeed(-pA.v(t2)); truck.userData.setBraking(t2 >= pA.T - 0.3);
+  return t2 >= pA.T ? 'docked' : 'reverse';
+}
+
+/* ================= SHOT C: pallet jack steered by its tiller around a corner + tug train (area origin -80,0) ================= */
+const C0 = V(-80, 0, 0);
+const pj = createPalletJack({}), gpj = createPalletJack({}); scene.add(pj);
+const jload = createPalletLoad({ variant: 'half', height: 1.0, seed: 31 });
+{ pj.updateMatrixWorld(true); const fb = new THREE.Box3(); pj.userData.parts.forks.forEach((f) => fb.expandByObject(f));
+  jload.position.set(0, fb.max.y - OPEN_HI, (fb.min.z + fb.max.z) / 2 + 0.02); pj.userData.parts.liftFrame.add(jload); pj.userData.setLift(1); }
+const pjStart = { x: C0.x, z: C0.z + 4, yaw: 0 }, JST = 0.9, JL = pj.userData.kin.L, JARC = (Math.PI / 2) * JL / Math.tan(JST);
+const scriptC = [{ k: 'wait', dur: 0.3 }, { k: 'drive', d: 1.6, v: 1.88, dir: -1, a: 1.6 }, { k: 'drive', d: JARC, v: 1.50, dir: -1, steer: JST },
+  { k: 'drive', d: 1.7, v: 1.88, dir: -1 }, { k: 'wait', dur: 0.3 }];
+// steer ramps for the tiller: insert smooth in/out (operator swings the handle while walking)
+scriptC.splice(2, 0, { k: 'drive', d: 0.4, v: 1.50, dir: -1, steer: JST * 0.5 }); scriptC.splice(4, 0, { k: 'drive', d: 0.4, v: 1.50, dir: -1, steer: JST * 0.5 });
+for (const m of [pj, gpj]) { m.position.set(pjStart.x, 0, pjStart.z); m.rotation.y = pjStart.yaw; }
+const gpath = []; { const r = runner(gpj, scriptC); let n = 0; while (!r.done && n++ < 5000) { for (let k = 0; k < SUB; k++) r.step(DT / SUB); gpath.push(gpj.position.clone()); } }
+const durC = gpath.length * DT;
+const pjRun = runner(pj, scriptC);
+const wk = createWorker({ walking: false, seed: 4 }); scene.add(wk); wk.position.set(C0.x, 0, C0.z + 5); // parked in shot C until it runs
+// inside-corner props: column + bollards + pallet stack at the turn's inside
+{ const mid = gpath[Math.floor(gpath.length * 0.5)], st = gpath[0], en = gpath[gpath.length - 1];
+  const corner = V(en.x, 0, st.z).lerp(mid, 0.0); const inside = V(st.x, 0, en.z); // the L's inner vertex
+  const ib = createRackBay({ seed: 51 }); ib.position.set(inside.x + Math.sign(st.x - en.x) * 1.9, 0, inside.z + Math.sign(st.z - en.z) * 1.0 + Math.sign(st.z - en.z) * 0.9); ib.rotation.y = Math.PI / 2; scene.add(ib);
+  for (const k of [0, 1]) { const b = createBollard({ color: 'yellow' }); b.position.set(inside.x + Math.sign(st.x - en.x) * (0.75 + k * 1.2), 0, inside.z + Math.sign(st.z - en.z) * 0.75); scene.add(b); }
+  lanePaint((st.x + inside.x) / 2 - Math.sign(st.x - en.x) * 1.3, (st.z + inside.z) / 2, 0.1, Math.abs(st.z - inside.z) + 2);
+  window.__corner = { st: st.toArray(), en: en.toArray(), inside: inside.toArray() }; }
+const tug = createTugTrain({ carts: 3 }); tug.position.set(C0.x + 7.5, 0, C0.z - 10); tug.rotation.y = 0; scene.add(tug);
+let tugS = 0;
+
+/* ================= timeline / cameras ================= */
+const SHOTS = [
+  { name: 'A', dur: durA, cap: ['FORKLIFT', 'fork entry → lift → reverse turn (rear-wheel steer, tail swing) → triplex mast raise → rack stack'] },
+  { name: 'B', dur: durB, cap: ['TRACTOR-TRAILER', 'turn-in, then reverse to dock — trailer leads, kingpin articulation (tractrix)'] },
+  { name: 'C', dur: durC, cap: ['PALLET JACK + TUG TRAIN', 'tiller steer around a corner · cart hitches follow the tug'] },
+];
+let T = 0; const total = SHOTS.reduce((a, s) => a + s.dur, 0); window.__total = total; window.__durs = SHOTS.map((s) => +s.dur.toFixed(2));
+const camPos = V(0, 0, 0), camLook = V(0, 0, 0); let lastShot = null;
+function setSun(c, ext) { sun.position.set(c.x + ext * 0.45, ext * 1.4, c.z + ext * 0.7); sun.target.position.copy(c);
+  Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.5, far: ext * 4 }); sun.shadow.camera.updateProjectionMatrix(); }
+const tmp = V(0, 0, 0);
+function frame(dt) {
+  let t = T, si = 0; while (si < SHOTS.length - 1 && t >= SHOTS[si].dur) { t -= SHOTS[si].dur; si++; }
+  const shot = SHOTS[si], first = lastShot !== shot.name; lastShot = shot.name;
+  capEl.innerHTML = `<b>${shot.cap[0]}</b>${shot.cap[1]}`;
+  let look, pos;
+  if (shot.name === 'A') {
+    if (!flRun.done) for (let k = 0; k < SUB; k++) flRun.step(dt / SUB);
+    fl.userData.update(dt, T); rt.userData.update(dt, T);
+    const f = fl.position, mix = V(0, 0, 0).copy(f).lerp(pathC, 0.45);
+    look = V(mix.x, 1.3 + 0.35 * fl.userData.getForkHeight(), mix.z);
+    const side = V(0, 0, 0).copy(rackF).multiplyScalar(9.5).addScaledVector(rackX, -7.5); pos = V(pathC.x + side.x, 6.2, pathC.z + side.z);
+    pos.addScaledVector(rackX, 2.0 * ease(t / shot.dur));                                 // slow dolly
+    setSun(pathC, 16);
+  } else if (shot.name === 'B') {
+    const ph = truckAt(t); truck.userData._driven = true; truck.userData.update(dt, T);
+    for (const d of doors) d.userData.update(dt, T);
+    if (ph === 'docked') { dock.userData.setOpen(1); dock.userData.setSignal('green'); }
+    truck.userData.setHazards(ph === 'reverse' || ph === 'shift');
+    truck.updateMatrixWorld(true); const tr = truck.userData.parts.trailer || truck.userData.parts.tractor;
+    const c = new THREE.Box3().setFromObject(truck).getCenter(V(0, 0, 0)); const target = V(B0.x, 0, B0.z + 8).lerp(c, 0.55);
+    look = V(target.x, 1.5, target.z); pos = V(B0.x - 19 + 4 * ease(t / shot.dur), 17, B0.z + 27);
+    setSun(V(B0.x + 6, 0, B0.z + 12), 26);
+  } else {
+    if (!pjRun.done) for (let k = 0; k < SUB; k++) pjRun.step(dt / SUB);
+    pj.userData.update(dt, T);
+    // operator walks at the end of the tiller, facing travel (handle leads)
+    pj.updateMatrixWorld(true); const ts = pj.userData.parts.tillerSteer; const hp = ts.localToWorld(V(0, 0, -0.82)); hp.y = 0;
+    const tyaw = pj.rotation.y + ts.rotation.y + Math.PI; wk.position.copy(hp); wk.rotation.y = tyaw;
+    const moving = Math.abs(pj.userData.speed) > 0.05; wk.userData.setWalking(moving); wk.userData.walkSpeed = Math.max(0.6, Math.abs(pj.userData.speed)); wk.userData.update(dt, T);
+    pj.userData.setHandleAngle?.(moving ? -0.75 : -0.35);
+    // tug train loops on an S-curve in the background
+    const tv = Math.min(2.2, 0.6 + t * 0.9); tugS += tv * dt; const steer = tugS < 3 ? 0 : tugS < 9 ? -0.42 : tugS < 13 ? 0.0 : 0.42;
+    drive(tug, dt, tv, steer); tug.userData.update(dt, T);
+    const p = pj.position; look = V(p.x, 0.8, p.z);
+    pos = V(C0.x + 8.5, 6.5, C0.z + 9.5);
+    setSun(V(C0.x + 2, 0, C0.z), 16);
+  }
+  if (first) { camPos.copy(pos); camLook.copy(look); } else { camPos.lerp(pos, 1 - Math.exp(-3 * dt)); camLook.lerp(look, 1 - Math.exp(-3.5 * dt)); }
+  camera.position.copy(camPos); camera.lookAt(camLook);
+  T += dt;
+}
+window.__step = (n = 1) => { for (let i = 0; i < n; i++) frame(DT); renderer.render(scene, camera); };
+window.__forkV = () => ({ fl: flRun.F.maxV, seatErr: window.__seatErr });
+window.__info = { forkV: null, durA, durB, durC, total, hEntry, hAttach, hDep, TI, ARC, pick: pickPose.p.toArray(), rack: rackPos.toArray(), rackYaw, dockZ: DOCK_Z,
+  recA: recA.length, recB: recB.length, maxArt: Math.max(...recA.map((r) => Math.abs(r.tr))), maxArtB: Math.max(...recB.map((r) => Math.abs(r.tr))) };
+window.__ready = true;
+</script></body></html>

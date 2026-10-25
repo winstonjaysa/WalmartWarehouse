@@ -1,0 +1,252 @@
+# Walmart DC Live Ops (walmart-dc.html): QA & Art-Direction Review, FIRST PASS
+
+**Reviewer:** QA/art-direction executor · **Date:** 2026-10-25 ~07:40 UTC · **Checklist:** `qa/reference-checklist.md` (sections A R S V X Y Z W W-b P B–J)
+
+---
+
+## RELEASE GATE
+
+# SHIP: NO
+
+**Grading standard (binding):** strict, judged as art. **Every checklist item defaults to FAIL** until frame evidence (crop path plus frame number or timestamp) proves a pass. Code that looks correct is not proof; it only gets an item to "plausible, unproven".
+
+**Gate as of v1 (`builds/walmart-dc_v1.html`, 290,901 B, CANDIDATES 08:12:02Z, sha1 34e98e96…; tested copy `qa/snapshots/walmart-dc_v1.html`). Open BLOCKERS (21):** B1 (partial), B4–B12, B13 (partial, regressed), B15–B17, B19 (app-unproven: no reach truck in scene), B23 (unproven: no pickup in 60 s), B24 (unproven: no drop in 60 s), B25 (worse), **B26 (new)**, **B27 (new)**, B18 (improved but still overlapping and clipped, `qa/runs/v1/boot_mob_default.png`). **CLOSED in v1:** B20 (in-app trapezoid lift, peak 0.504 m/s = 0.84 cm/frame, `qa/runs/v1/sim_frames.json` f1232–1420), B21 (carried pallet base = tine top − 0.122 within 0.1–0.9 cm across all frames), B22 (mobile `?capture&noao` ready at 16.4 s, no PALS error, `qa/runs/v1/cap/console_mob_capture_noao.txt`). **CLOSED earlier (app2, 300,564 B):** B0, B2. B3 library-closed and app-unproven. B14 is MINOR m10.
+
+_Prior gate text (app2):_ **Open BLOCKERS (22):** B1 (partial), B4–B12, B13 (partial), B15–B21, B22–B25. **CLOSED in app2 (08:00–08:20 UTC):** B0 (300,564 B build boots and renders; see note on B0R) and B2 (popIn/popOut are dead code and no pallet scale changed in 3,600 frames). B3 is library-closed and app-unproven. B14 is MINOR m10. **B0R (regression watch):** the 288,815 B rebuild landed at 08:04:50 UTC mid-run. Its desktop default boots in 9.7 s, but the mobile `?capture&noao` run threw `ReferenceError: Cannot access 'PALS' before initialization` and never mounted. This is tracked as B22. The file was rebuilt again at 08:09:59 UTC (288,710 B) and that build is not yet tested.
+
+| # | Blocker | Evidence |
+|---|---|---|
+| ~~B0~~ | **CLOSED for the 300,564 B build (08:00 UTC).** `#gl` is 1280×800 and the scene renders, with trucks, racks and docks visible (`qa/runs/app2/sim_t20s.png`, `sim_t40s.png`). `grep '</script'` matches only the 4 real closers plus the importmap one, and `node --check` on the extracted module passes. *(Was: the app does not boot, so there is no 3D scene at all.** The main module dies at parse time with `[pageerror] Invalid or unexpected token`, the same on desktop and mobile. **Root cause:** the doc comment inlined from `parts/models.js:9` contains a literal `</script>`. The HTML parser ends the module `<script>` at that point, `walmart-dc.html:1180`. What is left of the module is an unterminated `/**` comment, which is a SyntaxError. Everything after it is stray text until line 3595. `#gl` stays the default **300×150** canvas, no renderer is created, and the centre of the page shows only the static fallback ("#scene · Three.js mounts here"). | `qa/runs/app1/console_desk.txt`, `console_mob.txt`; `qa/runs/app1/load_desk_1280x800.png`; probe `{"canvas":[300,150],"gl":true,"title":"RDC-7041 (demo) · Ops Dashboard — concept"}`; `/tmp/wsx/s3.mjs` (extracted module, 1,349 chars) `node --check` fails at its line 14 `/**`; `grep -n "</script>" walmart-dc.html` hits line 1180 inside the comment. **Fix:** in build.py, escape `</script` as `<\/script` in every inlined JS (or remove it from the comment). A QA-only proof copy with that one-character change is at `qa/patched/walmart-dc.fixed.html`. |
+| B1 | **PARTIAL.** The app boots and is sampled (app2), but the R, S, W, B–J items still have no frame proof. *(Earlier: the product exists but cannot be scored.)* Because of B0, no R, S, V, X, Y, Z, W, B–J item has any frame evidence, so they all stay FAIL by default. *(Was: "file missing".)* | see B0 |
+| B2 | **Objects pop in and out by scaling on screen.** `popIn()` scales from 0.0001 with easeOutBack overshoot and `popOut()` shrinks to 0. This breaks the hard rule that nothing appears or vanishes on screen. | `src/app1.js:77-87`: `function popIn(obj, dur = 0.7, ...) { obj.scale.setScalar(0.0001); ...` / `p.obj.scale.setScalar(Math.max(0.0001, p.target * easeOutBack(k)))` |
+| ~~B2~~ | **CLOSED (code + run).** `popIn`/`popOut` (`walmart-dc.html:2993-2994`) have no call sites, and the app2 run saw 0 visibility or scale changes on 21 pallets over 3,600 frames (`qa/runs/app2/analysis.txt`). | |
+| ~~B3~~ | **LIBRARY-CLOSED, APP-UNPROVEN.** `models.js` now has `createReachTruck` (537: triplex mast, pantograph reach) and `createTugTrain` (617). There is no frame proof yet because of B0. *(Was: the fleet is missing machine types.** There is no reach truck and no tug / cart train anywhere in the model library (Z3, Z6). | `grep -n "reach\|tug\|createReach\|createTug" parts/models.js` → only robot-arm IK `reachTo` (models.js:938, 970); `parts/check_results.txt`: 72 models, none of these types |
+| B4 | **The auto stacker mast has one stage.** The carriage rises 1.8 m inside a 2.0 m outer mast with no inner stage, so at full lift the carriage and backrest run off the top of the uprights (Y2, A). | crop `qa/artefacts/glb_stacker_single_stage_mast.png` (render `assets/renders/pallet_stacker_auto.png`); GLB node tree has a single `mast` node; check_results "autoStacker animated size y 3.62 vs rest 2.5" |
+| B5 | **Lift, stack, putaway and trailer loading are unproven** (Y1–Y4): double-stacking, multi-level putaway with a telescoping mast, level set-down, and trailer rows. | No app; `parts/motion_demo.mp4` missing |
+| B6 | **Vehicle kinematics in the app are unproven** (V1–V10, Z1–Z7): pivot, slip, wheel roll, rear steer, forks low, articulated reverse into dock. | No app, no motion_demo.mp4. The library `drive()` code is good (see "What is already right"), but there is no frame proof |
+| B7 | **The 60 fps deterministic capture and scrub have not been run** (R1–R10: jitter, popping, z-fighting, clipping, AA). | Pending the HTML |
+| B8 | **The 3 simulated-minute automation run has not been run** (S1–S8: pops, stuck agents, teleports, camera tour loop). | Pending the HTML |
+| B9 | **Dock count in the UI contradicts the scene.** The UI says 24 docks "D01–D24, 14 of 24 occupied", but the scene builds 8 inbound + 8 outbound doors with IDs `DR-001…` / `DS-101…`. Labels cannot anchor to doors that don't exist, and the ID scheme differs. | `src/body.html:9-10` "Building A · Docks D01–D24", "Receiving · D01–D12 / Shipping · D13–D24"; `src/app2.js:4-5` `IN_DOORS = Array.from({ length: 8 }...'DR-'+...` and `OUT_DOORS ... length: 8 ... 'DS-'+(101+i)` |
+| B10 | **Brand colour is washed out in render** (trailer wordmark). The texture is on brand, but the lit and tone-mapped result is far off: rendered `#3B8BE6` vs `#0071CE`, **ΔE00 9.8**. The reference photo is navy `#133462`. Spark renders `#FFE243` vs `#FFC220`, **ΔE00 10.3** (shifted toward lemon). The app uses the same lighting recipe (hemi 1.25 + ambient 0.25 + ACES 1.05), so this will reproduce in product. | crops `qa/artefacts/glb_truck_wordmark_washout.png`, ref `qa/artefacts/ref02_trailer_wordmark.png`; samples `qa/colour_samples.json`; `src/app1.js:35-36,53-54` |
+| B11 | **The truck tractor carries no Walmart branding** in the GLB: generic white cab, blue stripe, no door spark or wordmark. Real Walmart tractors (imgref 01/02) carry the wordmark and spark on the door and fairing. | crop `qa/artefacts/glb_truck_cab_no_branding.png` (render `assets/renders/qa/walmart_truck__cab.png`) |
+| B12 | **No post-processing chain** (SSAO / outline / AA-through-composer / OutputPass). The clay-toy reference look (soft AO contact, ink outline) cannot be met by forward rendering alone (P1–P6). | `grep -nE "EffectComposer|SSAO|GTAO|Outline|SMAA|FXAA|OutputPass" src/app1.js src/app2.js` → no hits |
+| B13 | **PARTIAL (app2).** The scene now has 4 semis (tractor + trailer), 1 forklift (FL-07, counterbalance), 1 worker and 4 AMRs on loops, out of 6,207 objects. Only one process runs: trailer → LANE5 floor unload. There are no reach trucks, no rack put-away, no pallet jacks, no picking and no loading. The 4,000+ rack slots are filled randomly and never touched. *(Was: no part of the DC process is shown in motion.)* `src/` (app1–app3, last change 03:38 box) creates **no** trucks, yard tractors, forklifts, reach trucks, pallet jacks or associates. The model factories are imported but never called. The only moving elements are the sorter cases and the belt UV scroll. So L1–L10 have scenery but no behaviour. | `grep -nE "create(SemiTruck\|YardTractor\|Forklift\|PalletJack\|Worker\|AMR)\(" src/app*.js` → 0 hits; the only motion is `updateCases()` at `src/app3.js:70-76` |
+| ~~B14~~ | **DOWNGRADED to MINOR m10.** The UI and title now say "RDC-7041 (demo)" (`qa/runs/app1/load_desk_1280x800.png`). "Walmart DC #6094" survives only in a source comment at `walmart-dc.html:2917`. *(Was: the facility is named after a real Walmart DC.)* The spec says the site must stay fictional, but the UI and loader say "DC #6094 · Bentonville, AR". The building sign says "Demo RDC-7041", so the naming also contradicts itself. | `SIM_SPEC_WALMART.md:5` "RDC-7041 stays fictional… (… Bentonville DC 6094 …)"; `src/body.html:6,9,46`, `src/app1.js:2` vs `src/app2.js:158` |
+| B15 | **The pallet build and stretch-wrap stage (NCV) is missing.** There is no NCV zone, no wrap turntable and no film. The spec flow "pallet build → wrap → load" has a hole (L8). | `src/app2.js:3` layout comment lists only RCV, MXA, RES, XDK, PM, CNV, NXA/SRT1, OBS; `grep -in "ncv\|wrap station\|turntable" src/` → 0; spec `SIM_SPEC.md:52` NCV "Pallet build…, wrap stations" |
+| B16 | **The sorter is a closed racetrack, and its cases sink into a diamond tube.** (a) 90 cases loop forever at 1.8 m/s. Nothing feeds them from the pick conveyors, there is no scan tunnel, and no case diverts to a door lane, so it reads as a toy track rather than sortation (L7). (b) `TubeGeometry(…, 0.42, 4 radial segs)` makes a diamond cross-section with its apex at y 6.62, while the case bottoms sit at 6.32. So **0.30 m of each 0.32 m case is inside the belt**: clipping. | `src/app3.js:61-76`; a numeric rebuild of the same geometry (`/tmp/tube.mjs`, three r1xx) gives tube y 5.78…6.62, case 6.32…6.64. The `sh` belt Shape at `app3.js:62` is built and then never used. |
+| B17 | **There are no captions and no guided tour.** body.html has no caption element. Tools offer only a camera preset and auto-orbit. No code follows one item from the gate to departure. A layperson cannot read the flow (L12, L13). | `src/body.html` tools `data-t="cam"`/`orbit` only; `grep -in "caption\|tour\|follow" src/` → 0 hits |
+
+| **B18** | **Mobile 390×844 layout is broken.** The desktop grid is not responsive. The Alerts popover and the TRL-48213 trailer panel sit on top of the Missions list, panels are clipped at the right edge, the KPI strip is off-screen, and text is truncated ("ulic fault in aisle 14", "jected 18m past cutoff"). | `qa/runs/app1/load_mob_390x844.png`. **Fix:** add a ≤600 px breakpoint with a single column, panels as a bottom sheet, alerts as a drawer, and the scene first. |
+| **B19** | **Slot-exact (code): the reach truck cannot reach the top RES beams.** `maxForkHeight` is 6.5 m, but the RES beam tops are 7.00 m (E) and 8.75 m (F). Any put-away to E or F clamps and lands on the wrong level or in mid-air. That is exactly the "level N vs N+1" failure. | `parts/models.js:537-…` (reach truck, makeMast H0 2.9 / maxH 6.5) vs the `RACK_LV` table. **Fix:** set maxH to at least 8.9 (triplex 3.1 m stages) or cap rack levels, and assert `target ≤ maxH` in the planner. |
+| **B20** | **Slot-exact (code): lift motion is exponential, so the load jumps between frames.** `damp()` (models.js:121, `cur+(target-cur)*(1-exp(-k*dt))`, k=3.2) gives a peak speed of 3.2·Δh. For a 5 m lift that is ~16 m/s, so **more than 5 cm per frame for any lift over 0.94 m** (rule d). It also creeps at the end: ~1.8 s to get within 2 cm, so either the planner waits or it attaches before the forks are within ±2 cm (rule a). | `parts/models.js:121`. **Fix:** use a trapezoidal profile (v ≤ 0.45 m/s laden, 0.55 unladen; a = 0.5 m/s²) with an exact arrival and snap at ≤1 mm. |
+| **B21** | **Slot-exact (code): the carried load is seated 12 cm too high and the mast root offset is not subtracted.** The carriage load is at `loadG.position.set(0,0.05,0.64)` (models.js:583, 967, 1020) with tines only 0.048 thick (858). The pallet deck underside is ~0.122, so the pallet rides ~0.12 m above the tines and must jump at attach or detach. `setForkHeight(h)` is relative to the mast root, which sits 0.12 (reach / forklift), 0.06 (auto stacker) or 0.02 (walkie) above the chassis. Unless the app subtracts vehicle Y + root offset + FLOOR 1.2, the forks end 2–12 cm off the beam. | `parts/models.js:575, 583, 858, 874, 963, 967, 1018, 1020, 1125`. **Fix:** put the pallet origin at the bottom of the bottom boards and parent it at tine top y (0.048) minus the pallet entry clearance. Compute `h = slotY − (vehY + rootOff)`, and add a builder assert `|forkTipY − slotY| > 0.02 → console.error('[slot-assert] …')`. |
+| **B22** | **The latest rebuild (288,815 B, 08:04:50 UTC) regresses the boot on mobile capture.** It throws `[error] ReferenceError: Cannot access 'PALS' before initialization` at 17.5 s, `__ready` never becomes true, the placeholder "#scene · Three.js mounts here" stays and `__render` is undefined. `PALS` is declared with `const` (line 3222/3272) but used before that point in a code path. | `qa/runs/app2/console_mob.txt`. **Fix:** declare `PALS` before any builder that calls `trackPal`, and add a `?capture` mobile smoke test to the build. |
+| **B23** | **Slot-exact: the forks are 10–16 cm above the pallet at attach.** The load is parented at the wrong height and the forks pass through the deck boards. At the trailer pickup (deck Y 1.300), the fork heel (tine underside) is at world Y **1.461** (f519, t 8.65 s, FL-07, TRL pallet e133c840) and **1.401** (f2435, t 40.58 s, pallet 0b1186ee). The pocket band is 0.022–0.122 above the pallet bottom, so the error is **+0.14 m** and **+0.08 m** against the tolerance of ±0.02. | `qa/runs/app2/analysis.txt` EV lines; code `walmart-dc.html` `scheduleUnload` → `.do(()=>carriage.attach(next))` with no height match, then `.lift(0.13)`. |
+| **B24** | **Slot-exact: the pallet floats, then snaps at drop.** At f1518 (t 25.30 s, LANE5 floor slot, Y 1.200) the pallet bottom is 1.233 just before detach and snaps to 1.200 on `next.position.y = FLOOR`. That is a **3.3 cm seat error** (>2 cm). At f3271 (t 54.52 s) the bottom is 1.293 and snaps to 1.200, a **9.3 cm one-frame jump** (rule d, >5 cm). | same; code `.lift(0.08).do(()=>{world.attach(next); next.position.y = FLOOR; …})`. **Fix:** lower until the pallet bottom equals the slot Y within 2 mm, then detach without a snap. |
+| **B25** | **Kinematics: heading snaps and lateral slip.** FL-07 yaw jumps **10.33° in one frame** (f2896) and 10.25° (f2172), plus 6.65°, 5.78° and 5.66° at segment joins. This makes the carried visible pallet jump **8–12 cm per frame** (f794, 1084, 1116). Lateral slip at the front (drive) axle reaches **0.41 m/s** at a speed of 0.65 m/s, and 745 of 3,128 moving frames exceed 0.03 m/s. Rear steer against path curvature `atan(wb·κ)` has mean error 6.9° and max 61°, and both rear wheels share one angle (no Ackermann). | `qa/runs/app2/analysis.txt`. **Fix:** continuous-curvature (clothoid) joins between drive segments, heading from integrated steer, and per-wheel Ackermann angles. |
+| B25-v1 | **v1 update: WORSE on the worst case.** A **90.0° single-frame yaw snap** at f1232 (t 20.53 s) while stationary at (−0.56, 28.8). Other steps are ≤3.83° (app2: 10.33°). Visible load jumps fell to 0 (app2: 6). Slip is 110 of 3,410 frames >0.03 m/s (app2: 745 of 3,128), but the front axle peaks at 1.99 m/s at the pivot. Steer error max is 16.2° (app2: 61°). | `qa/runs/v1/analysis.txt`, `sim_frames.json` f1231→1232 dir (1,0)→(0,1). **Fix:** never set heading directly. Turn in place only through a rate-limited pivot (≤30°/s) or a curved arc. |
+| B23/B24-v1 | **v1: UNPROVEN, so FAIL.** There were 0 attach and 0 detach events in 60 s (B27), so the fork-to-surface Y, yaw <2° and lateral <5 cm checks could not be measured. The builder assert exists (2 cm tolerance, `walmart-dc_v1.html:3268`) but logged 0 lines. | `qa/runs/v1/console_sim.txt` |
+| **B26** | **v1, new. The forklift travels with the load raised to 1.29 m.** After lifting at f1232–1400 (stationary), FL-07 drives 17+ m with fork height 1.287 m for **2,180 of 3,412 moving frames (36 s)**. Real practice and checklist V6 require forks ≤ 0.15–0.3 m when travelling. app2 passed this (0.015–0.13 m), so this is a **regression**. | `qa/runs/v1/sim_frames.json` f1420–3599 `fh 1.287`, x −0.56→−3.06, z 28.8→11.10; `qa/runs/v1/analysis.txt` "forks moving 0.01-1.287". **Fix:** lower to travel height (≤0.15 m) before the drive segment and raise only at the destination, with the mast tilted back. |
+| **B27** | **v1, new. Nothing completes in 60 s.** FL-07 starts the run already carrying a pallet (parent `carriage` at f0, pallet 7cdce3f9) and over 3,600 frames makes **0 pickups and 0 drops**. KPI `moved:0`, `__assert {ok:0,fail:0,jumps:0}`, and Units/hr shows **0** (−14,500 vs target) on screen. The slot-exact rules K1–K6 cannot be demonstrated, so they default to FAIL, and the KPI strip reads as broken. | `qa/runs/v1/console_sim.txt` `assert {"a":{"ok":0,"fail":0,"jumps":0},…"kpi":{"moved":0,…}}`; `qa/runs/v1/sim_t45s.png` (Units/hr 0). **Fix:** the first cycle (pickup → put-away) must finish within the first 20 s at 1×. Seed the KPIs from history until sim counts exist, or label them "since start". |
+The gate flips to **SHIP: YES** only when B0–B21 (except the closed B3) are all closed **with frame evidence**, no MAJOR item remains in categories 1–11, and every Process legibility stage (L1–L13) is graded PASS.
+
+---
+
+## PROCESS LEGIBILITY (checklist §L): can a layperson read the DC flow just by watching?
+
+**Method:** I read `SIM_SPEC.md` §A–B8 and `SIM_SPEC_WALMART.md` in full, then checked each stage against `src/app1.js`, `app2.js`, `app3.js` and `body.html`, plus `parts/models.js` for the available machines. **Code evidence only:** walmart-dc.html has not landed, so every stage is still FAIL until frame-proven. The "Frame evidence" column fills in after the app run.
+
+**Spatial order is correct.** Seen in plan view, the zones run south to north exactly as the spec does: RCV y0–10 → MXA → RES aisles 01–08 / XDK corridor x45–50 → PM x50–72 → CNV x72–98 → NXA + SRT1 at +5 m → OBS y50–62 (`app2.js:2-3`, floor paint `app2.js:72-85`). Inbound doors are on the south wall and outbound on the north, as in the spec. **What is missing is the process in time:** nothing moves through these zones (B13).
+
+| # | Stage (spec) | Exists? (code evidence) | Order | Signs / captions vs spec | Grade | Concrete fix | Frame evidence |
+|---|---|---|---|---|---|---|---|
+| L1 | Gate check-in (B1.1; W A7 automated lane + GC exception lane) | **Static prop only.** One booth with a single boom arm at the SE corner (100, 0, 70). The arm group is exposed (`world.userData.gate`) but nothing animates it. There are no in/out lane split, no OCR/QR camera post, no scale, no queue. `app2.js:189-193` | Position matches the spec (GTE at SE) | No "GATE" or "CHECK-IN" sign; no caption | **BLOCKER** (B13) / MAJOR for missing lanes | Add 2 in + 2 out lanes with islands, a camera pole that flashes on read, and the boom raised with easeIO when a truck stops. Signs "GATE · CHECK-IN" / "CHECK-OUT". Caption "Truck checks in at the gate (QR + plate scan)". | pending |
+| L2 | Yard: drop, yard tractor hook, move to door, back in (B1.2–B1.4, B8) | **Partial.** Slots are painted, with labels `YA-01…15` (south) and `YD-01…15` (north) only (`app2.js:35`). Spec has YA/YB/YC + YD/YE/YF, and **YE is the outbound-staged zone that departure needs**. `createYardTractor` is never called. | n/a | Slot labels match the spec format `Y[A-F]-NN` ✓; no "YARD" sign | **BLOCKER** (B13) | Add YB/YC/YE/YF (or at least YE). Instantiate yard tractors that drive `drive()` paths: hook → pull → reverse in with trailer leading (tractrix). Caption "Yard truck moves trailer to door DR-00x". | pending |
+| L3 | Inbound unload + scan (B2.1–B2.4) | **Scenery only.** Door corridors, a green leveler strip and stage lanes `STG-DR001-1` with 4 FIFO slots per door (`app3.js:39-41`, `app2.js:73`). The `STG-DRxxx-n` naming matches the spec ✓. No unloader, no scanning, no SS/DA split, no EXT/ACL conveyor door. | Correct (south docks → RCV) | Floor label "RECEIVING" is painted flat (`app2.js:83`) and unreadable at oblique angles. No door numbers on the doors. No "Staple Stock"/"DA" vocabulary (W A3). | **BLOCKER** (B13) | Animate pallet jack / forklift trailer → stage lane. Add an associate with an RF scanner that flashes a beam and a "✓ LPN" chip over the pallet. Add hanging door number plates "DR-001…". Caption "Unload + scan each pallet (LPN)". | pending |
+| L4 | Disposition: put-away to reserve **or** cross-dock (B2.4, B3) | **Partial.** RES racks: 8 aisles × 11 bays × 6 levels with beam tops 0/1.75/3.5/5.25/7.0/8.75 = spec ✓ (`app2.js:6-7`, `app3.js:3-19`); aisle clear ≈ 3.2 m ✓. XDK corridor with northbound arrows ✓ (`app2.js:75-78`). **No reach truck exists** (B3), so narrow-aisle put-away cannot be shown. Slot fill is toggled by **scale 0↔1** (`app3.js:31-32`), so a put-away would **pop** a pallet into the rack (B2 class). | Correct | "XDK ▲" floor text is 0.6 scale (≈1.1 m glyphs) and sits under the mezzanine edge. **No "RESERVE" sign.** Slot IDs are `RES-01-01W-A1` vs the spec format `01-001-A-1` (MINOR). | **BLOCKER** (B3, B13) | Build a reach truck (pantograph/reach carriage, triple mast). Put-away should carry the pallet in, raise the mast, reach and lower onto the beam, *then* call setSlot. Never scale. Show the split with a coloured route ribbon (blue = store, yellow = XDK). Upright signs "RESERVE STORAGE" and "CROSS-DOCK". | pending |
+| L5 | Replenishment reserve → pick face (B4) | **Absent behaviour.** Flow-rack faces at x 57/65 on L1 (`app3.js:54-58`), but nothing feeds them, and there is no replenishment aisle or rear-load side marking. | n/a | No sign | **BLOCKER** (B3, B13) | A reach truck lowers a pallet from RES and drives to the rear of a PM flow lane. The case slides forward (flow-rack motion). Caption "Replenish pick face from reserve". | pending |
+| L6 | Pick (B5: voice/RF case pick → label → takeaway conveyor) | **Scenery only.** 3-tier mezzanine (decks at +5.0/+8.5, yellow rails), flow faces on L1 only, takeaway conveyors at x 52/70/74 (`app3.js:48-58`). No associates (`createWorker` unused); L2/L3 decks are empty slabs. | Correct (PM between RES and CNV) | No "PICK MODULE" sign: the mezzanine deck covers the floor paint | **BLOCKER** (B13) / MAJOR (empty decks) | Pickers walk to the face, take a case, apply a label (white flash), and place it on the belt. Cases ride the takeaway belt into CNV. Populate L2/L3 with carton-flow faces. | pending |
+| L7 | Sortation (B6: merge → induct/scan → sliding-shoe divert → spiral to OBS) | **Exists but wrong.** The SRT1 loop is at +5 m over NXA (position matches the spec ✓), but it is a closed loop with no merge, no scan tunnel, no diverts and no spirals. The diamond tube clips the cases by 0.30 m (B16). | **Out of order in effect:** the loop is disconnected from pick and from OBS | No "SORTER" sign (only "CNV · INDUCT" floor text at `app2.js:84`) | **BLOCKER** (B16) | Model it as a flat belt (use the unused `sh` Shape + ExtrudeGeometry along the curve). Add an induct merge fed from the takeaway belts, a scan arch that blinks, and divert chutes/spirals down to each DS lane. A case leaves the loop at its door. | pending |
+| L8 | Pallet build + stretch wrap (NCV; W B6) | **Absent.** | — | — | **BLOCKER** (B15) | Add an NCV area by the OBS ends: a pallet build station plus a turntable wrapper with an animated film spiral. Caption "Build + wrap mixed pallet". | pending |
+| L9 | Outbound load (B7.1–B7.4, W: trailer stays until cubed/weighed out) | **Scenery only.** OBS lanes are painted 1 per door with green plates (`app2.js:74`). There is no loader, no trailer at the DS door, and no fill % display. | Correct (north) | "SHIPPING · OBS" floor text ✓ vocabulary. No door numbers. | **BLOCKER** (B13) | Spot an empty trailer, load nose-first in rows (sim `loadedPct`), show a fill bar above the door, and close the door at ≥ 92 %. | pending |
+| L10 | Departure (seal → YE → road tractor → gate out with seal check) | **Absent.** No YE zone (L2) and no gate out-lane (L1). | — | — | **BLOCKER** (B13) | Seal flash at the door, pull to YE, road tractor hooks and exits through the gate out-lane, fading out through fog beyond the perimeter road (no scale pop). | pending |
+| L11 | Order and continuity, one item end to end | No item identity carries across stages: the stage-lane pallets (`makePalletObj`), the rack instances (`imLoad`) and the sorter cases (`cases`) are three unrelated systems | Spatial ✓, temporal ✗ | — | **BLOCKER** (B13) | Give each payload an id that persists. Hand the same mesh (or a matched instance swap hidden by the carrier) from truck → lane → rack/XDK → pick → case → sorter → lane → trailer. | pending |
+| L12 | Captions and zone signs accurate to the spec | All zone naming is floor paint at 50 % navy (`app2.js:82-85`), hidden under racks and mezzanine at hero angles. **Missing:** RESERVE/RES, PICK MODULE/PM, SORTER/SRT, NCV, GATE, YARD, door numbers. "AMR ZONE" (`app2.js:84`) conflicts with W C12 (AMRs default 0 in Mode A). Facility naming conflicts with the spec (B14). Dock IDs conflict with the UI (B9). | — | see left | **BLOCKER** (B14, B17) / MAJOR (signage) | Add hanging double-sided zone signs (navy #041E42 board, white Bogle-like text, spark accent) at each zone entry, ~6 m up, sized ≥ 1.2 m cap height. Add a caption bar (bottom-centre, ≤ 8 words, fades in and out with the stage). Remove "AMR ZONE" or gate it behind Mode B. | pending |
+| L13 | Camera tour follows one item | **Absent.** Only a HOME preset (`app1.js:44`) and auto-orbit. | — | — | **BLOCKER** (B17) | A tour of about 12 shots (one per L1–L10 + intro/outro), each 8–15 s, eased dolly with a look-at on the tracked item, looping to HOME without a cut jump. | pending |
+
+**Process MAJOR / MINOR findings (code):**
+- **M12 (MAJOR):** stored rack loads are a single rounded box scaled non-uniformly in Y. This squashes the bevel radius, and every load is the same 1.0 × 1.0 footprint with only 6 colours, so the racks read as clones (X2/W). Evidence: `app3.js:21,29,32`. Fix: use 4–6 load archetypes (cases stacked, shrink-wrapped, drums, mixed), each with its own geometry, and pick by slot hash.
+- **M13 (MAJOR):** gate and yard are underspecified vs the spec. There is one gate lane, and only YA and YD are built (YE is missing, and departure needs it). Evidence: `app2.js:35`, `app2.js:189-193`.
+- **M14 (MAJOR):** there is no SS/DA receiving-door vocabulary and no EXT/ACL door, although Walmart spec A3 asks for it. Fix: label DR-001…004 "SS" and DR-005…008 "DA", and give one door an extendable conveyor.
+- **m7 (MINOR):** the RES slot-ID format `RES-01-01W-A1` differs from the spec `AA-BBB-L-P` (`app3.js:18`).
+- **m8 (MINOR):** UI numbers drift from the spec. Throughput "18,420 units/hr" vs spec seed 14,500 cases/h (`SIM_SPEC.md:335`). "48,212 pallet positions" vs spec 36,480 (`SIM_SPEC.md:64`; the built scene has 8×2×11×6×2 = 2,112). The shift list has no Swing 14–22 (`SIM_SPEC.md:513`).
+- **m9 (MINOR):** no Mode A / Mode B toggle (W §Two modes, line 25).
+
+### v1 pass, 08:12–08:27 UTC: `builds/walmart-dc_v1.html` (290,901 B, CANDIDATES 08:12:02Z; tested copy `qa/snapshots/walmart-dc_v1.html`, identical to `qa/snapshots/walmart-dc.290901.20261025T081112Z.html`)
+
+All results in this section come from **v1** only. The 288,710 B intermediate build was skipped (superseded by v1). Run dir: `qa/runs/v1/`.
+
+- **Static:** the module passes `node --check`, with 5 real `</script` closers. `const PALS` is at line 3222, before its first use (3238), and `__ready` is set after `compileAsync` (3400).
+- **Boot, desktop 1280×800:**
+  - default: `GL … SwiftShader -> quality low` (auto-detect works), ready 66.6 s under load avg ~22, canvas 1280×800, no placeholder, FPS **0.132**. `boot_desk_default.png`
+  - `?q=low`: ready 49.0 s, FPS **0.056**. `boot_desk_qlow.png`
+  - Console on both: only `[warn] KHR_parallel_shader_compile extension not supported`. No errors, no failed requests.
+- **Boot, mobile 390×844:**
+  - default: ready 49.1 s, canvas 390×844, docW 390 = vw (no horizontal overflow), FPS 0.071.
+  - `?q=low`: ready 16.0 s, canvas 390×844, docW = vw, FPS 0.126, no errors (`console_mob_qlow.txt`).
+  - **`?capture&noao`: ready at 16.4 s, no `ReferenceError`, canvas 390×844, render 33 ms.** That is `qa/runs/v1/cap/console_mob_capture_noao.txt` and `cap/boot_mob_capture_noao.png`. **B22 CLOSED in v1.**
+  - **B18 still OPEN** (improved, not fixed). See `boot_mob_default.png`:
+    - the Alerts popover sits on top of the TRL-48213 panel
+    - the header is clipped at the right edge (LIVE badge and icons cut off)
+    - the 2nd KPI card is clipped, and the trailer sheet covers about 65% of the viewport, so almost none of the 3D scene is visible
+    - **Fix:** collapse alerts into a badge or drawer, make the trailer panel a dismissible bottom sheet at ≤40 vh, make the KPI strip a horizontal scroller with scroll-snap, and give the header a compact layout.
+  - Also, Units/hr reads 14,820 at boot but **0** at t=45 s in the sim (`sim_t45s.png`), so the KPIs swing from demo data to sim counts (B27).
+- **Sim** (`?capture&noao&q=low`, 3,600 frames, 60 s):
+  - Scene: 5,953 objects, 4 semis, **1 forklift, 1 worker, 0 AMR** (off by default), 21 pallets. No reach truck, pallet jack or tug.
+  - **Slot events: 0 attach, 0 detach** (B27).
+  - Builder assert lines `[slot-assert]`: **0** (`ASSERT {ok:0, fail:0, jumps:0}`), so the assert never fired because no handoff happened. The assert code exists (`walmart-dc_v1.html:3268-3269`, tolerance 2 cm on fork seat, dxz and dy), so **K5 is now present in code** but unexercised.
+  - Visible load jumps >5 cm: **0** (app2: 6, at 8–12 cm).
+  - Carried seat: pallet base − carriage heel = −0.073 to −0.082 m against the ideal −0.074 (TINE 0.048 − DECK_UNDER 0.122), so it holds within 0.9 cm. B21 is closed.
+  - Lift: trapezoid, peak 0.504 m/s, max 0.84 cm/frame. B20 is closed.
+  - **Yaw: a 90.0° snap in ONE frame at f1232** (t 20.53 s) while stationary at (−0.56, 28.8), changing heading from +X to +Z. The next largest is 3.83° (f1420). app2's max was 10.33°. Most joins are now smooth, but this snap is worse (B25).
+  - Front-axle slip max 1.99 m/s, which is the pivot at f1232. Away from it, lateral body slip is <0.5 m/s on every frame, and 110 of 3,410 frames exceed 0.03 m/s (app2: 745 of 3,128).
+  - Steer error mean 6.9°, max 16.2° (app2: 61°).
+  - Roll r 0.345 vs wheel height 0.330 (4.5%, PASS within 5%).
+  - Forks while travelling: up to **1.287 m** (B26, regression).
+  - Distance 43.1 m.
+- **B13 process coverage (v1):** **regressed.**
+  - Only the trailer → dock forklift move exists, and it doesn't finish within 60 s.
+  - AMRs are now off.
+  - No rack put-away, no picking, no loading. The rack stays static, with occupancy 1,322 of 2,112 slots.
+  - The on-screen alert "RCH-041 hydraulic fault in aisle 04" and the mission "Replen 04-016-C-2 · RCH-041" refer to a reach truck that isn't in the scene (MAJOR M19).
+- **UI (`sim_t45s.png`):**
+  - The KPI strip shows Units/hr **0** (−14,500) and dock utilisation 18.8% (−61.3 pt), all red, which reads as an outage (B27).
+  - The 2D/3D/floor bar overlaps the "Concept… not affiliated with Walmart Inc." footer at the bottom left (MINOR m11).
+  - The forklift is not in frame at t=45 s from the default camera, so the only moving machine is invisible (MAJOR M20).
+
+### App pass 2, 08:00–08:20 UTC (file 300,564 B, 03:51 box; rebuilt mid-run to 288,815 B, 04:04:50 box)
+- **Boot (300,564 B):** OK. `__ready` at about 104 s (CPU load 24 on 8 cores), canvas 1280×800 at CSS 1280×800, placeholder gone, renders present (`sim_t2s/t20s/t40s/t59s.png`). Console: `[http 404] /favicon.ico` and `[error] Failed to load resource … 404` only. No pageerror and no requestfailed.
+- **Boot (288,815 B):** desktop default `[info] [gateflow] GL: ANGLE (… SwiftShader driver) -> quality low`, `[warn] THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.`, ready at 9.7 s. Mobile `?capture&noao`: `[error] ReferenceError: Cannot access 'PALS' before initialization`, never ready (B22).
+- **`?q=low`:** exists in 288,815 B (`const Q = QS.get('q') || (GL_INFO.weak ? 'low':'high')`, line 2736), and SwiftShader auto-selects low. It was absent in 300,564 B, which only has `?capture` and `?noao`.
+- **FPS:** `?q=low` at 1280×800 under SwiftShader gave **1 frame in 9.18 s = 0.109 fps**. `?capture&noao` gave one composer frame in **43.06 s**. These are CPU-GL numbers; the real-GPU FPS is still unmeasured.
+- **60 s accelerated run** (`qa/tools/app2.js sim`; 3,600 fixed steps of 1/60 via `__step`; GL draw stubbed for the probe and restored for screenshots). Raw data in `qa/runs/app2/sim_frames.json`, `analysis.txt`.
+
+| event | slot | fork Y (heel) | slot Y | error | yaw err | lateral err | max frame jump ±10 | PASS/FAIL |
+|---|---|---|---|---|---|---|---|---|
+| attach f519 t8.65 s, FL-07, pal e133c840 | TRL-48213 deck pos 1 | 1.461 | 1.300 (+pocket 0.022) | **+0.14 m** | 0.07° | 0.000 (no XZ jump) | 0.002 | **FAIL** (K1) |
+| detach f1518 t25.30 s | LANE5 floor slot | 1.395 | 1.200 | pallet bottom +0.033 then snap | 0.03° | 0.000 | 0.033 | **FAIL** (K1/K3) |
+| attach f2435 t40.58 s, pal 0b1186ee | TRL deck pos 2 | 1.401 | 1.300 | **+0.08 m** | 0.23° | 0.000 | 0.005 | **FAIL** (K1) |
+| detach f3271 t54.52 s | LANE5 floor slot | 1.395 | 1.200 | **+0.093 snap** | 0.12° | 0.000 | **0.093** | **FAIL** (K1/K4) |
+
+  Builder assert grep (`fork|slot|seat|beam|attach|detach|assert`) over the console logs: **0 lines**. **The builder has no fork-to-slot assert, and that absence is itself a fail (K5).** Global load jumps over 5 cm per frame: 19, of which 6 are on the visible carried pallet (yaw snaps, B25). The rest are on the hidden built-in carriage load (visible = 0, ignored).
+- **Kinematics:** wheel roll **PASS**: 40.19 m over 123.7 rad implies r = 0.325 m against a wheel centre height of 0.33 m. Forks low while travelling **PASS**: fork height 0.015–0.13 m. Pivot and slip **FAIL** and steer **FAIL** (B25). The rear steer sign does reverse (+/−), so it is not one-sided.
+- **Pop-in/out PASS:** B2 closed.
+- **Render, MAJOR M18:** at the default camera the only working forklift is hidden. The trailer panel auto-opens and, with the alerts popover, covers about 45% of the 3D view (`sim_t40s.png`), so the unload process is never readable on screen.
+
+### First app pass, 07:50–08:01 UTC (fast pass, steering 07:49)
+- **Load:** FAIL (B0). Desktop: `[pageerror] Invalid or unexpected token`, `[http 404] http://127.0.0.1:8931/favicon.ico`, `[error] Failed to load resource: the server responded with a status of 404 (File not found)`. Mobile: `[pageerror] Invalid or unexpected token`. No requestfailed entries.
+- **Render:** FAIL. `#gl` stays 300×150 and no WebGL scene is ever drawn. The UI chrome renders at 1280×800 (`qa/runs/app1/load_desk_1280x800.png`). At 390×844 the layout is broken (B18).
+- **QA-only patched copy** (`qa/patched/walmart-dc.fixed.html`, `</script>` → `<\/script>` at line 1180). All 19 unpkg modules return 200 at about 1.1 s and **no further pageerror appears**. However, the main thread then stays blocked: `load` fires only at **88.9 s**, and every `evaluate` times out at 8 s through 145 s (`qa/runs/app1_patched/console_live.txt`). **FPS < 0.12 under SwiftShader at 1280×800**, with no frame responsive within 8 s. This is a CPU-GL worst case, not a GPU number, but it is still MAJOR **M17**: a cold build blocks the main thread for ~89 s with no progressive loading. The fix is to build in chunks with `await` / idle callbacks, warm up with `renderer.compileAsync`, merge instances, and gate GTAO by device tier. The real-GPU FPS is still to be measured.
+- **The 60 s accelerated slot/kinematics run and the FPS read were not possible** on the shipped file (0 vehicles, 0 events), and under SwiftShader on the patched copy (the page does not respond to the probe). Both are deferred until B0 is fixed, and the patched copy needs a GPU or a lighter tier.
+
+## SLOT-EXACT HANDLING (steering 07:46, checklist §K): BLOCKER class
+
+**The per-event table could not be filled: B0 means there were 0 vehicles and 0 attach/detach events.** The instrumentation is ready: `qa/tools/auto2.js` (`__slotProbe` per frame: fork tip world Y, heel, yaw, parent/owner of each load, SLOTS diffs, all console output → `console_all.txt`) and `qa/tools/slot_analyze.py` (seat error, yaw error, lateral error, max jump ±10 frames, grep for the builder assert).
+
+| event | slot | fork Y | slot Y | error | yaw err | lateral err | max frame jump | PASS/FAIL |
+|---|---|---|---|---|---|---|---|---|
+| (none captured: app does not boot, B0) | – | – | – | – | – | – | – | **FAIL** |
+
+**Console grep for the builder fork-to-slot assert (>2 cm):** `fork|slot|seat|beam|attach|detach|assert` in `qa/runs/app1/console_*.txt` gives **0 hits**. The only messages are the pageerror and the favicon 404. Absence of the assert is not a pass, because the code never ran.
+
+**Code path for target height (off-by-one check): PASS on the slot table, FAIL on the vehicle side.** Racks use `levels: RACK_LV.slice(1)`, and SLOTS Y = `FLOOR + RACK_LV[lv] + (lv ? 0.004 : 0)`. The beam is centred at y−0.065 with h 0.13, so the beam top equals the level value and the wire deck sits at +0.004. Index and level map 1:1, with no off-by-one. The failures are B19 (maxH clamp), B20 (exp lift), B21 (seat and root offset), plus M15 below.
+
+## Inputs: present vs missing
+
+| Input | Status |
+|---|---|
+| `walmart-dc.html` | **MISSING.** Waited 03:00→07:39 UTC (two waiters; `qa/wait2.sh` deadline 07:51 UTC). **Pending** |
+| `parts/motion_demo.mp4` | **MISSING.** Frame extraction at 10 fps (wheel, steer, articulation) **pending** |
+| `src/app1.js` (122 lines), `src/app2.js` (193), `src/body.html` (46), `src/style.css` (185) | Present, read-only reviewed (code evidence below) |
+| `parts/models.js` (1,479 lines), `parts/preview.html`, `parts/check_results.txt` (72 PASS / 0 FAIL, all static bounds checks), `parts/closeup_*.png` | Present, reviewed |
+| `assets/raw/*.glb` (forklift_counterbalance, pallet_stacker_auto, walmart_truck) + `assets/renders/**` | Present, reviewed (`qa/glb_inspect.json`) |
+| `imgref/01–18` | Present, used for the checklist and colour refs |
+
+---
+
+## Mandatory category coverage (strict: FAIL unless frame-proven)
+
+| # | Category | Grade | Findings |
+|---|---|---|---|
+| 1 | Scale & proportions | **FAIL** (unproven in app) | Library dims are good (see "What is already right"). **MAJOR M1:** fork length is inconsistent. GLB tines are **1.20 m** (z 1.0–2.2), procedural `forkGeo(L = 1.07)` (`models.js:643`). Use 1.07 m everywhere so the pallet overhangs the tips by ~0.13 m. **MINOR m1:** rack bay depth 1.25 m (`check_results`: rackBay 2.96×7.27×1.25) is deeper than the 1.22 m pallet, so pallets won't overhang the beams the way real ones do (1.07–1.1 m frame, 50–75 mm overhang each side). Set frame depth to 1.07 m. |
+| 2 | Clipping & z-fighting | **FAIL** (unproven) | **MAJOR M2:** the `sb` sub-sign plane is coplanar with the parapet face at x 58.75 with no polygonOffset; only the main sign has it (`src/app2.js:156` has `polygonOffset: true`, `:159` `new THREE.MeshBasicMaterial({ map: sub, transparent: true })` does not). Add `polygonOffset: true, polygonOffsetFactor: -2` or move it 2 cm off the face. **MAJOR M3:** stacker carriage overruns the mast top (B4). Needs the R-capture z-fight scan once the app exists. |
+| 3 | Jitter & popping | **FAIL** | B2 (scale pop-in/out). Fix: spawn and despawn only beyond the fog/frustum edge. Trucks enter via the gate road from outside `Fog(380,900)`; pallets are created inside trailers or behind dock doors; no scale tweens on world objects. Keep `popIn` for UI tags only. |
+| 4 | Wheel roll & steer | **FAIL** (unproven) | Library math is correct: per-wheel ICR distance `d / radius` (`models.js:452-455`), bicycle model yaw `speed*tan(steer)/L` (`:441`). Unproven in the app (B6). **MAJOR M4:** `spinWheels()` (`models.js:408`) uses `speed*dt/r` with no ICR correction. Any model driven through it (pallet jack, AMR, rider truck) will slip inner/outer wheels on turns. Route all wheeled machines through `drive()` with `kin` set. |
+| 5 | Mast timing | **FAIL** | B4 (single stage). Telescoping order is unproven: free-lift of the carriage first, then the inner stage, eased, only while stationary. Fix: add `mast_inner` to the stacker; sequence carriage 0→free-lift, then inner stage; gate lift on `speed < 0.05`. |
+| 6 | Pallet seating | **FAIL** (unproven) | Pallet geometry is excellent (plank by plank). Seating on forks, beams and trailer floor is unproven. Requirement: pallet bottom = beam top ±1 cm, pitch/roll ≤0.5°, tines fully inside the fork pockets (pocket clear height 0.078 m vs tine thickness; check tine ≤0.05 m). |
+| 7 | Shadows & lighting | **FAIL** | **MAJOR M5:** one 4096² sun shadow over a 250×200 m frustum (`src/app1.js:57-58`) gives ≈6 texels/m (16 cm per texel). Fork, pallet and wheel contact shadows will be mush and shimmer as the camera tours. Fix: CSM (3 cascades) or fit the frustum to the camera view each frame, plus baked contact AO under vehicles. **MAJOR M6:** fill is too flat. Hemi 1.25 + ambient 0.25 + fill 0.45 (`src/app1.js:53-54,61`) kills form and washes out brand colour (B10). Target hemi 0.6–0.8, drop ambient, rely on SSAO. |
+| 8 | Outline & AA sharpness | **FAIL** | B12 (no composer, so no outline). `antialias: true` is lost the moment a composer is added: use a multisampled render target (`samples: 4`) or SMAA. **MAJOR M7:** ground markings are painted into a **10 px/m** canvas (`src/app2.js:17` `GP = 10`), so a 0.15 m dock line is **1.5 px wide**. That blurs at hero zoom (R4). Use 40 px/m tiles, or vector line meshes / decals for markings within 60 m of the hero camera. |
+| 9 | Label alignment | **FAIL** | B9 (24 vs 16 docks, mismatched IDs). Tags `#tags` (body.html:2) projection, anchoring, drift and overlap all untested. Need a 240-frame capture with a projected anchor vs label centre error ≤2 px and no overlap. Wordmark on trailer texture: 54% width, 33% height, fine (texture). **MINOR m2:** trailer wordmark weight looks lighter than the bold photo reference. |
+| 10 | Colour fidelity (ΔE00) | **FAIL** | Sampled in `qa/colour_samples.json`. **Source values are on brand:** CSS `--blue:#0071CE --navy:#041E42 --mid:#004C91 --spark:#FFC220` exact (`src/style.css:1`); trailer texture #0673CE (ΔE 0.7), #FEC223 (ΔE 0.2); GLB `walmart_blue` #0070CD, `spark_yellow` #FFC125. **Rendered values are not:** truck wordmark #3B8BE6 (ΔE **9.8**), spark #FFE243 (ΔE **10.3**), stacker badge #488DE3 (ΔE **10.5**). Forklift body #FFC93B vs spark ΔE 2.3, a fine safety yellow (material #F1B222, ΔE 4.3). Gate ΔE00 ≤ 3 for brand surfaces in product frames. Fix: lower exposure and fill, author brand decals as emissive-assisted or `toneMapped: false` on decal materials, and re-sample in the app. |
+| 11 | Appearing / vanishing | **FAIL** | B2. `roof.visible = false` (`app2.js:133`) is a user toggle, which is fine if eased (fade or slide), not a hard cut. Run `auto.js` (S) to prove 0 on-screen pops over 3 min. |
+
+---
+
+## MAJOR (non-blocking but must fix before ship)
+
+- **M18** At the default camera the only active machine (FL-07 unloading at DR-012/LANE5) is not visible in any of the 4 sim screenshots. The auto-open TRL-48213 panel and the Alerts popover cover about 45% of the 3D view (`qa/runs/app2/sim_t20s.png`, `sim_t40s.png`). Fix: frame the active dock on load and keep panels collapsed until clicked.
+
+- **M17** After the B0 fix the page blocks the main thread for ~89 s before `load` and stays unresponsive (more than 8 s per frame) under SwiftShader. Evidence: `qa/runs/app1_patched/console_live.txt`. Fix: chunked or async build, `compileAsync`, a quality tier with no GTAO on low-end devices.
+
+- **M15** `imLoad` Y-scale also scales the 0.144 seat offset, so instanced rack loads sink up to 2.9 cm (hh 0.8) or float 1.7 cm (hh 1.12) off the deck (rule c, visibly seated). Fix: scale the geometry about its base, not its centre.
+- **M16** three@0.160.0 and its addons load from unpkg at runtime, so the single-file app shows a blank scene offline or if the CDN fails, with no error UI. Fix: inline or vendor three, or show a visible "3D unavailable" state.
+
+- **M1** Fork length 1.20 m in the GLB vs 1.07 m spec. Evidence: GLB node bounds (fork_L/R z 1.0–2.2), `models.js:643`, crop `qa/artefacts/glb_forklift_tines_square_tips.png`. Fix: scale the tines to 1.07 m, add a 45° taper over the last 0.1 m, and make them 0.10 m wide × 0.045 m thick.
+- **M2** Sub-sign z-fight risk. `src/app2.js:159`; fix as in the table.
+- **M3** Stacker carriage overruns the mast (see B4).
+- **M4** `spinWheels` has no ICR. `parts/models.js:408`.
+- **M5** Shadow resolution 16 cm/texel. `src/app1.js:57-58`.
+- **M6** Over-filled lighting washes out the palette. `src/app1.js:53-54,61`.
+- **M7** 10 px/m ground-marking texture. `src/app2.js:17`.
+- **M8** Truck GLB is over budget: **32,878 tris** (budget ≤25k per vehicle), **60 primitives / 19 materials**. Fix: merge primitives by material (`gltf-transform` `join`/`palette`) to ≤12 draws, and decimate the tyre treads and the lug-nut ring.
+- **M9** All GLBs are uncompressed. Measured with meshopt + webp: forklift 1,563,168 → **293,212 B**, stacker 604,132 → **116,684 B**, truck 2,251,852 → **409,024 B** (−81%). Base64 in a single HTML adds 33%. Command: `gltf-transform optimize in.glb out.glb --compress meshopt --texture-compress webp` (load with `MeshoptDecoder`).
+- **M10** The forklift GLB has 4 open edges on the body (asset meta QA). Weld or close them, or they will show as light leaks with SSAO.
+- **M11** No motion reference: `parts/motion_demo.mp4` is missing, so the wheel, steer and articulation timing review cannot be done.
+
+- **M19 (v1):** the alerts and missions name RCH-041 / a reach truck that does not exist in the scene. **Fix:** spawn it, or remap the demo data to FL-07.
+- **M20 (v1):** the default camera at t=45 s does not frame FL-07, the only active machine. **Fix:** frame the active task by default, or use the ?tour=1 behaviour.
+
+## MINOR
+
+- **m11 (v1):** the bottom-left 2D/3D/floor control overlaps the "Concept… not affiliated" disclaimer (`qa/runs/v1/sim_t45s.png`). **Fix:** lift the disclaimer above the bar, or move it right of the bar.
+
+- **m10** `walmart-dc.html:2917` comment "Walmart DC #6094 digital twin": rename it to RDC-7041 (it is visible in view-source).
+- **m11** `favicon.ico` 404 (`[http 404] http://127.0.0.1:8931/favicon.ico`) on the desktop load: inline a data-URI spark favicon.
+
+- **m1** Rack depth 1.25 m (see category 1).
+- **m2** Wordmark weight.
+- **m3** Asset render staging has a hard beige horizon band (#E2DDD6 at y≈67) across the top of the renders. Crop: `qa/artefacts/glb_truck_render_bg_seam.png`. This is presentation only; use a gradient sweep backdrop.
+- **m4** The main truck render crops the cab. Re-frame it.
+- **m5** All materials are metalness 0, even forks, chains and chrome. That's acceptable for the clay look, but give chains and forks roughness ≤0.5 for a soft highlight so they read as steel.
+- **m6** Camera near plane 1 m (`src/app1.js:42`) clips anything within 1 m in close inspector shots. Use near 0.3 with a logarithmic depth buffer, or a dynamic near.
+
+---
+
+## What is already right (plausible, still needs frame proof)
+
+- **Pallets are plank by plank:** 3 bottom boards, 9 blocks, 3 stringer boards, 5 top boards with gaps, 1.02×1.22×0.144 m. Steel and blue-wood variants and instancing (`models.js:282-330,402`).
+- **Load mix exists in the library:** heights 0.86 (sacks), 1.07 (totes), 1.17 (cartons), 1.38 (wrapped) (`check_results.txt`). This is still not proof the app mixes them.
+- **Tractor-trailer `drive()`:** bicycle model, tractrix trailer at the kingpin with off-tracking, per-wheel ICR roll (`models.js:437-460`). check_results "semiTruck driven trailerYaw 0.163, kingpinErr 0".
+- **Forklift GLB hierarchy is fixed:** body > mast_tilt > mast_outer > mast_inner > fork_carriage > forks; rear steer ±75°; min y 0. The 03:15 version had forks floating 2.8 m ahead; that is resolved.
+- **Damping is delta-time based** (`app1.js:16-17` `1 - Math.exp(-k*dt)`). DPR is capped at 2 (`app1.js:31`). sRGB output and ACES are set (`app1.js:35-37`). Fog starts at 380 m, which gives a spawn edge.
+- **Slab band style** blue #0071CE and spark pinstripe (`app2.js:53-54`) matches imgref 17. Bollards are present at the docks and the parapet (`app2.js:113,160`).
+
+---
+
+## Pending runs (tooling ready, all in `qa/tools/`, run as soon as walmart-dc.html lands)
+
+1. `node run.js` / `modes.js`: 1440×900 console errors plus screenshots (initial, settled, 2D, 3D, floors, inspector, day, night) and a 390×844 mobile view.
+2. `node cap60.js http://127.0.0.1:8931/walmart-dc.html /tmp/cap60 60 5 240 1440 900 1`, then `python3 scrub.py`. Artefacts go to `qa/artefacts/fNNNN_<kind>_<where>.png`.
+3. `node realfps.js`: p50/p95/max frame time and long frames (SwiftShader numbers are flagged as software GL).
+4. `node auto.js URL /tmp/auto 180 8 2`, then `auto_analyze.py` (pop, stuck, teleport, camera tour) and `vehicle_analyze.py` (V1/V2/V7/V8/V10 plus spin, steer, articulation, fork-height summaries and a speed plot).
+5. `ffmpeg -i parts/motion_demo.mp4 -vf fps=10 qa/motion/f%04d.png` when it exists.

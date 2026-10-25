@@ -1,0 +1,64 @@
+{
+ "facing": "+Z (face/toes toward +Z)",
+ "refs": [
+  "01_interior_dock_forklifts.jpg",
+  "14_iso_cutaway_orange_base.jpg"
+ ],
+ "dims": {
+  "height_m": 1.745
+ },
+ "animations": [
+  "Walk",
+  "Idle"
+ ],
+ "hierarchy": "worker > worker_rig (Armature, 21 bones) > worker_body (SkinnedMesh, rigid 1-bone weights)",
+ "rig": {
+  "bones": [
+   "hips",
+   "spine",
+   "chest",
+   "neck",
+   "head",
+   "upper_arm_L",
+   "forearm_L",
+   "hand_L",
+   "upper_arm_R",
+   "forearm_R",
+   "hand_R",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R"
+  ],
+  "skinning": "every vertex weighted 1.0 to one bone (rigid toy segments) -> cheap, no candy-wrapping",
+  "Walk": "1.0 s loop (31 frames @30fps), in place; drive root at ~1.35 m/s (stride 0.67 m, 2 steps/cycle) to avoid foot slide",
+  "Idle": "2.0 s loop (61 frames @30fps): breathing, head look, arm sway",
+  "anim_qa": {
+   "walk_lowest_vertex_m": [
+    -0.0,
+    0.0
+   ],
+   "idle_lowest_vertex_m": [
+    -0.0,
+    -0.0
+   ]
+  }
+ },
+ "nodes": {
+  "worker": "origin ground centre between feet",
+  "hips": "bone at y=0.93"
+ },
+ "qa": {
+  "min_z": -0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": 0.0
+ },
+ "blender_tris": 9576,
+ "file": "worker.glb"
+}

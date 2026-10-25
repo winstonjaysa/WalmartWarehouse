@@ -1,0 +1,181 @@
+models.js CHANGES — QA blockers B19, B20, B21, B23, B25 (qa/review.md, 08:13 UTC steering)
+Generated 2026-10-25. Line refs are for /workspace/gateflow/parts/models.js as saved now.
+The API is BACKWARD COMPATIBLE. Every existing factory, option, userData method and part name still works.
+Behaviour changes that callers can see are listed under "Compat notes".
+
+VERIFICATION
+  check.html -> check_results.txt     TOTAL 93, FAIL 0, ERRS [] (ground contact minY 0 +-1e-4, sizes == SIZES, pivots, wheels, NaN)
+  check_qa.html -> check_qa_results.txt   TOTAL 32, FAIL 0, ERRS []   (new blocker-specific asserts, listed below)
+  node --check models.js OK. Zero console errors in headless Chrome (SwiftShader), server 127.0.0.1 only.
+
+B19  Reach truck lifts to about 9.2 m with telescoping stages, carriage inside the rails
+  L636   createReachTruck: makeMast({H0: 4.0, maxH: opts.maxForkHeight ?? 9.2, drop: 0.012}). The mast is triplex:
+         2 inner stages plus the outer.
+         It was about 5 m before. userData.maxForkHeight is 9.2.
+  L941+  makeMast: stage count = ceil(extension / (H0 - OVERLAP)). Free lift first, then the stages extend together.
+  check_qa results at 9.2:
+    fork underside world Y 9.302 (clears the 8.75 beam plus entry clearance)
+    backrest top 10.533 <= rail top 10.570
+    per-stage overlap 0.775 m (>= 0.4)
+  SIZES.reachTruck has been regenerated: 1.275 x 4.13 x 3.128 at rest.
+
+B20  The fork lift is speed-capped and lands EXACTLY on target. The exponential ease is gone.
+  L922   FORK_VMAX = 0.5 m/s, FORK_ACC = 0.5 m/s^2.
+  L966   mast state st = {h, target, v, vmax, acc, minH}.
+  L974   set(h) clamps to [minH, maxH].
+  L975   snap() jumps straight to the target with v = 0. Every setForkHeight(h, true) path uses it.
+  L977   step(dt) is a trapezoid on a discrete-time braking curve, vB = sqrt(2*a*d + (a*dt/2)^2) - a*dt/2.
+         |v| <= vmax and |dv/dt| <= acc on every frame, including the landing frame.
+         The final position is assigned to the target exactly (h === target). There is no asymptotic creep.
+  check_qa results, for forklift / reach / autoStacker / walkie, 0 -> 1.6 m at 60 fps:
+    vmax 0.500, accel max 0.500 (cruise and landing), final === 1.6, 4.18 s
+  The motion.html runner uses the same profile.
+
+B21  The carried load sits on the tine top. getForkTopY() is exposed.
+  L922   Tine constants: FORK_T 0.045 (flat blade), FORK_BEVEL 0.006, FORK_TOP 0.051, FORK_BOT -0.006
+         (carriage space). Total tine section is 0.057 m.
+  L927   Tine shape: flat top up to L - 0.18, tapering to 0.012 at the tip.
+  L924   LOAD_SEAT_Y = FORK_TOP - PALLET_POCKET.hi (-0.071). The built-in loads at L646 (reach), L1046 (forklift)
+         and L1100 (autoStacker) sit there, so the top-deck underside rests exactly on the tine top.
+         LOAD_MIN_H = 0.1. setLoad(true) raises minH so a laden pallet can never be driven into the floor
+         (L659, L1051, L1104).
+  L169   getForkTopY() / getForkBottomY() return WORLD Y. They include vehicle position, yaw, mast tilt and floor.
+  check_qa: pallet bottom + 0.122 - forkTopY = 0.000 m for all 3 laden trucks, with the truck elevated and yawed.
+  Pallet geometry fix (L370-L395), needed for a real 0.122 pocket:
+    Problem: the 3 wooden stringer boards and the 3 steel cross-beams ran ACROSS the fork-entry axis at
+             y 0.10-0.122 (0.092-0.112 steel), so tines at deck height would have intersected them.
+    Fix:     they now run along Z on the block rows (x = 0, +-0.44).
+             Wood top-deck boards now run across the stringers (7 boards).
+             The steel perimeter Z-rails are now flush with the deck at 0.122-0.144.
+    Footprint, height (0.144) and SIZES are unchanged.
+    Ray tests (pine / steel / blueWood): the tine path along Z at y 0.052 and 0.109 is clear, and the
+    deck underside at the tine x is 0.122.
+
+B23  Fork pocket height
+  L163   PALLET_POCKET = {lo: 0.022, hi: 0.122}, FORK_ENTRY_CLEAR = 0.03.
+  L164   addForkApi(g, ud, mast) is installed on all 4 mast trucks (L664 reach, L1056 forklift, L1106 autoStacker,
+         L1212 walkie). It adds:
+           forkThickness (0.057 total tine section), palletPocket, forkPocketY (0.052 above pallet base)
+           getForkPocketY(pallet | baseY) -> world tine-underside Y for a clean entry (= pallet base + 0.052;
+                                            the tine top is then 0.013 below the deck)
+           forkHeightFor(bottomY) -> mast height argument
+           setForkBottomY(y, snap), setForkTopY(y, snap)
+           seatForkTopY(slotY) -> tine-top Y at which a carried pallet's bottom lands exactly on slotY (= slotY + 0.122)
+           isForkSettled(), getForkTarget()
+           setForkSpeed(v) (clamped 0.05..0.5), forkSpeed
+  check_qa: setForkBottomY(getForkPocketY(p)) lands within 1e-4 m on all 4 trucks.
+            Clearance 0.03 below and 0.013 above.
+  App side: for a slot-exact drop (B24), lower with setForkTopY(seatForkTopY(slotY)), wait for isForkSettled(),
+  then detach. Do not snap position.y.
+
+B25  Per-wheel Ackermann, rearSteer flag, rate-limited setSteer
+  L126   finish() installs addSteerApi on every model that has setSteer.
+  L137   addSteerApi:
+           setSteerNow(delta)          the old immediate behaviour
+           setSteer(delta, snap=false) sets steerTarget, clamped to the model's limit. Wheels slew at steerRate rad/s.
+           stepSteer(dt)               runs automatically in update(); drive() calls it too
+           ackermann(delta) -> {inner, outer, angles[]}   true per-wheel angles from the fixed-axle ICR,
+                                                          sign flipped for rear steer
+           getWheelSteer(), setWheelSteer(angles[])
+           steer (actual), steerTarget, steerRate
+  rearSteer / steerRate per vehicle:
+    L662 reachTruck true/1.5        L722 tugTrain false/1.5        L856 semiTruck false/0.6
+    L910 yardTractor false/0.6      L1054 forklift true/1.5        L1101 autoStacker true/1.5
+    L1145 palletJack, L1180 riderPalletTruck, L1210 walkieStacker  true/2.5
+  L553   drive(): after setSteer, it calls stepSteer(dt) and integrates the path with the ACTUAL wheel angle,
+         so the path and the wheels never disagree.
+  check_qa: first step = steerRate*dt. Forklift Ackermann at 0.4: inner 0.470, outer 0.347 (applied to the wheels).
+            The drive() slew is limited to steerRate/60 per frame.
+
+Other
+  L179   autoCycle(ud, mast, hi, dt, onTop) shares the autoLift demo for all mast trucks:
+         0 <-> hi, with a 1.5 s dwell after settling. reach 5.0 m (reach out at top), forklift 2.6 (tilt back on the way
+         up), autoStacker 1.6, walkie 1.4.
+  L941/L968  makeMast `drop` option: the carriage hangs below the rail foot so the tines touch the floor at h = 0
+             (forklift 0.105, autoStacker 0.045, reach 0.012, walkie 0).
+
+Compat notes
+  - setSteer() now slews instead of jumping. Use setSteer(x, true) or setSteerNow(x) for the old immediate set.
+    drive() follows the slewed angle.
+  - setForkHeight(h) now moves at <= 0.5 m/s (a 3 m lift takes about 7 s). setForkHeight(h, true) still snaps.
+  - When a load is set, setForkHeight clamps to >= 0.1 m.
+  - getForkHeight() is still the mast-local height argument. The new *Y getters are world Y.
+  - Pallet deck boards changed orientation (see B21). Pallet dims and SIZES are unchanged.
+  - Still the same: the pallet jack and rider truck forks are 1.15 m (others 1.07); the rack beam depth is 1.1;
+    the AMR is not rigged.
+  - B22 and B24 are app-side fixes. B24 can use seatForkTopY / isForkSettled.
+
+======================================================================
+STEP 2  TOTE + HAND PALLET JACK  (2026-10-25T08:32:06Z)   [steer 08:24 UTC]
+======================================================================
+Heavy-duty tote (ref imgref/19_tote_black_yellow_lid.webp)
+  L506  createTote({variant:'heavy'|'crate', lid=true, color='black'|'blue'|'grey'|hex, lidColor=0xE8A818, contents})
+         heavy (default): 0.462 x 0.379 x 0.692 m with lid (body 0.45 x 0.345 x 0.68). Tapered black body (bottom 87%/90%),
+         vertical ribs framing darker rib-recess panels, 4 corner lugs, rim lip, handle slots on both short ends,
+         open cavity when lid:false. Yellow snap lid: raised border, raised 5 x 7 grid, perimeter snap slots, under-skirt.
+         Flat bottom at y = 0 (conveyor-ready). parts: body, cavity, lid. userData: variant, size, hasLid, setLid(bool),
+         stackHeight (0.379 lidded / 0.345 open: put the next tote at y += stackHeight), nestPitch 0.09 (lid-less nesting).
+  L448  TOTE constants {w, d, h, bodyH, nestPitch, lidColor}
+  L454  getToteGeometry({color, lidColor}) -> {body, cavity, lid, parts}, each {geometry, material}. Merged
+         (vertex colours) and cached per colour pair: 3 draw calls per tote.
+  L497  createToteInstanced(count, {lid, color}) -> group of InstancedMesh (body, cavity[, lid]).
+  L521  createCrateTote(): the old 0.43 x 0.30 x 0.63 crate, kept. createTote({variant:'crate'}) returns it, and
+         createPallet('totes') still uses it so the 2 x 2 grid fits the pallet (unchanged).
+  The conveyor demo totes (opts.totes) now use the heavy tote (alternating lid/open). SIZES.conveyor/tote regenerated.
+  MODELS: tote (heavy, lidded), toteOpen (no lid, contents), toteCrate.
+
+Hand pallet jack / pump truck (ref imgref/20_hand_pallet_pump_truck.jpg)
+  L1233  createHandPalletJack({color, lift, name}). Yellow; forks 1.15 m (z -0.35 .. +0.80), 0.54 m wide, lowered
+         fork top 0.085, max lift +0.12. Fork blades are extruded from a plan shape with chamfered tips and a load-roller
+         window; the load rollers (r 0.04, z 0.66) show through it and the push-rod links stretch as the frame rises.
+         Rounded wedge pump housing with cheeks, capacity plate, relief valve; chrome pump cylinder; black tiller
+         with a D-loop handle, rubber grip bar and a red-tipped lift lever.
+    Rig:  steerTiller (vertical pivot at the steer axle z -0.5, y 0.08) carries the steer wheels, the pump cylinder,
+          pumpHead and tiller, so setSteer turns them together (rearSteer, steerRate 2.5, kin refZ 0.66, L 1.16).
+          tiller (=handle) is the pitch pivot.
+          pump(n=3, total=0.1)   n strokes of about 0.8 s each (handle down then up); lift rises on the down stroke;
+                                 total lift is capped at 0.12.
+          release()              squeezes the lever; forks lower at 0.1 m/s; the lever springs back.
+          setLift(0..1), getLift(), isPumping(), setHandleAngle(rad), setSpeed(v), getForkTopY().
+          Steer wheels and load rollers spin from setSpeed or drive().
+          userData.gripAnchor === userData.anchors.tillerGrip: Object3D at the grip (+X along the bar, +Y up the
+          tiller, +Z toward the operator).
+  L1303  createPalletJack(opts) is an alias (name 'palletJack') with the old API (setLift, setHandleAngle,
+         parts.handle/pump/forks/steerWheels/loadRollers/liftFrame/tillerSteer). Its size changed to
+         0.55 x 1.27 x 1.53 (the old tiller was taller); SIZES regenerated.
+  MODELS: palletJack, handPalletJack, handPalletJackRaised (lift 0.1).
+  Close-ups: parts/closeup_toteLid.png, closeup_toteOpen.png, closeup_handPalletJack.png,
+             closeup_handPalletJackRaised.png. I compared them with the refs: the silhouette, lid grid, roller
+             windows and loop handle all match.
+  Verification: check.py TOTAL 103 FAIL 0 ERRS [] | check_qa 32/0 | check_tj.html (new, tote+jack rig) 14/0, 0 console errors.
+    pump(3,0.1): 3 strokes, rise 0.100. pump(4) caps at 0.12. release -> 0. Tiller and wheels yaw together.
+    Grip at y 1.24. Tote bottom at 0 (within 1e-9). Instanced count ok.
+
+==== STEP B29 OPERATORS (createOperator + attachOperator on every vehicle) ====
+(Note: tote + hand pallet jack had already shipped (TOTE+JACK READY 08:32Z) when the 08:32 reorder arrived; operators
+ were done straight after, so the status lines are in time order rather than the reordered queue order.)
+- createWorker: hands rig. userData.attachHandsTo(obj | [objA, objB], spread=0.08), detachHands(), aimHands(), getHandPositions().
+  Arms aim at the grip every frame (shoulder->grip quaternion + small stretch); hands follow steering wheels/tillers.
+- export createOperator({pose:'seated'|'standing'|'walking-tiller', vest, hardHat, seed}): worker style (hi-vis vest, hard hat).
+  Seated = thigh/shin legs, hips 8 cm above the seat anchor, forward lean; walking-tiller = walk cycle driven by the figure's
+  own world speed (cadence follows speed, stops when the truck stops). setPose(pose,{lean}), pose, motionSpeed.
+- finish(): any vehicle that sets ud.operatorCfg gets installOperator(): anchors merged into ud.anchors,
+  ud.attachOperator(op?) (creates one if omitted; parents it to the anchor, sets pose, attaches hands), ud.detachOperator(),
+  ud.operator; vehicle update(dt,t) updates the operator. Factory option {operator:true} attaches one at creation.
+- Per vehicle (anchors):
+  forklift        seated, lean .36, hands on wheel         anchors.seat, steerGrip
+  reachTruck      standing side-stance (faces +X), R hand steer knob (new knob+column), L hand multi-task lever
+                                                            anchors.stand, steerKnob, multiTask
+  riderPalletTruck standing on the platform, hands on new grab bar   anchors.platform (=stand), grabBar
+  walkieStacker   walking-tiller, hands on tiller head, follows steer anchors.stand, tillerGrip
+  handPalletJack  walking-tiller, hands at anchors.tillerGrip, follows steer  anchors.stand, tillerGrip
+  tugTrain (tug)  seated, hands on wheel                    anchors.seat, steerGrip
+  yardTractor     seated; cab opened up (tub/dash/pillars/roof) + clear glass M.glassClear, seat + steering wheel
+  semiTruck       driver (no hard hat, blue vest) seated behind the windshield; cab hollowed (tub, dash, side walls, roof),
+                  clear windshield/side windows, driver + passenger seats, steering wheel. Outer dims unchanged.
+  autoStacker     driverless (no operator by design).
+  Rule kept: pallet trucks (walkie, hand jack, rider) are only ever moved by a human; attach an operator to them in scenes.
+- Sheet: parts/ops_sheet.html -> parts/closeup_operators.png (3x3: 8 vehicles + the 3 poses).
+- Verify: hand-to-grip error 0.000 m on all 8 vehicles, arm stretch 0.94-1.11; after steer -0.6 walkie/jack hands still on
+  grip, operator yaws with the tiller, walking=false when stopped; detach/reattach OK; check.py TOTAL 103 FAIL 0,
+  check_qa 32/0, check_tj 14/0, zero console errors.

@@ -1,0 +1,39 @@
+{
+ "anchors": {
+  "anchor_tiller_grip": "centre of the manual-mode push handle on the compute tower (hand point; walk-behind), child of body"
+ },
+ "facing": "+Z (forks point toward +Z)",
+ "refs": [
+  "01_interior_dock_forklifts.jpg",
+  "14_iso_cutaway_orange_base.jpg"
+ ],
+ "hierarchy": "pallet_stacker_auto > body > {steer_drive > wheel_drive, caster_L > wheel_caster_L, caster_R > wheel_caster_R, light_strip, lidar, mast_outer > mast_inner > fork_carriage}",
+ "rig": {
+  "drive": "move/rotate body (or root); rear drive wheel steers like a forklift rear axle; the fixed axle is the fork-side load rollers / mast legs (z +0.42 m glTF)",
+  "steer": "rotate steer_drive about local Y (+-90 deg); casters caster_L/R swivel freely about Y (point them along the velocity)",
+  "spin": "rotate wheel_drive (r 0.15 m) / wheel_caster_L/R (r 0.07 m) about local X",
+  "lift": "two-stage: (1) free lift - translate fork_carriage +Y 0..1.30 m (carriage frame stays inside the inner rails: top 1.92 < rail top 1.96); (2) translate mast_inner +Y 0..1.60 m (keeps 0.30 m overlap in the outer rails, lift rod stays in its cylinder). Max fork height 2.90 m; lift only when speed < 0.05 m/s"
+ },
+ "nodes": {
+  "body": "chassis + orange shell + tower, origin ground centre of chassis",
+  "steer_drive": "drive-wheel yoke; origin at the drive axle centre (x=0, y=0.15, z=-0.62 glTF) on the vertical steer axis; rotate about Y",
+  "wheel_drive": "child of steer_drive, origin at axle centre, spin about X",
+  "caster_L/R": "swivel yokes, origin at caster axle centre on the swivel axis; wheel_caster_L/R children spin about X",
+  "light_strip": "emissive cyan perimeter strip (material strip_cyan) - recolour/blink",
+  "lidar": "sensor arch + top lidar puck; origin at puck centre - spin about Y",
+  "mast_outer": "child of body, fixed outer uprights + lift cylinder; origin at mast foot on the ground (x=0, z=+0.42 glTF)",
+  "mast_inner": "child of mast_outer, inner uprights + crosshead + chains + lift rod; origin at mast foot; translate +Y 0..1.60 m",
+  "fork_carriage": "child of mast_inner; carriage, backrest, guide rollers, 2 tines (1.07 m x 0.12 x 0.06 m, tapered tips); origin at the fork heel on the ground; translate +Y 0..1.30 m (free lift)"
+ },
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "open_samples": [],
+  "ground_shift": -0.0
+ },
+ "blender_tris": 11280,
+ "file": "pallet_stacker_auto.glb"
+}

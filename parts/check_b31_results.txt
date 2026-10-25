@@ -1,0 +1,4 @@
+PASS B31 instanced cases visible 504 of 900 (30 loads, InstancedMesh draw calls for all loads: 3)
+INFO renderer calls 267
+TOTAL 1 FAIL 0 ERRS []
+console []

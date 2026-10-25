@@ -1,0 +1,25 @@
+{
+ "facing": "1.2 m side along X, 1.0 m side along Z (4-way entry; either axis is valid for forks)",
+ "refs": [
+  "01_interior_dock_forklifts.jpg",
+  "14_iso_cutaway_orange_base.jpg",
+  "03_interior_orange_racks_mezzanine.jpg"
+ ],
+ "nodes": {
+  "pallet": "pallet (merged), origin ground centre",
+  "load": "cartons + tape + labels (merged); hide/show to load/unload",
+  "film": "transparent stretch film (material stretch_film, alpha 0.32, roughness 0.35 for sheen)"
+ },
+ "note": "full load: pine pallet + 4 layers x 6 cases (0.39 x 0.49 x 0.335 m), stretch wrapped; total ~1.5 m",
+ "height_m": 1.503,
+ "qa": {
+  "min_z": 0.0,
+  "zfight_faces": 0,
+  "zfight_samples": [],
+  "open_edges": 0,
+  "open_by_node": {},
+  "ground_shift": -0.0
+ },
+ "blender_tris": 7484,
+ "file": "pallet_load_wrapped.glb"
+}

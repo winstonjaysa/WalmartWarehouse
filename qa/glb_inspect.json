@@ -1,0 +1,676 @@
+{
+ "forklift_counterbalance.glb": {
+  "file": "forklift_counterbalance.glb",
+  "bytes": 1563168,
+  "meshes": 11,
+  "primitives": 37,
+  "tris": 24318,
+  "verts": 43296,
+  "materials": [
+   {
+    "name": "fl_black",
+    "color": "#232326",
+    "rough": 0.85,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "beacon_orange",
+    "color": "#ff8924",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_yellow",
+    "color": "#f1b222",
+    "rough": 0.72,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_charcoal",
+    "color": "#3d4249",
+    "rough": 0.8,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_red",
+    "color": "#df2c2e",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_amber",
+    "color": "#ffa124",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "knob_red",
+    "color": "#c83330",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_guard",
+    "color": "#40474f",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_white",
+    "color": "#fff6df",
+    "rough": 0.3,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "mirror_glass",
+    "color": "#9eb7cb",
+    "rough": 0.25,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lpg_red",
+    "color": "#d13b33",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "steel_light",
+    "color": "#b8bcc2",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "valve_red",
+    "color": "#af2e2a",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "sticker_yellow",
+    "color": "#ffd13d",
+    "rough": 0.7,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_mast",
+    "color": "#32353a",
+    "rough": 0.78,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_fork",
+    "color": "#2a2c30",
+    "rough": 0.8,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "chain",
+    "color": "#7f848b",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "tyre",
+    "color": "#2a2b2f",
+    "rough": 0.92,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fl_rim",
+    "color": "#f1b222",
+    "rough": 0.7,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "hub_dark",
+    "color": "#3d4249",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   }
+  ],
+  "textures": [],
+  "bboxMin": [
+   -0.67,
+   0,
+   -1.25
+  ],
+  "bboxMax": [
+   0.67,
+   2.318,
+   2.2
+  ],
+  "size": [
+   1.34,
+   2.318,
+   3.45
+  ],
+  "nodes": 26,
+  "nodeNames": [
+   "beacon_geo",
+   "beacon",
+   "body_geo",
+   "fork_carriage_geo",
+   "fork_L_geo",
+   "fork_L",
+   "fork_R_geo",
+   "fork_R",
+   "fork_carriage",
+   "mast_inner_geo",
+   "mast_inner",
+   "mast_outer_geo",
+   "mast_outer",
+   "mast_tilt",
+   "wheel_RL_geo",
+   "wheel_RL",
+   "steer_RL",
+   "wheel_RR_geo",
+   "wheel_RR",
+   "steer_RR",
+   "wheel_FL_geo",
+   "wheel_FL",
+   "wheel_FR_geo",
+   "wheel_FR",
+   "body",
+   "forklift_counterbalance"
+  ],
+  "animations": [],
+  "extensions": [
+   "KHR_materials_emissive_strength"
+  ]
+ },
+ "pallet_stacker_auto.glb": {
+  "file": "pallet_stacker_auto.glb",
+  "bytes": 498912,
+  "meshes": 5,
+  "primitives": 22,
+  "tris": 7996,
+  "verts": 13458,
+  "materials": [
+   {
+    "name": "stacker_charcoal",
+    "color": "#323439",
+    "rough": 0.82,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "stacker_black",
+    "color": "#1e1f21",
+    "rough": 0.85,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "stacker_orange",
+    "color": "#f07920",
+    "rough": 0.72,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "decal_white",
+    "color": "#f4f4f2",
+    "rough": 0.7,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "walmart_blue",
+    "color": "#0070cd",
+    "rough": 0.65,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "spark_yellow",
+    "color": "#ffc125",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "sensor_glass",
+    "color": "#202933",
+    "rough": 0.25,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "estop_red",
+    "color": "#e22a2f",
+    "rough": 0.55,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "beacon_blue",
+    "color": "#3e8bff",
+    "rough": 0.35,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "pu_wheel",
+    "color": "#d8a425",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "stacker_grey",
+    "color": "#7a7f87",
+    "rough": 0.7,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "strip_cyan",
+    "color": "#3bdfff",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "fork_steel",
+    "color": "#3d3f44",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "chrome_soft",
+    "color": "#c8ccd1",
+    "rough": 0.45,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   }
+  ],
+  "textures": [],
+  "bboxMin": [
+   -0.556,
+   0,
+   -1.112
+  ],
+  "bboxMax": [
+   0.556,
+   2.303,
+   1.74
+  ],
+  "size": [
+   1.112,
+   2.303,
+   2.852
+  ],
+  "nodes": 11,
+  "nodeNames": [
+   "body_geo",
+   "lidar_geo",
+   "lidar",
+   "light_strip_geo",
+   "light_strip",
+   "forks_geo",
+   "forks",
+   "mast_geo",
+   "mast",
+   "body",
+   "pallet_stacker_auto"
+  ],
+  "animations": [],
+  "extensions": [
+   "KHR_materials_emissive_strength"
+  ]
+ },
+ "walmart_truck.glb": {
+  "file": "walmart_truck.glb",
+  "bytes": 2251852,
+  "meshes": 15,
+  "primitives": 60,
+  "tris": 32878,
+  "verts": 60309,
+  "materials": [
+   {
+    "name": "tyre",
+    "color": "#2a2b2f",
+    "rough": 0.92,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "alu",
+    "color": "#c8cbd0",
+    "rough": 0.55,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "hub_grey",
+    "color": "#8d939a",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "bumper_grey",
+    "color": "#c2c6cb",
+    "rough": 0.55,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "cab_white",
+    "color": "#f4f4f1",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "walmart_blue",
+    "color": "#0070cd",
+    "rough": 0.65,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "truck_charcoal",
+    "color": "#363a3f",
+    "rough": 0.8,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_white",
+    "color": "#fff6df",
+    "rough": 0.3,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_amber",
+    "color": "#ffa124",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "glass_dark",
+    "color": "#24313f",
+    "rough": 0.25,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "mirror_glass",
+    "color": "#9eb7cb",
+    "rough": 0.25,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "deckplate",
+    "color": "#7c8289",
+    "rough": 0.7,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "truck_black",
+    "color": "#232326",
+    "rough": 0.85,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "lamp_red",
+    "color": "#df2c2e",
+    "rough": 0.4,
+    "metal": 0,
+    "emissive": true,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "trailer_white",
+    "color": "#f2f1eb",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "trailer_rear",
+    "color": "#ffffff",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": true,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "trailer_side",
+    "color": "#ffffff",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": true,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "mark53",
+    "color": "#ffffff",
+    "rough": 0.75,
+    "metal": 0,
+    "emissive": false,
+    "tex": true,
+    "alpha": "OPAQUE"
+   },
+   {
+    "name": "trailer_trim",
+    "color": "#bec2c7",
+    "rough": 0.6,
+    "metal": 0,
+    "emissive": false,
+    "tex": false,
+    "alpha": "OPAQUE"
+   }
+  ],
+  "textures": [
+   {
+    "name": "trailer_rear",
+    "mime": "image/png",
+    "size": [
+     512,
+     512
+    ],
+    "kb": 11
+   },
+   {
+    "name": "trailer_side",
+    "mime": "image/png",
+    "size": [
+     2048,
+     512
+    ],
+    "kb": 62
+   },
+   {
+    "name": "mark53",
+    "mime": "image/png",
+    "size": [
+     128,
+     64
+    ],
+    "kb": 2
+   }
+  ],
+  "bboxMin": [
+   -1.54,
+   0,
+   -11.115
+  ],
+  "bboxMax": [
+   1.54,
+   4.15,
+   11.01
+  ],
+  "size": [
+   3.08,
+   4.15,
+   22.125
+  ],
+  "nodes": 33,
+  "nodeNames": [
+   "wheel_FL_geo",
+   "wheel_FL",
+   "steer_FL",
+   "wheel_FR_geo",
+   "wheel_FR",
+   "steer_FR",
+   "tractor_geo",
+   "landing_gear_geo",
+   "landing_gear",
+   "trailer_door_L_geo",
+   "trailer_door_L",
+   "trailer_door_R_geo",
+   "trailer_door_R",
+   "trailer_geo",
+   "trailer_wheel_L1_geo",
+   "trailer_wheel_L1",
+   "trailer_wheel_L2_geo",
+   "trailer_wheel_L2",
+   "trailer_wheel_R1_geo",
+   "trailer_wheel_R1",
+   "trailer_wheel_R2_geo",
+   "trailer_wheel_R2",
+   "trailer",
+   "wheel_RL1_geo",
+   "wheel_RL1",
+   "wheel_RL2_geo",
+   "wheel_RL2",
+   "wheel_RR1_geo",
+   "wheel_RR1",
+   "wheel_RR2_geo",
+   "wheel_RR2",
+   "tractor",
+   "walmart_truck"
+  ],
+  "animations": [],
+  "extensions": [
+   "KHR_materials_emissive_strength"
+  ]
+ }
+}

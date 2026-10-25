@@ -1,0 +1,147 @@
+{
+ "before": {
+  "wordmark": {
+   "n": 10822,
+   "rendered": "#074F97",
+   "target": "#0071CE",
+   "dE00": 12.82
+  },
+  "spark": {
+   "n": 1143,
+   "rendered": "#AF881A",
+   "target": "#FFC220",
+   "dE00": 18.51
+  },
+  "swatchBlue": {
+   "rendered": "#1561AE",
+   "target": "#0071CE",
+   "dE00": 6.47
+  },
+  "swatchSpark": {
+   "rendered": "#DBA521",
+   "target": "#FFC220",
+   "dE00": 8.22
+  },
+  "swatchNavy": {
+   "rendered": "#15213A",
+   "target": "#041E42",
+   "dE00": 3.98
+  }
+ },
+ "after": {
+  "wordmark": {
+   "n": 10743,
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "spark": {
+   "n": 1177,
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchBlue": {
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "swatchSpark": {
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchNavy": {
+   "rendered": "#041E42",
+   "target": "#041E42",
+   "dE00": 0.0
+  }
+ },
+ "after_med": {
+  "wordmark": {
+   "n": 10743,
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "spark": {
+   "n": 1177,
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchBlue": {
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "swatchSpark": {
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchNavy": {
+   "rendered": "#041E42",
+   "target": "#041E42",
+   "dE00": 0.0
+  }
+ },
+ "after_low": {
+  "wordmark": {
+   "n": 11327,
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "spark": {
+   "n": 1220,
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchBlue": {
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "swatchSpark": {
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchNavy": {
+   "rendered": "#041E42",
+   "target": "#041E42",
+   "dE00": 0.0
+  }
+ },
+ "after_auto": {
+  "wordmark": {
+   "n": 11327,
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "spark": {
+   "n": 1220,
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchBlue": {
+   "rendered": "#0071CE",
+   "target": "#0071CE",
+   "dE00": 0.0
+  },
+  "swatchSpark": {
+   "rendered": "#FFC220",
+   "target": "#FFC220",
+   "dE00": 0.0
+  },
+  "swatchNavy": {
+   "rendered": "#041E42",
+   "target": "#041E42",
+   "dE00": 0.0
+  }
+ }
+}

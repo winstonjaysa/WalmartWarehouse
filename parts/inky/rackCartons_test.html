@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>rackCartons test</title>
+<style>body{margin:0;overflow:hidden;background:#20242a;font:13px/1.4 system-ui,sans-serif}
+#hud{position:fixed;top:8px;left:8px;background:rgba(0,0,0,.65);color:#e8e8e8;padding:8px 10px;border-radius:6px;min-width:250px}
+button{margin-top:6px;margin-right:4px}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body><div id="hud"><div id="fps">FPS …</div><div id="calls">calls …</div><div id="mod">module calls …</div><div id="occ">occupied …</div>
+<button id="toggle">Start toggling 100/s</button><button id="close">Close-up</button><button id="wide">Wide</button></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { create, update as updateAll } from './rackCartons.js';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x2a2f36);
+scene.fog = new THREE.Fog(0x2a2f36, 60, 160);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xfff6e8, 0x3a3328, 0.55));
+const sun = new THREE.DirectionalLight(0xfff4e0, 2.0); sun.position.set(20, 40, 15); scene.add(sun);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 400);
+camera.position.set(-22, 18, 34);
+const controls = new OrbitControls(camera, renderer.domElement); controls.target.set(14, 3, 10); controls.enableDamping = true;
+
+// ---- rack layout: 10 rows x 13 bays x 2 positions x 6 levels = 1560 slots ----
+const ROWS = 10, BAYS = 13, POS = 2, LEVELS = 6, PITCH = 1.75, BAYW = 2.7, DEPTH = 1.1, AISLE = 3.4;
+const slots = [], uprights = [], beams = [];
+let seed = 1;
+for (let r = 0; r < ROWS; r++) {
+  const pair = r >> 1, back = r & 1;
+  const zc = pair * (2 * DEPTH + 0.3 + AISLE) + back * (DEPTH + 0.3) + DEPTH / 2;
+  for (let b = 0; b < BAYS; b++) {
+    const x0 = b * BAYW;
+    for (let l = 0; l < LEVELS; l++) for (let p = 0; p < POS; p++) {
+      slots.push({ id: `R${r}-B${b}-L${l}-P${p}`, position: { x: x0 + 0.1 + 0.65 + p * 1.25, y: l * PITCH + (l ? 0.12 : 0), z: zc },
+        w: 1.2, d: 1.0, h: PITCH - 0.2, seed: seed++, occupied: Math.random() < 0.85 });
+    }
+  }
+  for (let b = 0; b <= BAYS; b++) for (const dz of [-DEPTH / 2, DEPTH / 2]) uprights.push([b * BAYW, zc + dz]);
+  for (let b = 0; b < BAYS; b++) for (let l = 1; l < LEVELS; l++) for (const dz of [-DEPTH / 2, DEPTH / 2]) beams.push([b * BAYW + BAYW / 2, l * PITCH + 0.06, zc + dz]);
+}
+// rack context: 3 draw calls (uprights, beams, floor)
+const ctx = new THREE.Group(); scene.add(ctx);
+const H = LEVELS * PITCH;
+const up = new THREE.InstancedMesh(new THREE.BoxGeometry(0.08, H, 0.08).translate(0, H / 2, 0), new THREE.MeshStandardMaterial({ color: 0x2f5c9e, roughness: .5, metalness: .4 }), uprights.length);
+const beam = new THREE.InstancedMesh(new THREE.BoxGeometry(BAYW - 0.08, 0.12, 0.05), new THREE.MeshStandardMaterial({ color: 0xe06a1b, roughness: .45, metalness: .3 }), beams.length);
+const m = new THREE.Matrix4();
+uprights.forEach(([x, z], i) => up.setMatrixAt(i, m.makeTranslation(x, 0, z)));
+beams.forEach(([x, y, z], i) => beam.setMatrixAt(i, m.makeTranslation(x, y, z)));
+up.computeBoundingSphere(); beam.computeBoundingSphere();
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0x8a8c8e, roughness: .85 }));
+floor.rotation.x = -Math.PI / 2; floor.position.set(15, -0.001, 15);
+ctx.add(up, beam, floor);
+
+const rc = create({ scene, slots });
+window.rc = rc; window.slots = slots;
+
+// ---- toggling ----
+let toggling = false, acc = 0; const state = new Map(slots.map(s => [s.id, s.occupied]));
+document.getElementById('toggle').onclick = (e) => { toggling = !toggling; e.target.textContent = toggling ? 'Stop toggling' : 'Start toggling 100/s'; };
+document.getElementById('close').onclick = () => { camera.position.set(1.0, 2.6, 4.6); controls.target.set(3.2, 1.6, 0.4); };
+document.getElementById('wide').onclick = () => { camera.position.set(-22, 18, 34); controls.target.set(14, 3, 10); };
+window.toggle100 = () => { for (let k = 0; k < 100; k++) { const s = slots[(Math.random() * slots.length) | 0]; const v = !state.get(s.id); state.set(s.id, v); rc.setSlot(s.id, v); } };
+window.setToggling = (v) => { toggling = v; };
+
+// module-only draw calls: render once with context hidden
+window.measure = () => {
+  renderer.render(scene, camera); const total = renderer.info.render.calls;
+  ctx.visible = false; renderer.render(scene, camera); const mod = renderer.info.render.calls; ctx.visible = true;
+  document.getElementById('mod').textContent = `module calls: ${mod} (rack context adds ${total - mod})`;
+  return { total, module: mod, context: total - mod };
+};
+
+const clock = new THREE.Clock(); let frames = 0, ft = 0; window.__fps = 0;
+const elF = document.getElementById('fps'), elC = document.getElementById('calls'), elO = document.getElementById('occ');
+function loop() {
+  const dt = clock.getDelta();
+  if (toggling) { acc += dt; while (acc >= 1) { acc -= 1; window.toggle100(); } }
+  updateAll(dt); controls.update();
+  renderer.render(scene, camera);
+  frames++; ft += dt;
+  if (ft >= 0.5) { window.__fps = frames / ft; elF.textContent = `FPS ${window.__fps.toFixed(1)}`; frames = 0; ft = 0;
+    elC.textContent = `renderer.info.render.calls: ${renderer.info.render.calls} | tris ${(renderer.info.render.triangles / 1e3).toFixed(0)}k`;
+    elO.textContent = `slots ${slots.length} | occupied ${rc.count()} | cartons ${rc.stats().cartons}`; }
+  requestAnimationFrame(loop);
+}
+loop(); setTimeout(window.measure, 300);
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+window.__ready = true;
+</script></body></html>

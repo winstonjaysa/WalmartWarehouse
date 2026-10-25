@@ -1,0 +1,183 @@
+{
+ "desk": {
+  "sw": 1440,
+  "iw": 1440,
+  "canv": 1,
+  "chips": [
+   [
+    1080,
+    196,
+    152,
+    36,
+    "flex"
+   ],
+   [
+    1240,
+    196,
+    184,
+    36,
+    "flex"
+   ]
+  ],
+  "aexp": [
+   "false",
+   "false"
+  ],
+  "sheet": [
+   0,
+   0,
+   0,
+   0,
+   "none"
+  ],
+  "kpis": [
+   376,
+   88,
+   1048,
+   102,
+   "grid"
+  ],
+  "zoom": [],
+  "ui": [
+   "setTheme",
+   "getTheme",
+   "onThemeChange",
+   "setDayNight",
+   "onDayNightChange",
+   "showToast",
+   "pushLog",
+   "pushAlert",
+   "updateKPI",
+   "openInspector",
+   "closeInspector",
+   "collapseInspector",
+   "onInspectorAction",
+   "isInspectorOpen",
+   "expandAlerts",
+   "collapseAlerts",
+   "toggleAlerts",
+   "setCaption",
+   "clearCaption",
+   "setSheet",
+   "getSheet",
+   "setSheetTab",
+   "getSheetTab",
+   "onSheetChange",
+   "isMobile",
+   "setView",
+   "getView",
+   "onViewChange",
+   "setFloor",
+   "getFloor",
+   "onFloorChange",
+   "setScale",
+   "onSearch",
+   "onSelect",
+   "clearScenePlaceholder",
+   "startDemo",
+   "stopDemo",
+   "sceneEl"
+  ],
+  "kpi": null,
+  "text": "Walmart\nDC OPS\nCONCEPT\nRDC-7041 (demo)\nRegional GM \u00b7 96 stores\nSearch trailers, doors, SKUs, LPNs\nCtrl\u2009\nK\nLIVE\n07:48:14sim\nWJ\nOperations\nDay shift \u00b7 06:00\u201314:00 DEMO DATA\nMissions\n6\nVehicles\n6\nLogs\nAll\nInbound\nInventory\nOutbound\nRisk\nUnload TRL-48213 \u2192 DR-005\nM-UNL-031 \u00b7 Unload trailer\nIn progress\nMK\nMaria K.\n18m\n65%\nLoad RT-214A \u00b7 DS-103 \u00b7 3 stores\nM-LDR-214 \u00b7 Load route\nAt risk\nDP\nDev P.\n41m\n62%\nReplen 04-016-C-2 \u00b7 SKU 004418273\nM-RPL-118 \u00b7 Replenish\nBlocked\nRCH-041\n\u2014\n20%\nWave W1025-007 \u00b7 case pick PM-47\nM-PCK-007 \u00b7 Wave pick\nIn progress\n24 selectors\n1h 52m\n47%\nPut-away 6 LPNs \u2192 aisle 06\nM-PUT-226 \u00b7 Put-away\nAssigned\nRCH-017\n26m\n0%\nYard move TRL-50311 YB-07 \u2192 DR-003\nM-YRD-093 \u00b7 Yard move\nQueued\nYJ-03\n9m\n0%\nLoad RT-087C \u00b7 DS-105 \u00b7 ST-2405\nM-LDR-087 \u00b7 Load route\nDone\nSR\nSam R.\nDeparted\n100%\nUnits / hr\n14,820\ntgt 14,500\n+320\nDock utilisation\n81.4\n%\ntgt 80.0%\n+1.4 pt\nAvg trailer dwell\n2.8\nh\ntgt 2.5h\n+0.3 h\nOn-time dispatch\n98.9\n%\ntgt 98.5%\n+0.4 pt\nInventory accuracy\n99.2\n%\ntgt 99.0%\n+0.2 pt\nPick rate\n188\ncs/h\ntgt 180\n+8 cs/h\nAlerts\n1\n2\nInspect\nTRL-48213\n2D\n3D\nFLOOR\nB1\nL1\nL2\nMezz\n0\n25\n50 m\nYard move queued\nDoor DR-003 assigned to TRL-50311 \u00b7 YJ-03 dispatched\nConcept demo \u00b7 not affiliated with Walmart Inc. \u00b7 All data synthetic",
+  "chipErr": "Page.click: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\"#alertsChip\")\n",
+  "shotErr": "Page.screenshot: Timeout 45000ms exceeded.\nCall log:\n  - taking page screenshot\n    - disabled all CSS animations\n  - waiting for fonts to load...\n  -",
+  "errs": [
+   "warning: THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported."
+  ]
+ },
+ "mob": {
+  "sw": 390,
+  "iw": 390,
+  "canv": 1,
+  "chips": [
+   [
+    0,
+    0,
+    0,
+    0,
+    "inline-flex"
+   ],
+   [
+    0,
+    0,
+    0,
+    0,
+    "inline-flex"
+   ]
+  ],
+  "aexp": [
+   "false",
+   "false"
+  ],
+  "sheet": [
+   0,
+   726,
+   390,
+   118,
+   "flex"
+  ],
+  "kpis": [
+   0,
+   64,
+   390,
+   92,
+   "flex"
+  ],
+  "zoom": [],
+  "ui": [
+   "setTheme",
+   "getTheme",
+   "onThemeChange",
+   "setDayNight",
+   "onDayNightChange",
+   "showToast",
+   "pushLog",
+   "pushAlert",
+   "updateKPI",
+   "openInspector",
+   "closeInspector",
+   "collapseInspector",
+   "onInspectorAction",
+   "isInspectorOpen",
+   "expandAlerts",
+   "collapseAlerts",
+   "toggleAlerts",
+   "setCaption",
+   "clearCaption",
+   "setSheet",
+   "getSheet",
+   "setSheetTab",
+   "getSheetTab",
+   "onSheetChange",
+   "isMobile",
+   "setView",
+   "getView",
+   "onViewChange",
+   "setFloor",
+   "getFloor",
+   "onFloorChange",
+   "setScale",
+   "onSearch",
+   "onSelect",
+   "clearScenePlaceholder",
+   "startDemo",
+   "stopDemo",
+   "sceneEl"
+  ],
+  "kpi": null,
+  "text": "Walmart\nLIVE\nWJ\nUnits / hr\n14,820\n+320\nDock utilisation\n81.4\n%\n+1.4 pt\nAvg trailer dwell\n2.8\nh\n+0.3 h\nOn-time dispatch\n98.9\n%\n+0.4 pt\nInventory accuracy\n99.2\n%\n+0.2 pt\nPick rate\n187\ncs/h\n+7 cs/h\n2D\n3D\nB1\nL1\nL2\nMezz\nMissions\nVehicles\nLogs\nAlerts\nInspect\n6 active\n3 at risk\n1 critical\nTRL-48213\nAll\nInbound\nInventory\nOutbound\nRisk\nUnload TRL-48213 \u2192 DR-005\nM-UNL-031 \u00b7 Unload trailer\nIn progress\nMK\nMaria K.\n18m\n64%\nLoad RT-214A \u00b7 DS-103 \u00b7 3 stores\nM-LDR-214 \u00b7 Load route\nAt risk\nDP\nDev P.\n41m\n62%\nReplen 04-016-C-2 \u00b7 SKU 004418273\nM-RPL-118 \u00b7 Replenish\nBlocked\nRCH-041\n\u2014\n20%\nWave W1025-007 \u00b7 case pick PM-47\nM-PCK-007 \u00b7 Wave pick\nIn progress\n24 selectors\n1h 52m\n47%\nPut-away 6 LPNs \u2192 aisle 06\nM-PUT-226 \u00b7 Put-away\nAssigned\nRCH-017\n26m\n0%\nYard move TRL-50311 YB-07 \u2192 DR-003\nM-YRD-093 \u00b7 Yard move\nQueued\nYJ-03\n9m\n0%\nLoad RT-087C \u00b7 DS-105 \u00b7 ST-2405\nM-LDR-087 \u00b7 Load route\nDone\nSR\nSam R.\nDeparted\n100%\nYard move queued\nDoor DR-003 assigned to TRL-50311 \u00b7 YJ-03 dispatched\nConcept demo \u00b7 not affiliated with Walmart Inc. \u00b7 All data synthetic",
+  "sheetHalf": [
+   "half",
+   118
+  ],
+  "kpiScroll": [
+   1004,
+   390,
+   166
+  ],
+  "errs": [
+   "warning: THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported."
+  ]
+ }
+}
