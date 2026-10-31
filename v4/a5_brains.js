@@ -105,12 +105,24 @@ function initSim() {
       yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.5]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
     yield* walkTo(bev, -16.3, 9.0); for (;;) yield* wait(bev, 5, 'idle'); })());
   // ===== 8. SNACK vendor (reverses in, then pulls a skid) =====
-  const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer }); fillSkid(SNK, 16, () => ({ w: 0.5, h: 0.3, d: 0.4, col: KRAFT[(rnd() * 4) | 0] }));
+  const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, grp: SNACKS[0] }); const SNC = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, flz: -5.4, grp: SNACKS[1] });
   const snd = mkWorker({ x: 0, z: 0, torso: COL.snk, sit: true }); snd.seatOf = SNACK.tractor; snd.seat = seatOf(SNACK.tractor, [0.55, 1.95, 2.2]);
   const snv = role(mkWorker({ x: -11.5, z: 9.0, yaw: Math.PI, torso: COL.snk }), 'Snack vendor');
   brain(snv, (function* () { yield* until(snv, () => snackV.phase === 'docked' && snackV.doors >= 1);
     SNK.follow = null; yield* jackFetch(snv, jSn, SNK, Math.PI, []); yield* jackPull(snv, jSn, [[-11.5, 9.0], [-12.6, 6.6]]); yield* jackRelease(snv, jSn); yield* walkTo(snv, -13.6, 8.3); yield* face(snv, SNK.x, SNK.z);
-    yield* checkIn(snv, SNK, 'snack'); yield* jackRegrab(snv, jSn, SNK); yield* jackPull(snv, jSn, [[-12.4, 3.2], [-11.0, 1.2]]); yield* jackRelease(snv, jSn); yield* jackBackOut(snv, jSn, 1.4); for (;;) yield* wait(snv, 5); })());
+    yield* checkIn(snv, SNK, 'snack'); yield* jackRegrab(snv, jSn, SNK); yield* jackPull(snv, jSn, [[-12.4, 3.2], [-11.0, 1.2]]); yield* jackRelease(snv, jSn); yield* jackBackOut(snv, jSn, 1.4);
+    // second stack rides a wire case cart: wheel it out of the trailer and onto the sales floor
+    yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
+  // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
+  const MSK = [[-5.55, 18.4], [-4.45, 18.4], [-5.55, 20.0], [-4.45, 20.0], [-5.55, 21.6], [-4.45, 21.6]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
+  const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
+  const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
+  const CPARK = [[-5.0, -13.3], [-3.8, -13.3], [-2.6, -13.3], [-5.0, -14.6], [-3.8, -14.6], [-2.6, -14.6]];
+  brain(mk, (function* () { yield* until(mk, () => wrapped.every((s) => s.z < 12.0), 'idle');
+    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i]; const [px, pz] = CPARK[i];
+      yield* jackFetch(mk, jMk, sk, Math.PI, [[sk.x, 9.0], [sk.x, 11.0]]);
+      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.0], [px, pz + 1.2], [px, pz]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 1.4); }
+    yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
   NIGHTN = (NIGHTN | 0) + 1; for (const g of MCP) g.visible = false; const MG = MCP[NIGHTN % 2]; MG.visible = true; for (const m of MG.userData.wrap) { m.visible = true; m.scale.set(1, 1, 1); }
   const PH = mkSkid({ x: -17.6, z: 5.6, ry: Math.PI / 2, col: COL.blue, grp: MG, pharm: true });
@@ -189,7 +201,7 @@ function updateVehicles() {
     const ds = s - (v.lastS || 0); v.lastS = s; v.roll += ds / 0.5;
     placeTruck(lerp(a.kx, b.kx, f), lerp(a.kz, b.kz, f), a.yC + angDiff(a.yC, b.yC) * f, a.yT + angDiff(a.yT, b.yT) * f, lerp(a.steer, b.steer, f), v.roll); if (k >= 1) { v.phase = 'docked'; v.td = T; } }
   else if (v.phase === 'docked') { v.doors = Math.min(1, (T - v.td - 1) / 2.5); const pv = SNACK.trailer.userData.pivots; const a = Math.max(0, v.doors) * 2.55; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = -a; pv.rearDoor_R.rotation.y = a; } }
-  for (const s of SK) if (s.follow) { const o = s.follow; const [fx, fz] = fwd(o.rotation.y); const lz = -8.1 + 1.0; s.x = o.position.x + fx * lz; s.z = o.position.z + fz * lz; s.y = o.position.y + 1.25; s.ry = o.rotation.y; }
+  for (const s of SK) if (s.follow) { const o = s.follow; const [fx, fz] = fwd(o.rotation.y); const lz = s.flz ?? -7.1; s.x = o.position.x + fx * lz; s.z = o.position.z + fz * lz; s.y = o.position.y + 1.25; s.ry = o.rotation.y; }
 }
 function resetVehicles() { const pv = SNACK.trailer.userData.pivots; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = 0; pv.rearDoor_R.rotation.y = 0; } snackV.lastEk = 0; snackV.lastS = 0; snackV.roll = 0; BALER.userData.pivots.door.rotation.y = 0; }
 VEH.push(snackV, snackTrailerV, { id: 'beverage-vendor-box-truck', type: 'box-truck', obj: BOXT }, { id: 'walmart-trailer-A', type: 'tractor-trailer', placard: 'FDS' }, { id: 'walmart-trailer-B', type: 'tractor-trailer', placard: 'CP' }, ...YARD.map((y) => ({ id: 'yard-' + y.pl, type: 'tractor-trailer', placard: y.pl })));

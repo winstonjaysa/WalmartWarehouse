@@ -29,7 +29,7 @@ function fillSkid(sk, n, size) { for (let i = 0; i < n; i++) { const b = mkBox(s
 
 // --- jacks (Inky's palletJack, flipped so forks point -z and the handle side is +z) ---
 const JACK_GROUPS = [];
-for (let i = 0; i < 10; i++) { const outer = new THREE.Group(); const j = buildJack(THREE, PM, {}); j.rotation.y = Math.PI; outer.add(j); outer.userData.handle = j.userData.pivots.handle; scene.add(outer); JACK_GROUPS.push(outer); }
+for (let i = 0; i < 11; i++) { const outer = new THREE.Group(); const j = buildJack(THREE, PM, {}); j.rotation.y = Math.PI; outer.add(j); outer.userData.handle = j.userData.pivots.handle; scene.add(outer); JACK_GROUPS.push(outer); }
 const J_STEER = 0.61, J_PAL = -0.135, J_REACH = 1.45;
 function mkJack(o) { const j = Object.assign({ x: 0, z: 0, yaw: 0, lift: 0, tilt: -0.15, skid: null, g: JACK_GROUPS[JK.length] }, o); JK.push(j); return j; }
 function jackSteer(j) { const [fx, fz] = fwd(j.yaw); return [j.x + fx * J_STEER, j.z + fz * J_STEER]; }
@@ -147,4 +147,12 @@ function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() 
   G.userData = { wrap: wrapMs, memo, H, layers, totes: layers * 3 }; G.visible = false; scene.add(G); return G; }
 const MCP = [mkMcPallet(2, 3), mkMcPallet(3, 8)];
 const INKY_WR = [];
+// FDS milk: 5 skids of black crates (3x3 per layer): one 6-layer, one 4-layer, three 5-layer
+const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { o.material = MAT.iv; o.visible = false; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = MAT.carton; o.customDepthMaterial = undefined; } }); // program budget: reuse the carton shader for the crates (jugs hidden)
+  scene.add(g); return g; });
+// EGGS slot: 1 always-wrapped pallet of tall 15-dozen cases (~1.90 m, taller than 6-layer milk at ~1.80 m). parts/v4/eggPallet.js (Inky), 6 layers of 4x3
+const EGGS = [buildEggs(THREE, PM, { seed: 21, layers: 6, palletColor: 'natural' })]; for (const g of EGGS) scene.add(g);
+// snack DSD: tall kraft case stacks (no logos); one on a grey wire case cart
+const SNACKS = [buildSnackStack(THREE, PM, { seed: 5, height: 1.6 }), buildSnackStack(THREE, PM, { seed: 9, height: 1.6, cart: true })]; for (const g of SNACKS) { g.traverse((o) => { if (o.isMesh && o.material === PM.vcMetal) o.material = PM.vc; }); scene.add(g); }
+function* pushCart(w, s, pts, sp = 0.85) { for (const [x, z] of pts) { const g = walkTo(w, x, z, sp, 'push'); for (;;) { const r = g.next(); const f = fwd(w.yaw); s.x = w.x + f[0] * 0.8; s.z = w.z + f[1] * 0.8; s.ry = w.yaw; if (r.done) break; yield; } } }
 const ZEBRA = buildZebra(THREE, PM, { screen: 'scan' }); ZEBRA.scale.setScalar(1.6); scene.add(ZEBRA); const ZEBRA2 = buildZebra(THREE, PM, { screen: 'list' }); ZEBRA2.scale.setScalar(1.6); scene.add(ZEBRA2);

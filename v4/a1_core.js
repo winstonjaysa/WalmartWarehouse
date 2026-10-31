@@ -14,6 +14,9 @@ import { build as buildZebra } from '../parts/v4/zebraHandheld.js';
 import { palletGeo as inkyPalletGeo } from '../parts/v4/_pallet.js';
 import { build as buildWorkerI, restPose as wRest, walkPose as wWalk, jackPullPose as wPull, seatedDrivePose as wSeat, attachHandsTo as wHands } from '../parts/v4/worker.js';
 import { build as buildWrapped } from '../parts/v4/wrappedSkid.js';
+import { build as buildMilk } from '../parts/v4/milkCrateSkid.js';
+import { build as buildSnackStack } from '../parts/v4/snackCaseStack.js';
+import { build as buildEggs } from '../parts/v4/eggPallet.js';
 
 // ---------------- quality / renderer ----------------
 const QS = new URLSearchParams(location.search);

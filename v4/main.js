@@ -14,6 +14,9 @@ import { build as buildZebra } from '../parts/v4/zebraHandheld.js';
 import { palletGeo as inkyPalletGeo } from '../parts/v4/_pallet.js';
 import { build as buildWorkerI, restPose as wRest, walkPose as wWalk, jackPullPose as wPull, seatedDrivePose as wSeat, attachHandsTo as wHands } from '../parts/v4/worker.js';
 import { build as buildWrapped } from '../parts/v4/wrappedSkid.js';
+import { build as buildMilk } from '../parts/v4/milkCrateSkid.js';
+import { build as buildSnackStack } from '../parts/v4/snackCaseStack.js';
+import { build as buildEggs } from '../parts/v4/eggPallet.js';
 
 // ---------------- quality / renderer ----------------
 const QS = new URLSearchParams(location.search);
@@ -440,7 +443,7 @@ function fillSkid(sk, n, size) { for (let i = 0; i < n; i++) { const b = mkBox(s
 
 // --- jacks (Inky's palletJack, flipped so forks point -z and the handle side is +z) ---
 const JACK_GROUPS = [];
-for (let i = 0; i < 10; i++) { const outer = new THREE.Group(); const j = buildJack(THREE, PM, {}); j.rotation.y = Math.PI; outer.add(j); outer.userData.handle = j.userData.pivots.handle; scene.add(outer); JACK_GROUPS.push(outer); }
+for (let i = 0; i < 11; i++) { const outer = new THREE.Group(); const j = buildJack(THREE, PM, {}); j.rotation.y = Math.PI; outer.add(j); outer.userData.handle = j.userData.pivots.handle; scene.add(outer); JACK_GROUPS.push(outer); }
 const J_STEER = 0.61, J_PAL = -0.135, J_REACH = 1.45;
 function mkJack(o) { const j = Object.assign({ x: 0, z: 0, yaw: 0, lift: 0, tilt: -0.15, skid: null, g: JACK_GROUPS[JK.length] }, o); JK.push(j); return j; }
 function jackSteer(j) { const [fx, fz] = fwd(j.yaw); return [j.x + fx * J_STEER, j.z + fz * J_STEER]; }
@@ -558,6 +561,14 @@ function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() 
   G.userData = { wrap: wrapMs, memo, H, layers, totes: layers * 3 }; G.visible = false; scene.add(G); return G; }
 const MCP = [mkMcPallet(2, 3), mkMcPallet(3, 8)];
 const INKY_WR = [];
+// FDS milk: 5 skids of black crates (3x3 per layer): one 6-layer, one 4-layer, three 5-layer
+const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { o.material = MAT.iv; o.visible = false; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = MAT.carton; o.customDepthMaterial = undefined; } }); // program budget: reuse the carton shader for the crates (jugs hidden)
+  scene.add(g); return g; });
+// EGGS slot: 1 always-wrapped pallet of tall 15-dozen cases (~1.90 m, taller than 6-layer milk at ~1.80 m). parts/v4/eggPallet.js (Inky), 6 layers of 4x3
+const EGGS = [buildEggs(THREE, PM, { seed: 21, layers: 6, palletColor: 'natural' })]; for (const g of EGGS) scene.add(g);
+// snack DSD: tall kraft case stacks (no logos); one on a grey wire case cart
+const SNACKS = [buildSnackStack(THREE, PM, { seed: 5, height: 1.6 }), buildSnackStack(THREE, PM, { seed: 9, height: 1.6, cart: true })]; for (const g of SNACKS) { g.traverse((o) => { if (o.isMesh && o.material === PM.vcMetal) o.material = PM.vc; }); scene.add(g); }
+function* pushCart(w, s, pts, sp = 0.85) { for (const [x, z] of pts) { const g = walkTo(w, x, z, sp, 'push'); for (;;) { const r = g.next(); const f = fwd(w.yaw); s.x = w.x + f[0] * 0.8; s.z = w.z + f[1] * 0.8; s.ry = w.yaw; if (r.done) break; yield; } } }
 const ZEBRA = buildZebra(THREE, PM, { screen: 'scan' }); ZEBRA.scale.setScalar(1.6); scene.add(ZEBRA); const ZEBRA2 = buildZebra(THREE, PM, { screen: 'list' }); ZEBRA2.scale.setScalar(1.6); scene.add(ZEBRA2);
 
 await __yield("a4");
@@ -668,12 +679,24 @@ function initSim() {
       yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.5]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
     yield* walkTo(bev, -16.3, 9.0); for (;;) yield* wait(bev, 5, 'idle'); })());
   // ===== 8. SNACK vendor (reverses in, then pulls a skid) =====
-  const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer }); fillSkid(SNK, 16, () => ({ w: 0.5, h: 0.3, d: 0.4, col: KRAFT[(rnd() * 4) | 0] }));
+  const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, grp: SNACKS[0] }); const SNC = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, flz: -5.4, grp: SNACKS[1] });
   const snd = mkWorker({ x: 0, z: 0, torso: COL.snk, sit: true }); snd.seatOf = SNACK.tractor; snd.seat = seatOf(SNACK.tractor, [0.55, 1.95, 2.2]);
   const snv = role(mkWorker({ x: -11.5, z: 9.0, yaw: Math.PI, torso: COL.snk }), 'Snack vendor');
   brain(snv, (function* () { yield* until(snv, () => snackV.phase === 'docked' && snackV.doors >= 1);
     SNK.follow = null; yield* jackFetch(snv, jSn, SNK, Math.PI, []); yield* jackPull(snv, jSn, [[-11.5, 9.0], [-12.6, 6.6]]); yield* jackRelease(snv, jSn); yield* walkTo(snv, -13.6, 8.3); yield* face(snv, SNK.x, SNK.z);
-    yield* checkIn(snv, SNK, 'snack'); yield* jackRegrab(snv, jSn, SNK); yield* jackPull(snv, jSn, [[-12.4, 3.2], [-11.0, 1.2]]); yield* jackRelease(snv, jSn); yield* jackBackOut(snv, jSn, 1.4); for (;;) yield* wait(snv, 5); })());
+    yield* checkIn(snv, SNK, 'snack'); yield* jackRegrab(snv, jSn, SNK); yield* jackPull(snv, jSn, [[-12.4, 3.2], [-11.0, 1.2]]); yield* jackRelease(snv, jSn); yield* jackBackOut(snv, jSn, 1.4);
+    // second stack rides a wire case cart: wheel it out of the trailer and onto the sales floor
+    yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
+  // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
+  const MSK = [[-5.55, 18.4], [-4.45, 18.4], [-5.55, 20.0], [-4.45, 20.0], [-5.55, 21.6], [-4.45, 21.6]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
+  const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
+  const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
+  const CPARK = [[-5.0, -13.3], [-3.8, -13.3], [-2.6, -13.3], [-5.0, -14.6], [-3.8, -14.6], [-2.6, -14.6]];
+  brain(mk, (function* () { yield* until(mk, () => wrapped.every((s) => s.z < 12.0), 'idle');
+    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i]; const [px, pz] = CPARK[i];
+      yield* jackFetch(mk, jMk, sk, Math.PI, [[sk.x, 9.0], [sk.x, 11.0]]);
+      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.0], [px, pz + 1.2], [px, pz]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 1.4); }
+    yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
   NIGHTN = (NIGHTN | 0) + 1; for (const g of MCP) g.visible = false; const MG = MCP[NIGHTN % 2]; MG.visible = true; for (const m of MG.userData.wrap) { m.visible = true; m.scale.set(1, 1, 1); }
   const PH = mkSkid({ x: -17.6, z: 5.6, ry: Math.PI / 2, col: COL.blue, grp: MG, pharm: true });
@@ -752,7 +775,7 @@ function updateVehicles() {
     const ds = s - (v.lastS || 0); v.lastS = s; v.roll += ds / 0.5;
     placeTruck(lerp(a.kx, b.kx, f), lerp(a.kz, b.kz, f), a.yC + angDiff(a.yC, b.yC) * f, a.yT + angDiff(a.yT, b.yT) * f, lerp(a.steer, b.steer, f), v.roll); if (k >= 1) { v.phase = 'docked'; v.td = T; } }
   else if (v.phase === 'docked') { v.doors = Math.min(1, (T - v.td - 1) / 2.5); const pv = SNACK.trailer.userData.pivots; const a = Math.max(0, v.doors) * 2.55; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = -a; pv.rearDoor_R.rotation.y = a; } }
-  for (const s of SK) if (s.follow) { const o = s.follow; const [fx, fz] = fwd(o.rotation.y); const lz = -8.1 + 1.0; s.x = o.position.x + fx * lz; s.z = o.position.z + fz * lz; s.y = o.position.y + 1.25; s.ry = o.rotation.y; }
+  for (const s of SK) if (s.follow) { const o = s.follow; const [fx, fz] = fwd(o.rotation.y); const lz = s.flz ?? -7.1; s.x = o.position.x + fx * lz; s.z = o.position.z + fz * lz; s.y = o.position.y + 1.25; s.ry = o.rotation.y; }
 }
 function resetVehicles() { const pv = SNACK.trailer.userData.pivots; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = 0; pv.rearDoor_R.rotation.y = 0; } snackV.lastEk = 0; snackV.lastS = 0; snackV.roll = 0; BALER.userData.pivots.door.rotation.y = 0; }
 VEH.push(snackV, snackTrailerV, { id: 'beverage-vendor-box-truck', type: 'box-truck', obj: BOXT }, { id: 'walmart-trailer-A', type: 'tractor-trailer', placard: 'FDS' }, { id: 'walmart-trailer-B', type: 'tractor-trailer', placard: 'CP' }, ...YARD.map((y) => ({ id: 'yard-' + y.pl, type: 'tractor-trailer', placard: y.pl })));
