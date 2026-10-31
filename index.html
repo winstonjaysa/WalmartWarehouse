@@ -1436,6 +1436,7 @@ const r3 = (n) => Math.round(n * 1000) / 1000;
 
 function rbox(w, h, d, r = 0.04, seg = 4) {
   const rr = Math.max(0.001, Math.min(r, Math.min(w, h, d) / 2 - 0.0005));
+  seg = rr <= 0.026 ? 1 : rr <= 0.06 ? Math.min(seg, 2) : Math.min(seg, 3); // v3.1 perf: bevel tessellation scaled to the bevel size
   return cached(_geo, `rb${r3(w)},${r3(h)},${r3(d)},${r3(rr)},${seg}`, () => new RoundedBoxGeometry(w, h, d, seg, rr));
 }
 const cyl = (rt, rb, h, s = 24) => cached(_geo, `cy${r3(rt)},${r3(rb)},${r3(h)},${s}`, () => new THREE.CylinderGeometry(rt, rb, h, s));
@@ -1735,6 +1736,41 @@ function bakeGroup(root) {
   });
   return [...buckets.values()].map((b) => ({ geometry: mergeGeometries(b.geos, false), material: b.material }));
 }
+/* v3.1 perf: merge static meshes of a rigid group by material (one draw call per material). Skips transparent,
+   multi-material, instanced, named-protected meshes and anything under a node rejected by keepFn. */
+window.__gfMergeRigid = (r, o) => mergeRigid(r, o);
+function mergeRigid(root, opts = {}) {
+  const skip = opts.skip || (() => false), leafOnly = !!opts.leafOnly;
+  root.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), buckets = new Map(), victims = [];
+  const visit = (o, under) => {
+    for (const c of o.children.slice()) {
+      if (skip(c)) continue;
+      if (c.isMesh && !c.isInstancedMesh && !c.isSkinnedMesh && c.visible && !Array.isArray(c.material) && !c.material.transparent && !c.morphTargetInfluences && (!leafOnly || (c.children.length === 0 && !c.name))) {
+        if (c.children.length === 0) {
+          const g0 = c.geometry, g = cleanAttrs(g0.index ? g0.toNonIndexed() : g0.clone());
+          if (!g.attributes.normal) g.computeVertexNormals();
+          if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
+          _m4.multiplyMatrices(inv, c.matrixWorld); g.applyMatrix4(_m4);
+          if (_m4.determinant() < 0) for (const a of Object.values(g.attributes)) { const p = a.array, s = a.itemSize; for (let i = 0; i < a.count; i += 3) for (let k = 0; k < s; k++) { const t = p[(i + 1) * s + k]; p[(i + 1) * s + k] = p[(i + 2) * s + k]; p[(i + 2) * s + k] = t; } }
+          const key = c.material.uuid + '|' + Object.keys(g.attributes).sort().join(',') + '|' + (+c.castShadow) + (+c.receiveShadow) + '|' + c.renderOrder;
+          if (!buckets.has(key)) buckets.set(key, { mat: c.material, cast: c.castShadow, recv: c.receiveShadow, ro: c.renderOrder, geos: [] });
+          buckets.get(key).geos.push(g); victims.push(c); continue;
+        }
+      }
+      if (!leafOnly && !c.isMesh) visit(c, true);
+    }
+  };
+  visit(root, false);
+  if (victims.length < 2) return 0;
+  for (const b of buckets.values()) {
+    const mg = mergeGeometries(b.geos, false); if (!mg) return 0;
+  }
+  for (const v of victims) v.removeFromParent();
+  if (!leafOnly) { const prune = (o) => { for (const c of o.children.slice()) { if (skip(c)) continue; if (!c.isMesh) { prune(c); if (c.children.length === 0 && !c.name.match(/^(cartons|load)$/)) c.removeFromParent(); } } }; prune(root); }
+  for (const b of buckets.values()) { const m = new THREE.Mesh(mergeGeometries(b.geos, false), b.mat); m.castShadow = b.cast; m.receiveShadow = b.recv; m.renderOrder = b.ro; m.name = 'merged'; m.userData.merged = true; root.add(m); }
+  return victims.length;
+}
 function instancedFrom(parts, count, name) {
   const g = grp(null, name); const meshes = parts.map((p) => {
     const im = new THREE.InstancedMesh(p.geometry, p.material, count); im.castShadow = im.receiveShadow = !p.material.transparent; g.add(im); return im; });
@@ -1754,7 +1790,9 @@ const pineMap = () => canvasTex('pine', 256, 256, (ctx, W) => {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.bezierCurveTo(x + r() * 10 - 5, W * 0.3, x + r() * 10 - 5, W * 0.7, x + r() * 8 - 4, W); ctx.stroke(); }
   for (let i = 0; i < 3; i++) { ctx.fillStyle = 'rgba(110,70,35,0.18)'; ctx.beginPath(); ctx.ellipse(r() * W, r() * W, 5, 9, 0, 0, 7); ctx.fill(); }
 }, { repeat: true });
-function getPalletGeometry(variant = 'pine') {
+function getPalletGeometry(variant = 'pine', lite = false) {
+  if (lite) { const k = variant + ':lite'; if (_palletGeo[k]) return _palletGeo[k]; const full = getPalletGeometry(variant); const _rb = rbox; rbox = (w, h, d) => cached(_geo, `bx${r3(w)},${r3(h)},${r3(d)}`, () => new THREE.BoxGeometry(w, h, d)); const save = _palletGeo[variant]; delete _palletGeo[variant];
+    try { const g = getPalletGeometry(variant); _palletGeo[k] = { geometry: g.geometry, material: full.material }; } finally { rbox = _rb; _palletGeo[variant] = save; } return _palletGeo[k]; }
   if (_palletGeo[variant]) return _palletGeo[variant];
   const P = [], r = rng(variant.length * 17 + 3);
   const jit = (hex, amt) => { const c = new THREE.Color(hex); const k = 1 + (r() - 0.5) * amt; c.r *= k; c.g *= k * (1 + (r() - 0.5) * amt * 0.3); c.b *= k; return c; };
@@ -1911,11 +1949,13 @@ function createPallet(opts = {}) {
   if (load === 'cartons') {
     const L = grp(g, 'load', 0, PALLET.h, 0); const h = stackCartons(L, opts.seed ?? 1, opts.maxHeight ?? 1.336);
     if (opts.wrap !== false && h > 0.3) parts.wrap = addWrap(L, 1.0, h + 0.02, 1.2, 0);
+    mergeRigid(L, { skip: (o) => o.name === 'wrap' });
     parts.load = L;
   } else if (load === 'totes') {
     const L = grp(g, 'load', 0, PALLET.h, 0), rows = Math.max(1, Math.floor((opts.maxHeight ?? 1.25) / 0.3));
     for (let l = 0; l < rows; l++) for (const x of [-0.25, 0.25]) for (const z of [-0.31, 0.31]) {
       const t = createCrateTote({ color: opts.toteColor || 'blue', lid: l === rows - 1 }); t.position.set(x, l * 0.3, z); L.add(t); }
+    mergeRigid(L);
     parts.load = L;
   }
   return finish(g, parts, null, { variant });
@@ -1948,6 +1988,7 @@ function createPalletLoad(opts = {}) {
     const n = 2 + Math.floor(r() * 5), spots = [[-0.25, 0, -0.4], [0.25, 0, -0.4], [-0.25, 0, 0], [0.25, 0, 0.05], [-0.25, ch, -0.4], [0.25, ch, -0.4]];
     for (let j = 0; j < n; j++) { const [x, y, z] = spots[j]; makeCarton(C, cw - 0.012, ch - 0.004, cd - 0.012, x + (r() - 0.5) * 0.06, y, z + (r() - 0.5) * 0.06, r() < 0.7 ? tone : 4, (r() - 0.5) * (y ? 0.25 : 0.5)); }
   }
+  mergeRigid(C);
   const out = finish(g, P, null, { variant, palletType: onPallet ? pt : null });
   out.userData.height = new THREE.Box3().setFromObject(out, true).max.y; return out;
 }
@@ -3850,7 +3891,8 @@ const GL_INFO = (() => { try { const c = document.createElement('canvas'), g = c
 const Q = QS.get('q') || (GL_INFO.weak ? 'low' : 'high'), LOW = Q === 'low';
 console.info(`[gateflow] GL: ${GL_INFO.name} -> quality ${Q}`);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LOW, powerPreference: 'high-performance', preserveDrawingBuffer: QS.has('capture') });
-renderer.setPixelRatio(LOW ? 1 : Math.min(devicePixelRatio, 2));
+const DPR_MAX = LOW ? 1 : Math.min(devicePixelRatio || 1, +(QS.get('dpr') || 1.5)); // v3.1: cap DPR (Retina 2.0 -> 1.5)
+renderer.setPixelRatio(DPR_MAX);
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = LOW ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -3874,7 +3916,7 @@ const hemi = new THREE.HemisphereLight(0xf4f8ff, 0xb9c3cf, 1.25); scene.add(hemi
 const amb = new THREE.AmbientLight(0xffffff, 0.25); scene.add(amb);
 const sun = new THREE.DirectionalLight(0xfff3e2, 2.3);
 sun.position.set(-70, 140, 90); sun.castShadow = true;
-sun.shadow.mapSize.set(LOW ? 1024 : 4096, LOW ? 1024 : 4096);
+sun.shadow.mapSize.set(LOW ? 1024 : 2048, LOW ? 1024 : 2048); // v3.1: 2048 fitted to the building footprint
 Object.assign(sun.shadow.camera, { left: -125, right: 125, top: 100, bottom: -100, near: 10, far: 400 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04; sun.shadow.radius = 4;
 scene.add(sun); scene.add(sun.target);
@@ -4127,7 +4169,7 @@ RACK_ROWS.forEach((r, ri) => { for (let b = 0; b < BAYS; b++) for (let lv = 0; l
   SLOTS.push(sl); LOC.set(sl.id, sl);
 } });
 const SLOT_RE = /^\d{2}-\d{3}-[A-H]-\d$/; if (SLOTS.some((s) => !SLOT_RE.test(s.id)) || LOC.size !== SLOTS.length) console.error('[slot-assert] rack slot ids not unique / not AA-BBB-L-P');
-const palBase = getPalletGeometry('pine');
+const palBase = getPalletGeometry('pine', true);
 const loadGeo = rbox(1.0, 1.0, 1.2, 0.06, 2); loadGeo.translate(0, 0.5, 0); // origin at load base -> y-scale keeps it seated on the deck
 const loadMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.55 });
 const imBase = new THREE.InstancedMesh(palBase.geometry, palBase.material, SLOTS.length), imLoad = new THREE.InstancedMesh(loadGeo, loadMat, SLOTS.length);
@@ -4925,6 +4967,19 @@ window.__ents = ENTITIES;
 console.info('[gf] population', { vehicles: VEH.length, movers: POP.movers.length, workers: POP.peds.length });
 
 } catch (e) { console.warn('[gf] population layer disabled:', e && e.message); }
+try { // v3.1 perf pass (draw calls)
+  const NOPE = /pallet|load|tote|carton|wrap|film|case/i, refd = new Set(), seen = new Set();
+  const walk = (v, d) => { if (!v || d > 3 || typeof v !== 'object') return; if (v.isObject3D) { refd.add(v); return; } if (seen.has(v)) return; seen.add(v);
+    if (Array.isArray(v)) { for (const x of v) walk(x, d + 1); return; } if (v.constructor !== Object) return; for (const k in v) walk(v[k], d + 1); };
+  const roots = [...VEH.map((v) => v.obj), ...((typeof POP !== 'undefined' && POP.movers) ? POP.movers.map((m) => m.obj) : []), ...((typeof POP !== 'undefined' && POP.peds) ? POP.peds.map((p) => p.o) : [])].filter(Boolean);
+  let merged = 0;
+  for (const R of roots) { R.traverse((o) => { const ud = o.userData; if (ud) for (const k in ud) walk(ud[k], 1); });
+    const nodes = []; R.traverse((o) => { if (!o.isMesh) nodes.push(o); });
+    for (const n of nodes) { let bad = false; for (let q = n; q && q !== R.parent; q = q.parent) if (NOPE.test(q.name)) { bad = true; break; } if (bad) continue;
+      const kids = n.children.filter((c) => c.isMesh && !c.name && c.children.length === 0 && !refd.has(c));
+      if (kids.length >= 2) merged += window.__gfMergeRigid(n, { leafOnly: true, skip: (c) => !kids.includes(c) }); } }
+  console.info('[gf] v3.1 merged vehicle/people meshes', merged);
+} catch (e) { console.warn('[gf] merge pass', e && e.message); }
 let SIGNS = null; try { SIGNS = COOKER_SIGNS.create(world, { floorY: FLOOR, ceiling: 12.6 }); world.traverse((m) => { if (m.isMesh && m.parent && /sign/i.test(m.parent.name + m.name) && m.material && !Array.isArray(m.material)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = -1; m.material.polygonOffsetUnits = -1; } }); } catch (e) { console.warn('[gf] signs', e && e.message); }
 
 await __yield(72, "fleet & people");
@@ -4995,29 +5050,49 @@ function render(alpha, draw = true) {
   if (!draw) return;
   if (composer) composer.render(); else renderer.render(scene, camera);
 }
+let __onScreen = true;
+try { new IntersectionObserver((es) => { __onScreen = es[es.length - 1].isIntersecting; }).observe(canvas); } catch (e) {}
+const AQ = { lvl: 0, t: 0, n: 0, sum: 0, off: QS.has('noaq') || LOW };
+function stepQuality() { // v3.1 adaptive quality: DPR -> shadows -> AO, one step per 2 s window of slow frames
+  AQ.lvl++;
+  if (AQ.lvl === 1) { const pr = Math.max(1, Math.min(renderer.getPixelRatio() - 0.25, 1.25)); if (pr < renderer.getPixelRatio()) { renderer.setPixelRatio(pr); if (composer) composer.setPixelRatio(pr); onResize(); } else AQ.lvl++; }
+  if (AQ.lvl === 2) { const pr = 1; if (pr < renderer.getPixelRatio()) { renderer.setPixelRatio(pr); if (composer) composer.setPixelRatio(pr); onResize(); } else AQ.lvl++; }
+  if (AQ.lvl === 3) { sun.shadow.mapSize.set(1024, 1024); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } renderer.shadowMap.type = THREE.PCFShadowMap; renderer.shadowMap.needsUpdate = true; scene.traverse((o) => { if (o.material && o.material.needsUpdate !== undefined) { const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) m.needsUpdate = true; } }); }
+  if (AQ.lvl === 4) { if (composer) for (const p of composer.passes) if (p.constructor && /GTAO/.test(p.constructor.name)) p.enabled = false; }
+  if (AQ.lvl === 5) { if (composer) for (const p of composer.passes) if (p.constructor && /SMAA/.test(p.constructor.name)) p.enabled = false; }
+  if (AQ.lvl >= 5) AQ.off = true;
+  window.__aq = AQ.lvl; console.info('[gf] adaptive quality -> level ' + AQ.lvl);
+}
 function frame(now) {
-  const dt = Math.min(0.5, (now - last) / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21)
+  if (!QS.has('capture')) requestAnimationFrame(frame);
+  if (document.hidden || !__onScreen) { last = now; return; } // v3.1: no sim/render when hidden or scrolled offscreen
+  const ms = now - last, dt = Math.min(0.25, ms / 1000); // fixed-step accumulator: sim time tracks wall time, independent of render rate (M21)
   last = now; acc += dt * speed;
-  let n = 0; while (acc >= STEP && n < 8) { simStep(STEP); acc -= STEP; n++; }
-  if (n >= 8) acc = 0;
-  controls.update(); render(acc / STEP); if (!QS.has('capture')) requestAnimationFrame(frame);
+  let n = 0; while (acc >= STEP && n < 2) { simStep(STEP); acc -= STEP; n++; } /*SIMLOOP*/
+  if (acc >= STEP) acc %= STEP; // v3.1: cap catch-up at 2 steps, drop the excess (no spiral of death)
+  controls.update(); render(acc / STEP);
+  if (!AQ.off && ms > 0 && ms < 1000) { AQ.sum += ms; AQ.n++; AQ.t += ms; if (AQ.t >= 2000) { if (AQ.n > 0 && AQ.sum / AQ.n > 22) stepQuality(); AQ.t = AQ.sum = AQ.n = 0; } }
 }
 window.__step = (dt) => { let k = Math.round(dt / STEP); while (k-- > 0) simStep(STEP); };
 window.__place = () => render(1, false);
 window.__render = () => { controls.update(); render(0); };
 window.__cam = (px, py, pz, tx, ty, tz) => { camera.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); };
-function onResize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) composer.setSize(w, h); }
-addEventListener('resize', onResize);
+let __rzT = 0; addEventListener('resize', () => { clearTimeout(__rzT); __rzT = setTimeout(onResize, 120); }); // v3.1: debounced
+function onResize() { const w = innerWidth, h = innerHeight; if (w < 2 || h < 2) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); if (composer) composer.setSize(w, h); }
 camera.position.set(-20, 95, 150); controls.target.set(-14, 0, 22); controls.update();
 setupPost();
 if (UIX) { try { UIX.stopDemo(); UIX.clearScenePlaceholder(); UIX.onViewChange((v) => {}); } catch (e) { console.error(e); } }
 Object.assign(sun.shadow.camera, { left: -75, right: 75, top: 70, bottom: -70, near: 60, far: 330 }); sun.position.set(-60, 160, 110); sun.target.position.set(-5, 0, 10); sun.shadow.camera.updateProjectionMatrix(); fill.intensity = 0.2;
+try { const _sph = new THREE.Sphere(), _sv = new THREE.Vector3(); let nc = 0; scene.updateMatrixWorld(true);
+  scene.traverse((o) => { if (!o.isMesh || o.isInstancedMesh || !o.castShadow) return; const g = o.geometry; if (!g.boundingSphere) g.computeBoundingSphere(); o.getWorldScale(_sv);
+    if (g.boundingSphere.radius * Math.max(_sv.x, _sv.y, _sv.z) < 0.12) { o.castShadow = false; nc++; } });
+  console.info('[gf] v3.1 small parts no longer cast shadows:', nc); } catch (e) { console.warn('[gf] shadow pass', e && e.message); }
 const __hideLoad = () => { const el = document.getElementById('gfLoad'); if (el) el.remove(); };
 await __yield(90, 'compiling shaders');
 try { await renderer.compileAsync(scene, camera); } catch (e) { console.warn('compileAsync', e); }
 __hideLoad();
 window.__sim = { VEH, PALS, SLOTS, LOC, COUNTS, ASSERT, get t() { return SIMT; } };
-window.__quality = Q; window.__assert = ASSERT; window.__ready = true;
+window.__quality = Q; window.__assert = ASSERT; window.__ready = true; window.__R = { renderer, scene, camera, sun, get composer() { return composer; } };
 requestAnimationFrame(frame);
 window.__dbg = { docked, reachD, FK1, tineTopY, carriageOf, syncPose, placeVehicle, LANES, THREE };
 
