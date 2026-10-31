@@ -1,0 +1,910 @@
+{
+  "viewport": "desktop",
+  "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 5482ms",
+      "found": []
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)",
+      "found": {
+        "zoomIn": null,
+        "zoomOut": null,
+        "explore": null
+      }
+    },
+    "frame": {
+      "pass": false,
+      "detail": "canvas capture failed/timed out (main thread blocked?): snap a: timeout: canvas probe >4000ms; snap b: timeout: canvas probe >4000ms",
+      "ttffMs": 5038.60009765625
+    },
+    "vehicles": {
+      "pass": true,
+      "method": "world positions via __sim.VEH + window.__step(5) sim-time fallback",
+      "wall": {
+        "movedN": 0,
+        "of": 21,
+        "simT": [
+          0.267,
+          0.333
+        ],
+        "simSecondsPerWallSecond": 0.007,
+        "maxD": 0.005
+      },
+      "sample": [
+        {
+          "id": "TRL-48213",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50177",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-71540",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-53390",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-66102",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50311",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "FL-07",
+          "type": "Counterbalance forklift",
+          "d": 0
+        },
+        {
+          "id": "FL-03",
+          "type": "Counterbalance forklift",
+          "d": 0
+        }
+      ],
+      "states": [
+        {
+          "id": "TRL-48213",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50177",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-71540",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-53390",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-66102",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50311",
+          "state": "Arriving",
+          "task": "Gate check-in",
+          "ds": 0
+        },
+        {
+          "id": "FL-07",
+          "state": "Unloading",
+          "task": "TRL-48213/P01 → STG-DR005-1:2",
+          "ds": 0
+        },
+        {
+          "id": "FL-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-09",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RP-01",
+          "state": "Moving",
+          "task": "To STG-DR002-1:1",
+          "ds": 0
+        },
+        {
+          "id": "RP-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-04",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-05",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-06",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-11",
+          "state": "Loading",
+          "task": "To OB-DS-103",
+          "ds": 0
+        },
+        {
+          "id": "FL-12",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-01",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "WS-01",
+          "state": "Replenishment",
+          "task": "Approach WS-01-B",
+          "ds": 0.003166666666666667
+        },
+        {
+          "id": "WS-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        }
+      ],
+      "sim": {
+        "simT": [
+          0.333,
+          5.333
+        ],
+        "movedN": 5,
+        "of": 21,
+        "maxD": 2.937,
+        "sample": [
+          {
+            "id": "TRL-48213",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-50177",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-71540",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-53390",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-66102",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-50311",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "FL-07",
+            "type": "Counterbalance forklift",
+            "d": 2.249
+          },
+          {
+            "id": "FL-03",
+            "type": "Counterbalance forklift",
+            "d": 0
+          }
+        ]
+      },
+      "detail": "wall 2s: 0/21 moved, sim clock 0.267->0.333 (0.007 sim-s/wall-s); after __step(5) sim 0.333->5.333: 5/21 moved, max 2.937m"
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs.length=55 (limit 60); hooked linkProgram=55, compileShader=110"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 5038.60009765625,
+    "ttffPolls": 2,
+    "loaderProbeAtMs": 32856.60009765625,
+    "simSecondsPerWallSecond": 0.007,
+    "fpsWindowS": 3.5,
+    "avgFps": 0.29,
+    "rendererFrameFps": 1.44,
+    "drawCallsPerFrameHooked": 9287,
+    "drawCallsRendererInfo": 1,
+    "programsRendererInfo": 55,
+    "programsLinkedHook": 55,
+    "shadersCompiledHook": 110,
+    "quality": "high",
+    "ttffMs": 6528,
+    "loaderTimeline": [
+      [
+        504,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2001,
+        "Loading 3D scene · models…",
+        0,
+        0
+      ],
+      [
+        2853,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3262,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        5202,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5374,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5482,
+        "(gone)",
+        50,
+        25
+      ]
+    ],
+    "longTasks": [
+      [
+        382,
+        104
+      ],
+      [
+        2001,
+        662
+      ],
+      [
+        2666,
+        180
+      ],
+      [
+        2856,
+        377
+      ],
+      [
+        3280,
+        886
+      ],
+      [
+        4172,
+        1012
+      ],
+      [
+        5204,
+        156
+      ],
+      [
+        5374,
+        88
+      ],
+      [
+        5601,
+        928
+      ],
+      [
+        6530,
+        7948
+      ],
+      [
+        14484,
+        4412
+      ],
+      [
+        20514,
+        7699
+      ],
+      [
+        28216,
+        4843
+      ],
+      [
+        33071,
+        4835
+      ],
+      [
+        37908,
+        4487
+      ],
+      [
+        42402,
+        4996
+      ],
+      [
+        47406,
+        4920
+      ],
+      [
+        53936,
+        2189
+      ],
+      [
+        56126,
+        4813
+      ]
+    ],
+    "longestTaskMs": 7948,
+    "loaderGoneMs": 5482
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\" (console/requests from the interstitial discarded: 0)",
+    "poll error: timeout: screenshot >8000ms",
+    "snap a: timeout: canvas probe >4000ms",
+    "snap b: timeout: canvas probe >4000ms",
+    "FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)"
+  ],
+  "failedRequests": [],
+  "state10": {
+    "hooks": {
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "draws": 27825,
+      "raf": 3,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 6511,
+      "lastLinkAt": 6511,
+      "firstDrawFrameAt": 6528,
+      "framesWithDraws": 3
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "high",
+    "renderer": {
+      "programs": 55,
+      "calls": 1,
+      "triangles": 1,
+      "frame": 15,
+      "geometries": 1822,
+      "textures": 63,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "fatal": "viewport hard timeout 60000ms (page hang / main thread blocked)",
+  "stateEnd": {
+    "hooks": {
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "draws": 111324,
+      "raf": 12,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 6511,
+      "lastLinkAt": 6511,
+      "firstDrawFrameAt": 6528,
+      "framesWithDraws": 12
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "high",
+    "renderer": {
+      "programs": 55,
+      "calls": 1,
+      "triangles": 1,
+      "frame": 60,
+      "geometries": 1822,
+      "textures": 63,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "hangDump": {
+    "smoke": {
+      "t0": 373.8999999994412,
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "compileStatusPolls": 0,
+      "draws": 111324,
+      "raf": 12,
+      "longTasks": [
+        [
+          382,
+          104
+        ],
+        [
+          2001,
+          662
+        ],
+        [
+          2666,
+          180
+        ],
+        [
+          2856,
+          377
+        ],
+        [
+          3280,
+          886
+        ],
+        [
+          4172,
+          1012
+        ],
+        [
+          5204,
+          156
+        ],
+        [
+          5374,
+          88
+        ],
+        [
+          5601,
+          928
+        ],
+        [
+          6530,
+          7948
+        ],
+        [
+          14484,
+          4412
+        ],
+        [
+          20514,
+          7699
+        ],
+        [
+          28216,
+          4843
+        ],
+        [
+          33071,
+          4835
+        ],
+        [
+          37908,
+          4487
+        ],
+        [
+          42402,
+          4996
+        ],
+        [
+          47406,
+          4920
+        ],
+        [
+          53936,
+          2189
+        ],
+        [
+          56126,
+          4813
+        ]
+      ],
+      "loader": [
+        [
+          504,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2001,
+          "Loading 3D scene · models…",
+          0,
+          0
+        ],
+        [
+          2853,
+          "Loading 3D scene · environment…",
+          0,
+          0
+        ],
+        [
+          3262,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          5202,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          5374,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          5482,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "lastCompileAt": 6510.699999999255,
+      "lastLinkAt": 6510.699999999255,
+      "contexts": 0,
+      "parallelExt": false,
+      "linkFail": 0
+    },
+    "ready": true
+  },
+  "final": {
+    "shaders": 110,
+    "programsLinked": 55,
+    "draws": 120611,
+    "framesWithDraws": 13,
+    "firstDrawFrameAt": 6528,
+    "frames": [
+      [
+        6528,
+        9275
+      ],
+      [
+        14477,
+        9275
+      ],
+      [
+        18894,
+        9275
+      ],
+      [
+        20511,
+        9275
+      ],
+      [
+        28212,
+        9275
+      ],
+      [
+        33059,
+        9275
+      ],
+      [
+        37905,
+        9275
+      ],
+      [
+        42394,
+        9275
+      ],
+      [
+        47397,
+        9275
+      ],
+      [
+        52325,
+        9275
+      ],
+      [
+        56122,
+        9287
+      ],
+      [
+        60938,
+        9287
+      ],
+      [
+        66909,
+        9287
+      ]
+    ],
+    "loader": [
+      [
+        504,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2001,
+        "Loading 3D scene · models…",
+        0,
+        0
+      ],
+      [
+        2853,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3262,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        5202,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5374,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5482,
+        "(gone)",
+        50,
+        25
+      ]
+    ],
+    "longTasks": [
+      [
+        382,
+        104
+      ],
+      [
+        2001,
+        662
+      ],
+      [
+        2666,
+        180
+      ],
+      [
+        2856,
+        377
+      ],
+      [
+        3280,
+        886
+      ],
+      [
+        4172,
+        1012
+      ],
+      [
+        5204,
+        156
+      ],
+      [
+        5374,
+        88
+      ],
+      [
+        5601,
+        928
+      ],
+      [
+        6530,
+        7948
+      ],
+      [
+        14484,
+        4412
+      ],
+      [
+        20514,
+        7699
+      ],
+      [
+        28216,
+        4843
+      ],
+      [
+        33071,
+        4835
+      ],
+      [
+        37908,
+        4487
+      ],
+      [
+        42402,
+        4996
+      ],
+      [
+        47406,
+        4920
+      ],
+      [
+        53936,
+        2189
+      ],
+      [
+        56126,
+        4813
+      ]
+    ],
+    "lastCompileAt": 6511,
+    "parallelExt": false,
+    "linkFail": 0,
+    "ready": true,
+    "programsInfo": 55,
+    "quality": "high",
+    "now": 66912
+  },
+  "infoLog": [
+    {
+      "t": 2.48,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version) -> quality high (lite GPU: AO/outline off)",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 3.61,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 5.4,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 5.8,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 6.03,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 6.13,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    },
+    {
+      "t": 6.14,
+      "type": "info",
+      "text": "[gf] v3.2 shader warm-up 100 ms, programs 25",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 53.17,
+      "type": "warn",
+      "text": "[ASSERT] path end FL-11: pos err 1.1 cm, heading err 1.5 deg",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 53.3,
+      "type": "warn",
+      "text": "[ASSERT] path end FL-12: pos err 1.1 cm, heading err 1.5 deg",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    }
+  ],
+  "pass": false
+}

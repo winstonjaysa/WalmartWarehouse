@@ -1,0 +1,84 @@
+
+URL: https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html
+OUT: /workspace/gateflow/qa/smoke_out/v32_run1
+
+viewport | loader | frame | vehicles | buttons | console | programs | RESULT
+desktop  | PASS   | PASS  | FAIL     | FAIL    | PASS    | PASS     | FAIL
+phone    | PASS   | PASS  | PASS     | FAIL    | PASS    | PASS     | FAIL
+
+[desktop] TTFF(first GL frame)=9551ms screenshotNonBlank=5030.800048828125ms loaderGone=9673ms avgFps=0.53 (renderer.frame undefined) draws/frame=9282 (info.calls undefined) programs=30 linked=30 shaders=60 quality=low longest task=4895ms simRate=0.018
+  loader: PASS - loader removed at 9673ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: PASS - stats {"mean":208.2,"sd":40.54,"colours":500,"blank":false} diff1s {"changedFrac":0.00286,"meanAbs":0.196}
+  vehicles: FAIL - wall 2s: 0/21 moved, sim clock 0.8->0.9 (0.018 sim-s/wall-s); after __step(5) sim null->null: 0/0 moved, max 0m
+  programs: PASS - renderer.info.programs.length=30 (limit 60); compileShader=60 [from final dump]
+  console: PASS - 0 console.error, 0 pageerror
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+
+[phone] TTFF(first GL frame)=7939ms screenshotNonBlank=2380.800048828125ms loaderGone=8023ms avgFps=0.66 (renderer.frame undefined) draws/frame=7771.6 (info.calls undefined) programs=30 linked=30 shaders=60 quality=low longest task=4491ms simRate=0.024
+  loader: PASS - loader removed at 8023ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: PASS - stats {"mean":195.4,"sd":49.93,"colours":500,"blank":false} diff1s {"changedFrac":0.01023,"meanAbs":0.652}
+  vehicles: PASS - wall 2s: 0/21 moved, sim clock 0.833->0.967 (0.024 sim-s/wall-s); after __step(5) sim 1.033->6.133: 12/21 moved, max 6.67m
+  programs: PASS - renderer.info.programs.length=30 (limit 60); compileShader=60 [from final dump]
+  console: PASS - 0 console.error, 0 pageerror
+  FATAL: viewport budget 60s exceeded before fps window
+EXIT std run1: 1
+
+URL: https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high
+OUT: /workspace/gateflow/qa/smoke_out/v32_mac_run1
+
+viewport | loader | frame | vehicles | buttons | console | programs | RESULT
+desktop  | PASS   | FAIL  | FAIL     | FAIL    | PASS    | PASS     | FAIL
+
+[desktop] TTFF(first GL frame)=12905ms screenshotNonBlank=4954.300048828125ms loaderGone=5168ms avgFps=0.24 (renderer.frame undefined) draws/frame=9275 (info.calls undefined) programs=55 linked=55 shaders=110 quality=high longest task=7574ms simRate=undefined
+  loader: PASS - loader removed at 5168ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: FAIL - canvas capture failed/timed out (main thread blocked?): snap a: timeout: screenshot >8000ms; snap b: timeout: screenshot >8000ms
+  programs: PASS - renderer.info.programs.length=55 (limit 60); compileShader=110 [from final dump]
+  console: PASS - 0 console.error, 0 pageerror
+  vehicles: FAIL - not reached (viewport hard timeout 60000ms (page hang / main thread blocked))
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+EXIT mac run1: 1
+
+URL: https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html
+OUT: /workspace/gateflow/qa/smoke_out/v32_run2
+
+viewport | loader | frame | vehicles | buttons | console | programs | RESULT
+desktop  | PASS   | FAIL  | PASS     | FAIL    | PASS    | PASS     | FAIL
+phone    | PASS   | PASS  | PASS     | FAIL    | PASS    | PASS     | FAIL
+
+[desktop] TTFF(first GL frame)=5890ms screenshotNonBlank=5249.89990234375ms loaderGone=5267ms avgFps=0.49 (renderer.frame undefined) draws/frame=9282.6 (info.calls undefined) programs=30 linked=30 shaders=60 quality=low longest task=5117ms simRate=0.022
+  loader: PASS - loader removed at 5267ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: FAIL - canvas capture failed/timed out (main thread blocked?): snap a: timeout: screenshot >8000ms; snap b: timeout: screenshot >8000ms
+  vehicles: PASS - wall 2s: 0/21 moved, sim clock 0.6->0.7 (0.022 sim-s/wall-s); after __step(5) sim 0.8->5.9: 12/21 moved, max 6.454m
+  programs: PASS - renderer.info.programs.length=30 (limit 60); compileShader=60 [from final dump]
+  console: PASS - 0 console.error, 0 pageerror
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+
+[phone] TTFF(first GL frame)=8571ms screenshotNonBlank=2476.300048828125ms loaderGone=3666ms avgFps=0.73 (renderer.frame 0.73) draws/frame=7604 (info.calls 3792) programs=30 linked=30 shaders=60 quality=low longest task=4849ms simRate=0.019
+  loader: PASS - loader removed at 3666ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: PASS - stats {"mean":195.2,"sd":50.41,"colours":500,"blank":false} diff1s {"changedFrac":0.0126,"meanAbs":0.861}
+  vehicles: PASS - wall 2s: 0/21 moved, sim clock 0.8->0.867 (0.019 sim-s/wall-s); after __step(5) sim 0.967->5.967: 5/21 moved, max 2.867m
+  programs: PASS - renderer.info.programs.length=30 (limit 60); hooked linkProgram=30, compileShader=60
+  console: PASS - 0 console.error, 0 pageerror
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+EXIT std run2: 1
+
+URL: https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high
+OUT: /workspace/gateflow/qa/smoke_out/v32_mac_run2
+
+viewport | loader | frame | vehicles | buttons | console | programs | RESULT
+desktop  | PASS   | FAIL  | PASS     | FAIL    | PASS    | PASS     | FAIL
+
+[desktop] TTFF(first GL frame)=6528ms screenshotNonBlank=5038.60009765625ms loaderGone=5482ms avgFps=0.29 (renderer.frame 1.44) draws/frame=9287 (info.calls 1) programs=55 linked=55 shaders=110 quality=high longest task=7948ms simRate=0.007
+  loader: PASS - loader removed at 5482ms
+  buttons: FAIL - zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)
+  frame: FAIL - canvas capture failed/timed out (main thread blocked?): snap a: timeout: canvas probe >4000ms; snap b: timeout: canvas probe >4000ms
+  vehicles: PASS - wall 2s: 0/21 moved, sim clock 0.267->0.333 (0.007 sim-s/wall-s); after __step(5) sim 0.333->5.333: 5/21 moved, max 2.937m
+  programs: PASS - renderer.info.programs.length=55 (limit 60); hooked linkProgram=55, compileShader=110
+  console: PASS - 0 console.error, 0 pageerror
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+EXIT mac run2: 1

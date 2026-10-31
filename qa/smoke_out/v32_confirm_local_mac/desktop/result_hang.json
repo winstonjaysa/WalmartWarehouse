@@ -1,0 +1,32 @@
+{
+  "viewport": "desktop",
+  "pass": false,
+  "fatal": "hard timeout 75000ms (hang)",
+  "checks": {
+    "loader": {
+      "pass": false,
+      "detail": "hang: viewport did not finish within hard timeout (page/main thread unresponsive)"
+    },
+    "frame": {
+      "pass": false,
+      "detail": "hang"
+    },
+    "vehicles": {
+      "pass": false,
+      "detail": "hang"
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "hang"
+    },
+    "console": {
+      "pass": false,
+      "detail": "hang"
+    },
+    "programs": {
+      "pass": false,
+      "detail": "hang"
+    }
+  },
+  "metrics": {}
+}

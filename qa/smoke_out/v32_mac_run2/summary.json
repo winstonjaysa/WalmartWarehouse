@@ -1,0 +1,154 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "loader": true,
+      "buttons": false,
+      "frame": false,
+      "vehicles": true,
+      "programs": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 5038.60009765625,
+      "ttffPolls": 2,
+      "loaderProbeAtMs": 32856.60009765625,
+      "simSecondsPerWallSecond": 0.007,
+      "fpsWindowS": 3.5,
+      "avgFps": 0.29,
+      "rendererFrameFps": 1.44,
+      "drawCallsPerFrameHooked": 9287,
+      "drawCallsRendererInfo": 1,
+      "programsRendererInfo": 55,
+      "programsLinkedHook": 55,
+      "shadersCompiledHook": 110,
+      "quality": "high",
+      "ttffMs": 6528,
+      "loaderTimeline": [
+        [
+          504,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2001,
+          "Loading 3D scene · models…",
+          0,
+          0
+        ],
+        [
+          2853,
+          "Loading 3D scene · environment…",
+          0,
+          0
+        ],
+        [
+          3262,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          5202,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          5374,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          5482,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "longTasks": [
+        [
+          382,
+          104
+        ],
+        [
+          2001,
+          662
+        ],
+        [
+          2666,
+          180
+        ],
+        [
+          2856,
+          377
+        ],
+        [
+          3280,
+          886
+        ],
+        [
+          4172,
+          1012
+        ],
+        [
+          5204,
+          156
+        ],
+        [
+          5374,
+          88
+        ],
+        [
+          5601,
+          928
+        ],
+        [
+          6530,
+          7948
+        ],
+        [
+          14484,
+          4412
+        ],
+        [
+          20514,
+          7699
+        ],
+        [
+          28216,
+          4843
+        ],
+        [
+          33071,
+          4835
+        ],
+        [
+          37908,
+          4487
+        ],
+        [
+          42402,
+          4996
+        ],
+        [
+          47406,
+          4920
+        ],
+        [
+          53936,
+          2189
+        ],
+        [
+          56126,
+          4813
+        ]
+      ],
+      "longestTaskMs": 7948,
+      "loaderGoneMs": 5482
+    }
+  }
+]

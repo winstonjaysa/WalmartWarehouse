@@ -1,0 +1,601 @@
+{
+  "viewport": "desktop",
+  "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 5168ms",
+      "found": []
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)",
+      "found": {
+        "zoomIn": null,
+        "zoomOut": null,
+        "explore": null
+      }
+    },
+    "frame": {
+      "pass": false,
+      "detail": "canvas capture failed/timed out (main thread blocked?): snap a: timeout: screenshot >8000ms; snap b: timeout: screenshot >8000ms",
+      "ttffMs": 4954.300048828125
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs.length=55 (limit 60); compileShader=110 [from final dump]"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    },
+    "vehicles": {
+      "pass": false,
+      "detail": "not reached (viewport hard timeout 60000ms (page hang / main thread blocked))"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 4954.300048828125,
+    "ttffPolls": 2,
+    "loaderProbeAtMs": 40898.300048828125,
+    "ttffMs": 12905,
+    "loaderTimeline": [
+      [
+        482,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2667,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3040,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        4854,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5022,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5168,
+        "(gone)",
+        50,
+        25
+      ]
+    ],
+    "longTasks": [
+      [
+        369,
+        94
+      ],
+      [
+        895,
+        1000
+      ],
+      [
+        1899,
+        305
+      ],
+      [
+        2690,
+        325
+      ],
+      [
+        3046,
+        794
+      ],
+      [
+        3846,
+        989
+      ],
+      [
+        4858,
+        151
+      ],
+      [
+        5022,
+        76
+      ],
+      [
+        5333,
+        7574
+      ],
+      [
+        12908,
+        2295
+      ],
+      [
+        15209,
+        3872
+      ],
+      [
+        19082,
+        5807
+      ],
+      [
+        24890,
+        5018
+      ],
+      [
+        29909,
+        4564
+      ],
+      [
+        34480,
+        3973
+      ],
+      [
+        38455,
+        3455
+      ],
+      [
+        44924,
+        2141
+      ],
+      [
+        47080,
+        4439
+      ],
+      [
+        51521,
+        5641
+      ],
+      [
+        58106,
+        3964
+      ]
+    ],
+    "longestTaskMs": 7574,
+    "loaderGoneMs": 5168,
+    "programsLinkedHook": 55,
+    "shadersCompiledHook": 110,
+    "programsRendererInfo": 55,
+    "quality": "high",
+    "drawCallsPerFrameHooked": 9275,
+    "avgFps": 0.24
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\" (console/requests from the interstitial discarded: 0)",
+    "poll error: timeout: screenshot >8000ms",
+    "t10 screenshot: timeout: screenshot t10 >15000ms",
+    "snap a: timeout: screenshot >8000ms",
+    "FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)",
+    "snap b: timeout: screenshot >8000ms"
+  ],
+  "failedRequests": [],
+  "state10": {
+    "hooks": {
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "draws": 27825,
+      "raf": 3,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 12891,
+      "lastLinkAt": 12891,
+      "firstDrawFrameAt": 12905,
+      "framesWithDraws": 3
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "high",
+    "renderer": {
+      "programs": 55,
+      "calls": 1,
+      "triangles": 1,
+      "frame": 15,
+      "geometries": 1822,
+      "textures": 63,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "fatal": "viewport hard timeout 60000ms (page hang / main thread blocked)",
+  "hangDump": {
+    "smoke": {
+      "t0": 365.70000000018626,
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "compileStatusPolls": 0,
+      "draws": 111300,
+      "raf": 12,
+      "longTasks": [
+        [
+          369,
+          94
+        ],
+        [
+          895,
+          1000
+        ],
+        [
+          1899,
+          305
+        ],
+        [
+          2690,
+          325
+        ],
+        [
+          3046,
+          794
+        ],
+        [
+          3846,
+          989
+        ],
+        [
+          4858,
+          151
+        ],
+        [
+          5022,
+          76
+        ],
+        [
+          5333,
+          7574
+        ],
+        [
+          12908,
+          2295
+        ],
+        [
+          15209,
+          3872
+        ],
+        [
+          19082,
+          5807
+        ],
+        [
+          24890,
+          5018
+        ],
+        [
+          29909,
+          4564
+        ],
+        [
+          34480,
+          3973
+        ],
+        [
+          38455,
+          3455
+        ],
+        [
+          44924,
+          2141
+        ],
+        [
+          47080,
+          4439
+        ],
+        [
+          51521,
+          5641
+        ]
+      ],
+      "loader": [
+        [
+          482,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2667,
+          "Loading 3D scene · environment…",
+          0,
+          0
+        ],
+        [
+          3040,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          4854,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          5022,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          5168,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "lastCompileAt": 12891.299999999814,
+      "lastLinkAt": 12891.299999999814,
+      "contexts": 0,
+      "parallelExt": false,
+      "linkFail": 0
+    },
+    "ready": true
+  },
+  "final": {
+    "shaders": 110,
+    "programsLinked": 55,
+    "draws": 120575,
+    "framesWithDraws": 13,
+    "firstDrawFrameAt": 12905,
+    "frames": [
+      [
+        12905,
+        9275
+      ],
+      [
+        15201,
+        9275
+      ],
+      [
+        19077,
+        9275
+      ],
+      [
+        24887,
+        9275
+      ],
+      [
+        29906,
+        9275
+      ],
+      [
+        34472,
+        9275
+      ],
+      [
+        38448,
+        9275
+      ],
+      [
+        41909,
+        9275
+      ],
+      [
+        47064,
+        9275
+      ],
+      [
+        51513,
+        9275
+      ],
+      [
+        57162,
+        9275
+      ],
+      [
+        62069,
+        9275
+      ],
+      [
+        63675,
+        9275
+      ]
+    ],
+    "loader": [
+      [
+        482,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2667,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3040,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        4854,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5022,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5168,
+        "(gone)",
+        50,
+        25
+      ]
+    ],
+    "longTasks": [
+      [
+        369,
+        94
+      ],
+      [
+        895,
+        1000
+      ],
+      [
+        1899,
+        305
+      ],
+      [
+        2690,
+        325
+      ],
+      [
+        3046,
+        794
+      ],
+      [
+        3846,
+        989
+      ],
+      [
+        4858,
+        151
+      ],
+      [
+        5022,
+        76
+      ],
+      [
+        5333,
+        7574
+      ],
+      [
+        12908,
+        2295
+      ],
+      [
+        15209,
+        3872
+      ],
+      [
+        19082,
+        5807
+      ],
+      [
+        24890,
+        5018
+      ],
+      [
+        29909,
+        4564
+      ],
+      [
+        34480,
+        3973
+      ],
+      [
+        38455,
+        3455
+      ],
+      [
+        44924,
+        2141
+      ],
+      [
+        47080,
+        4439
+      ],
+      [
+        51521,
+        5641
+      ],
+      [
+        58106,
+        3964
+      ]
+    ],
+    "lastCompileAt": 12891,
+    "parallelExt": false,
+    "linkFail": 0,
+    "ready": true,
+    "programsInfo": 55,
+    "quality": "high",
+    "now": 63684
+  },
+  "infoLog": [
+    {
+      "t": 1.92,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version) -> quality high (lite GPU: AO/outline off)",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 3.78,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 5.43,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 5.79,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 6.02,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    },
+    {
+      "t": 6.1,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    },
+    {
+      "t": 6.11,
+      "type": "info",
+      "text": "[gf] v3.2 shader warm-up 87 ms, programs 25",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html?q=high"
+    }
+  ],
+  "pass": false
+}

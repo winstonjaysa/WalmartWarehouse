@@ -17,6 +17,14 @@ import { build as buildWrapped } from '../parts/v4/wrappedSkid.js';
 import { build as buildMilk } from '../parts/v4/milkCrateSkid.js';
 import { build as buildSnackStack } from '../parts/v4/snackCaseStack.js';
 import { build as buildEggs } from '../parts/v4/eggPallet.js';
+import { build as buildDiv } from '../parts/v4/divShelving.js';
+import { build as buildOffice } from '../parts/v4/officeKit.js';
+import { build as buildTraining } from '../parts/v4/trainingRoom.js';
+import { build as buildLunch } from '../parts/v4/lunchRoom.js';
+import { build as buildSick } from '../parts/v4/sickRoom.js';
+import { build as buildCleaning } from '../parts/v4/cleaningRoom.js';
+import { build as buildStairs } from '../parts/v4/stairs.js';
+import { build as buildBev, setWrapped as bevSetWrapped } from '../parts/v4/beverageSkid.js';
 
 // ---------------- quality / renderer ----------------
 const QS = new URLSearchParams(location.search);
@@ -103,7 +111,7 @@ const blobTex = canvasTex(64, 64, (g, w, h) => { const gr = g.createRadialGradie
 MAT.blob = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, color: '#ffffff' });
 
 // ---------------- sign atlas (one texture, one draw call for every sign / decal) ----------------
-const ATL = 2048; const atlasCv = document.createElement('canvas'); atlasCv.width = atlasCv.height = ATL; const AG = atlasCv.getContext('2d');
+const ATL = 2048, ATLH = 3072; const atlasCv = document.createElement('canvas'); atlasCv.width = ATL; atlasCv.height = ATLH; const AG = atlasCv.getContext('2d');
 let ax = 0, ay = 0, arow = 0;
 function atlasCell(w, h, draw) { if (ax + w > ATL) { ax = 0; ay += arow + 2; arow = 0; } const r = { x: ax, y: ay, w, h }; AG.save(); AG.translate(ax, ay); AG.beginPath(); AG.rect(0, 0, w, h); AG.clip(); draw(AG, w, h); AG.restore(); ax += w + 2; arow = Math.max(arow, h); return r; }
 const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -147,4 +155,4 @@ class Builder {
 }
 // sign quads -> atlas UVs
 const signGeos = [];
-function sign(cell, w, h, x, y, z, ry = 0, rx = 0) { const g = new THREE.PlaneGeometry(w, h); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) { uv.setXY(i, (cell.x + uv.getX(i) * cell.w) / ATL, 1 - (cell.y + (1 - uv.getY(i)) * cell.h) / ATL); } if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); signGeos.push(norm(paint(g, '#ffffff'))); }
+function sign(cell, w, h, x, y, z, ry = 0, rx = 0) { const g = new THREE.PlaneGeometry(w, h); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) { uv.setXY(i, (cell.x + uv.getX(i) * cell.w) / ATL, 1 - (cell.y + (1 - uv.getY(i)) * cell.h) / ATLH); } if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); signGeos.push(norm(paint(g, '#ffffff'))); }

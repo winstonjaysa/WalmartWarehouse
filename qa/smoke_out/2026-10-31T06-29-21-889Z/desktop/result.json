@@ -1,0 +1,192 @@
+{
+  "viewport": "desktop",
+  "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html",
+  "checks": {
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    },
+    "loader": {
+      "pass": false,
+      "detail": "not reached (timeout: hook dump >5000ms)"
+    },
+    "frame": {
+      "pass": false,
+      "detail": "not reached (timeout: hook dump >5000ms)"
+    },
+    "vehicles": {
+      "pass": false,
+      "detail": "not reached (timeout: hook dump >5000ms)"
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "not reached (timeout: hook dump >5000ms)"
+    },
+    "programs": {
+      "pass": false,
+      "detail": "not reached (timeout: hook dump >5000ms)"
+    }
+  },
+  "metrics": {
+    "ttffMs": 4408.10009765625,
+    "ttffPolls": 2
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\"",
+    "poll error: timeout: screenshot >8000ms",
+    "FATAL: timeout: hook dump >5000ms"
+  ],
+  "fatal": "timeout: hook dump >5000ms",
+  "hangDump": {
+    "smoke": {
+      "t0": 384.1000000005588,
+      "shaders": 60,
+      "programsLinked": 30,
+      "programsCreated": 30,
+      "compileStatusPolls": 0,
+      "draws": 37128,
+      "raf": 4,
+      "longTasks": [
+        [
+          6,
+          88
+        ],
+        [
+          1510,
+          502
+        ],
+        [
+          2015,
+          137
+        ],
+        [
+          2161,
+          313
+        ],
+        [
+          2514,
+          844
+        ],
+        [
+          3364,
+          1154
+        ],
+        [
+          4545,
+          176
+        ],
+        [
+          4733,
+          97
+        ],
+        [
+          5008,
+          5801
+        ],
+        [
+          10809,
+          2627
+        ],
+        [
+          13445,
+          4681
+        ],
+        [
+          18128,
+          5569
+        ]
+      ],
+      "loader": [
+        [
+          112,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2015,
+          "Loading 3D scene · scene…",
+          0,
+          0
+        ],
+        [
+          2484,
+          "Loading 3D scene · racks & conveyors…",
+          0,
+          0
+        ],
+        [
+          2514,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          4538,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          4732,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          4906,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "lastCompileAt": 6540.600000000559,
+      "lastLinkAt": 6540.600000000559,
+      "contexts": 0,
+      "parallelExt": false,
+      "linkFail": 0
+    },
+    "ready": true
+  },
+  "infoLog": [
+    {
+      "t": 2.31,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) -> quality low",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 3.13,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 4.91,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.36,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.61,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.72,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  ],
+  "pass": false
+}

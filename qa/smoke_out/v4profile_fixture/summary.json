@@ -1,0 +1,116 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": true,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "nav": true,
+      "loader": true,
+      "programs": true,
+      "draws": true,
+      "longtask": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 444,
+      "simSecondsPerWallSecond": 1.007,
+      "fpsWindowS": 10,
+      "avgFps": 59.98,
+      "drawsPerFrameHookWindow": 10,
+      "ttffMs": 267,
+      "shaders": 2,
+      "programsHook": 1,
+      "programsPage": null,
+      "drawsPerFramePage": null,
+      "drawsPerFrameHook": 10,
+      "longestTaskMs": 207,
+      "top3LongTasks": [
+        "207ms @11ms"
+      ],
+      "longTaskCount": 1,
+      "loaderTimeline": [
+        [
+          268,
+          "Loading…",
+          2,
+          1
+        ],
+        [
+          1110,
+          "(gone)",
+          2,
+          1
+        ]
+      ],
+      "loaderGoneMs": 1110,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": null,
+        "camera": "__R.camera",
+        "scene": null
+      },
+      "windowGlobals": [
+        "__sim",
+        "__R",
+        "__step"
+      ]
+    }
+  },
+  {
+    "viewport": "phone",
+    "pass": false,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "nav": false,
+      "loader": true,
+      "programs": true,
+      "draws": true,
+      "longtask": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 111,
+      "simSecondsPerWallSecond": 0.998,
+      "fpsWindowS": 10,
+      "avgFps": 59.99,
+      "drawsPerFrameHookWindow": 10,
+      "ttffMs": 46,
+      "shaders": 2,
+      "programsHook": 1,
+      "programsPage": null,
+      "drawsPerFramePage": null,
+      "drawsPerFrameHook": 10,
+      "longestTaskMs": 0,
+      "top3LongTasks": [],
+      "longTaskCount": 0,
+      "loaderTimeline": [
+        [
+          114,
+          "Loading…",
+          2,
+          1
+        ],
+        [
+          914,
+          "(gone)",
+          2,
+          1
+        ]
+      ],
+      "loaderGoneMs": 914,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": null,
+        "camera": "__R.camera",
+        "scene": null
+      },
+      "windowGlobals": [
+        "__sim",
+        "__R",
+        "__step"
+      ]
+    }
+  }
+]

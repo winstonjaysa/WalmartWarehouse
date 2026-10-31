@@ -1,0 +1,98 @@
+{
+  "viewport": "phone",
+  "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 102ms",
+      "found": []
+    },
+    "frame": {
+      "pass": false,
+      "detail": "no canvas",
+      "ttffMs": null
+    },
+    "vehicles": {
+      "pass": true,
+      "method": "screenshot diff fallback (no vehicle globals)",
+      "detail": "{\"changedFrac\":1,\"meanAbs\":255}"
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "zoomIn: NOT FOUND in DOM; zoomOut: NOT FOUND in DOM; explore: NOT FOUND in DOM",
+      "found": {
+        "zoomIn": null,
+        "zoomOut": null,
+        "explore": null
+      }
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer not accessible (unknown); hooked linkProgram=0"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffMs": null,
+    "ttffPolls": 39,
+    "loaderGoneMs": 102,
+    "loaderTimeline": [
+      [
+        102,
+        "(gone)",
+        0,
+        0
+      ]
+    ],
+    "longTasksFirst": [],
+    "longTaskTotalMs": 0,
+    "longestTaskMs": 0,
+    "fpsWindowS": 10,
+    "avgFps": 0,
+    "rendererFrameFps": null,
+    "drawCallsPerFrameHooked": null,
+    "drawCallsRendererInfo": null,
+    "programsRendererInfo": null,
+    "programsLinkedHook": 0,
+    "shadersCompiledHook": 0
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [],
+  "state10": {
+    "hooks": {
+      "shaders": 0,
+      "programsLinked": 0,
+      "programsCreated": 0,
+      "draws": 0,
+      "raf": 0,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": -395,
+      "lastLinkAt": -395
+    },
+    "globals": [],
+    "ready": false
+  },
+  "stateEnd": {
+    "hooks": {
+      "shaders": 0,
+      "programsLinked": 0,
+      "programsCreated": 0,
+      "draws": 0,
+      "raf": 0,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": -395,
+      "lastLinkAt": -395
+    },
+    "globals": [],
+    "ready": false
+  },
+  "pass": false
+}

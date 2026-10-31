@@ -1,0 +1,104 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "buttons": false,
+      "loader": true,
+      "programs": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 3830,
+      "simSecondsPerWallSecond": 0.016,
+      "fpsWindowS": 3.9,
+      "avgFps": 0.51,
+      "drawsPerFrameHookWindow": 9288,
+      "ttffMs": 10207,
+      "shaders": 60,
+      "programsHook": 30,
+      "programsPage": 30,
+      "drawsPerFramePage": 5483,
+      "drawsPerFrameHook": 9283.4,
+      "longestTaskMs": 5050,
+      "top3LongTasks": [
+        "5050ms @5160ms",
+        "3339ms @31936ms",
+        "3225ms @36684ms"
+      ],
+      "longTaskCount": 33,
+      "loaderTimeline": [
+        [
+          121,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          1663,
+          "Loading 3D scene · scene…",
+          0,
+          0
+        ],
+        [
+          2798,
+          "Loading 3D scene · racks & conveyors…",
+          0,
+          0
+        ],
+        [
+          2827,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          4639,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          4804,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          4911,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "loaderGoneMs": 4911,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": "__R.renderer",
+        "camera": "__R.camera",
+        "scene": "__R.scene"
+      },
+      "windowGlobals": [
+        "__glBoot",
+        "__gfFail",
+        "__THREE__",
+        "__gfMergeRigid",
+        "__ents",
+        "__step",
+        "__place",
+        "__render",
+        "__cam",
+        "__sim",
+        "__quality",
+        "__assert",
+        "__ready",
+        "__R",
+        "__dbg",
+        "__kpi"
+      ],
+      "quality": "low"
+    }
+  }
+]

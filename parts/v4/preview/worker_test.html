@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#3a3f47}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body><script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { build, seatedDrivePose, jackPullPose, handWorld } from '../worker.js';
+const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(1600, 1000); r.shadowMap.enabled = true; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x3a3f47); sc.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+const L = new THREE.DirectionalLight(0xffffff, 2.2); L.position.set(3, 6, 5); L.castShadow = true; sc.add(L, new THREE.HemisphereLight(0xdfe8ff, 0x404040, 0.5));
+const fl = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({ color: 0x6d6f73, roughness: 0.9 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; sc.add(fl);
+const grey = new THREE.MeshStandardMaterial({ color: 0x555a60, roughness: 0.6 });
+// 1 standing
+const a = build(THREE, {}, { seed: 3 }); a.position.x = -0.95; a.rotation.y = 0.3; sc.add(a);
+// 2 seated on a stool seat object with a wheel stand-in
+const seat = new THREE.Object3D(); seat.name = 'seat'; seat.position.set(0.0, 0.55, 0); seat.rotation.y = 0.55; sc.add(seat);
+const stool = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.5, 0.45), grey); stool.position.set(0, -0.31, 0); seat.add(stool);
+const b = build(THREE, {}, { seed: 8 }); seatedDrivePose(b, seat);
+const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.017, 6, 24).rotateX(Math.PI / 2).rotateX(-0.6), grey); wheel.position.set(0, 0.374, 0.49); seat.add(wheel);
+// 3 jack pull, facing camera-left, handle stand-in at grip
+const c = build(THREE, {}, { seed: 5 }); c.position.set(1.05, 0, 0); c.rotation.y = -1.1; sc.add(c); jackPullPose(c);
+const hb = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.3, 8).rotateZ(Math.PI / 2), grey); hb.position.copy(c.userData.gripTarget); hb.quaternion.copy(c.quaternion); sc.add(hb);
+const cam = new THREE.PerspectiveCamera(32, 1.6, 0.05, 50); cam.position.set(0.15, 1.4, 4.3); cam.lookAt(0.1, 0.9, 0);
+r.render(sc, cam); const hw = handWorld(c);
+window.__info = { dc: a.userData.drawCalls, calls: r.info.render.calls, grip: c.userData.gripTarget.toArray().map(v=>+v.toFixed(3)), handR: hw.R.toArray().map(v=>+v.toFixed(3)) }; window.__done = true;
+</script></body></html>

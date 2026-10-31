@@ -1,0 +1,9 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "loader": false
+    }
+  }
+]

@@ -37,7 +37,14 @@ function wallWithDoors(isExterior) {
   if (isExterior) { UP.box(40, 0.6, 0.05, 0, 5.6, 12.3, '#0071ce'); UP.box(40, 0.12, 0.05, 0, 5.15, 12.3, '#ffc220'); S.box(40.6, 0.1, 0.36, 0, 0.95, 12.15, '#cfd5dc'); }
 }
 wallWithDoors(false); wallWithDoors(true);
-wallC(-20, -12, 20, -12, 0, BR.H, '#f6f6f4');                  // north (cooler wall, insulated panel white)
+wallC(-20, -12, -4.9, -12, 0, BR.H, '#f6f6f4'); wallC(-2.3, -12, 20, -12, 0, BR.H, '#f6f6f4'); wallC(-4.9, -12, -2.3, -12, 3.0, BR.H, '#f6f6f4'); // north (cooler wall) with the walk-in cooler doorway open
+// walk-in cooler interior: stainless panels, sealed floor, strip curtain in the doorway
+S.box(13.8, 0.04, 4.9, -3.6, 0.0, -14.45, '#c7ccd0');
+wallC(-10.5, -12, -10.5, -16.9, 0, 3.2, '#b9c0c6'); wallC(-10.5, -16.9, 3.3, -16.9, 0, 3.2, '#c3c9ce'); wallC(3.3, -16.9, 3.3, -12, 0, 3.2, '#b9c0c6');
+for (let x = -10; x < 3.3; x += 1.15) S.box(0.03, 3.1, 0.02, x, 1.55, -16.86, '#a9b0b6');
+S.box(13.8, 0.12, 0.06, -3.6, 0.06, -16.85, '#8e959b'); S.cyl(0.14, 1.2, -9.9, 0.6, -12.6, YEL, 12);
+for (let i = 0; i < 9; i++) S.box(0.24, 2.6, 0.012, -4.75 + 0.18 + i * 0.29, 1.65, -12.06 - (i % 2) * 0.02, i % 2 ? '#dfe9ee' : '#d3e0e7');
+sign(SIGN.cooler, 1.0, 0.25, -3.6, 3.25, -11.89, 0);
 wallC(-20, 12, -20, -12, 0, BR.H, WALL);                         // west
 wallC(20, -12, 20, -1.6, 0, BR.H, WALL); wallC(20, 1.6, 20, 12, 0, BR.H, WALL); wallC(20, -1.6, 20, 1.6, 3.2, BR.H, WALL); // east (backroom side)
 wallC(20, 12, 20, 1.6, 0, 5.5, '#f3f1ec'); wallC(20, -1.6, 20, -12, 0, 5.5, '#f3f1ec'); wallC(20, 1.6, 20, -1.6, 3.2, 5.5, '#f3f1ec'); // east wall, sales-floor side
@@ -74,6 +81,7 @@ for (const [k, d] of Object.entries(DOORS)) {
   S.box(d.w + 1, GROUND * -1, 0.2, d.x, GROUND / 2, 12.3, '#8e8f8c'); // dock face concrete
 }
 // ---- cooler + freezer doors with yellow guard rails (north wall, like the refs) ----
+function coldDoorRails(x) { for (const s of [-1, 1]) { S.cyl(0.05, 1.05, x + s * 3.0, 0.53, -10.9, YEL, 8); S.box(1.2, 0.06, 0.06, x + s * 2.4, 1.0, -10.9, YEL); S.box(1.2, 0.06, 0.06, x + s * 2.4, 0.55, -10.9, YEL); } S.cyl(0.14, 1.3, x - 2.0, 0.65, -10.3, YEL, 12); S.cyl(0.14, 1.3, x + 2.0, 0.65, -10.3, YEL, 12); }
 function coldDoor(x, label) {
   S.box(2.7, 3.0, 0.08, x, 1.5, -11.95, '#d6dadc'); S.box(2.4, 2.75, 0.1, x, 1.4, -11.92, '#b4bbc0');
   for (let i = 0; i < 10; i++) S.box(2.38, 0.015, 0.105, x, 0.2 + i * 0.27, -11.91, '#a5acb2');
@@ -82,7 +90,7 @@ function coldDoor(x, label) {
     S.cyl(0.05, 1.05, x + s * 3.0, 0.53, -10.9, YEL, 8); S.box(1.2, 0.06, 0.06, x + s * 2.4, 1.0, -10.9, YEL); S.box(1.2, 0.06, 0.06, x + s * 2.4, 0.55, -10.9, YEL); }
   S.cyl(0.14, 1.3, x - 2.0, 0.65, -10.3, YEL, 12); S.cyl(0.14, 1.3, x + 2.0, 0.65, -10.3, YEL, 12);
 }
-coldDoor(-3.6, SIGN.cooler); coldDoor(3.0, SIGN.freezer);
+coldDoorRails(-3.6); coldDoor(3.0, SIGN.freezer);
 
 // ---- roller conveyor: Inky's skate-wheel line (parts/v4/skateConveyor.js), runs along z from inside trailer B to the sort area ----
 { const cv = buildConveyor(THREE, PM, { length: ROLLER.zHead - ROLLER.zTail, height: 0.84 }); cv.rotation.y = Math.PI / 2; cv.position.set(ROLLER.x, 0, (ROLLER.zHead + ROLLER.zTail) / 2); scene.add(cv); }
@@ -201,6 +209,32 @@ const YARD = [{ x: -22, z: 47, pl: 'ADS' }, { x: 6, z: 47, pl: 'MP' }];
 for (const y of YARD) xform(() => { trailer(S, 0, 0, { roof: true, placard: y.pl }); tractorBody(S, 0, 15); }, new THREE.Matrix4().makeTranslation(y.x, 0, y.z).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)));
 
 // static scene meshes
+// ---------------- 1st floor (upstairs) shell: room walls, labels, simple box placeholders ----------------
+// Inky models: divShelving, officeKit (manager, personnel, upc, storeManager), trainingRoom, lunchRoom, sickRoom, cleaningRoom, stairs (U-turn).
+const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
+{ const F = UPF.y, WC = '#e9e7e2', ROOMS = [];
+  for (const [x, z] of [[-45.6, -11.6], [-22.4, -11.6], [-45.6, 11.6], [-22.4, 11.6], [-34, -11.6], [-34, 11.6], [-45.6, 0], [-22.4, 0]]) S.box(0.35, F, 0.35, x, F / 2, z, '#9aa0a6');
+  S.box(24, 0.25, 24, -34, F - 0.125, 0, '#bfc3c7'); S.box(24, 0.02, 24, -34, F + 0.01, 0, '#d9d6cf');
+  const wall = (x0, z0, x1, z1) => S.wall(x0, z0, x1, z1, F, F + UPF.wh, WC);
+  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 12);
+  wall(-22, -12, -22, 6.4); // stair landing opening on the backroom side
+  const ROW = [[-46, -38, 'Training room', 'trainingRoom'], [-38, -30, 'Lunch room', 'lunchRoom'], [-30, -26, 'Sick room', 'sickRoom'], [-26, -22, 'Cleaning', 'cleaningRoom']];
+  const ROW2 = [[-46, -40.5, 'Store manager', 'officeKit'], [-40.5, -35.5, 'Personnel', 'officeKit'], [-35.5, -31, 'UPC office', 'officeKit'], [-31, -26.5, 'Variants manager', 'officeKit'], [-26.5, -24.6, 'Div shelving', 'divShelving']];
+  for (const [rz0, rz1, list] of [[-12, -1, ROW], [1, 12, ROW2]]) { const zc = rz1 > 0 ? 1 : -1; // corridor walls with a door gap per room
+    for (const [a, b, name] of list) { const m = (a + b) / 2; wall(a, zc, m - 0.5, zc); wall(m + 0.5, zc, b, zc); if (b < -22.1) wall(b, rz0, b, rz1);
+      ROOMS.push([name, m, (rz0 + rz1) / 2]); sign(textSign([name], { w: 512, h: 96, bg: '#041e42', fg: '#fff', size: 0.5 }), Math.min(2.6, b - a - 0.4), 0.42, m, F + UPF.wh + 0.3, zc + (zc > 0 ? -0.07 : 0.07) * -1, zc > 0 ? Math.PI : 0); } }
+  // Inky's floor-1 models (parts/v4/*.js, shared PM materials so no new programs)
+  const put = (g, x, z, ry = 0) => { g.position.set(x, F, z); g.rotation.y = ry; scene.add(g); return g; };
+  put(buildTraining(THREE, PM, { seed: 3, tables: 4 }), -42, -6.6);
+  put(buildLunch(THREE, PM, { seed: 4, tables: 3, fridgeOpen: 0 }), -34, -6.6);
+  put(buildSick(THREE, PM, { seed: 5 }), -28, -7.0);
+  put(buildCleaning(THREE, PM, { seed: 6, cartColor: 'yellow' }), -24, -7.0);
+  for (const [name, v, sd] of [['Store manager', 'storeManager', 1], ['Personnel', 'personnel', 2], ['UPC office', 'upc', 3], ['Variants manager', 'manager', 4]]) { const r = ROOMS.find((q) => q[0] === name); put(buildOffice(THREE, PM, { variant: v, seed: sd }), r[1], 7.2); }
+  for (const [z, sd] of [[4.0, 11], [8.6, 12]]) put(buildDiv(THREE, PM, { seed: sd, bays: 3, colorRate: 0.1 }), -25.55, z, Math.PI / 2);
+  // U-turn stairs from the backroom floor up to the 1st-floor opening (west side)
+  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; scene.add(ST); window.__stairs = ST;
+  sign(textSign(['1st floor · offices & staff rooms'], { w: 1024, h: 128, bg: '#0071ce', fg: '#fff', size: 0.46 }), 6, 0.75, -34, F + UPF.wh + 1.2, 12.05, 0);
+}
 scene.add(S.merge(MAT.v, 'static'));
 const LIGHTS_MESH = tubes.merge(MAT.e, 'lights'); scene.add(LIGHTS_MESH);
 const UPPER = UP.merge(MAT.v, 'upper'); scene.add(UPPER);

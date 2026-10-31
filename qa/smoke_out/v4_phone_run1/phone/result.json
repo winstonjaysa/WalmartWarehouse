@@ -1,0 +1,378 @@
+{
+  "viewport": "phone",
+  "profile": "v4",
+  "url": "file:///workspace/gateflow/builds/walmart-store_v4.html",
+  "checks": {
+    "frame": {
+      "pass": true,
+      "detail": "stats {\"mean\":184.4,\"sd\":70.17,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.01116,\"meanAbs\":0.455}"
+    },
+    "movers": {
+      "pass": true,
+      "sources": [
+        "__sim.VEH",
+        "__sim.workers"
+      ],
+      "wall": {
+        "vehicles": "0/3",
+        "workers": "5/21",
+        "any": true,
+        "simT": [
+          1.383,
+          1.9
+        ],
+        "rate": 0.258
+      },
+      "sample": [
+        {
+          "id": "VEH[0]:snack-vendor-tractor-trailer",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "VEH[1]:snack-vendor-trailer",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "VEH[2]:beverage-vendor-box-truck",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "workers[0]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[1]:worker",
+          "kind": "worker",
+          "d": 0.646
+        },
+        {
+          "id": "workers[2]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[3]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[4]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[5]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[6]:worker",
+          "kind": "worker",
+          "d": 0
+        }
+      ],
+      "detail": "2 s wall: vehicles 0/3, workers 5/21 moved; sim 1.383->1.9 (0.258 sim-s/wall-s)"
+    },
+    "nav": {
+      "pass": true,
+      "required": [
+        "next",
+        "prev",
+        "touch-swipe"
+      ],
+      "controls": {
+        "next": {
+          "key": "› | Next step | | next | | {\"smoke\":\"next\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"next\"]",
+          "n": 1
+        },
+        "prev": {
+          "key": "‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"prev\"]",
+          "n": 1
+        },
+        "dots": 0,
+        "dotKeys": []
+      },
+      "inputs": [
+        {
+          "input": "next",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 22.725,
+          "imgDiff": 0.97095,
+          "captionBefore": "What happens in the backroom while the store sleeps",
+          "captionAfter": "Unloading the trailer",
+          "scrollY": [
+            0,
+            798
+          ],
+          "err": null
+        },
+        {
+          "input": "prev",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 9.715,
+          "imgDiff": 0,
+          "captionBefore": "Mixed skids, stretch-wrapped",
+          "captionAfter": "A gravity roller down the middle",
+          "scrollY": [
+            1684,
+            2524
+          ],
+          "err": null
+        },
+        {
+          "input": "wheel",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 33.042,
+          "imgDiff": 0,
+          "captionBefore": "A gravity roller down the middle",
+          "captionAfter": "One person per skid, more for big ones",
+          "scrollY": [
+            2531,
+            4571
+          ],
+          "err": null,
+          "method": "wheel"
+        },
+        {
+          "input": "touch-swipe",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 19.911,
+          "imgDiff": 0,
+          "captionBefore": "Filling the holes",
+          "captionAfter": "Milk and eggs, straight to the cooler",
+          "scrollY": [
+            5411,
+            6251
+          ],
+          "err": null,
+          "method": "touch-swipe"
+        },
+        {
+          "input": "scrollBy",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 7.789,
+          "imgDiff": 0,
+          "captionBefore": "Vendors deliver direct",
+          "captionAfter": "A snack vendor backs in",
+          "scrollY": [
+            7091,
+            8775
+          ],
+          "err": null,
+          "method": "scrollBy"
+        }
+      ],
+      "detail": "next:ok caption changed, cam 22.725; prev:ok caption changed, cam 9.715; wheel:ok caption changed, cam 33.042; touch-swipe:ok caption changed, cam 19.911; scrollBy:ok caption changed, cam 7.789"
+    },
+    "loader": {
+      "pass": true,
+      "detail": "loader gone at 2578 ms (limit 3000); last text \"Loading the backroom…\""
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)"
+    },
+    "draws": {
+      "pass": true,
+      "detail": "GL hook 84.6/frame (window avg 64.4), page renderer.info.render.calls 64 (limit <300)"
+    },
+    "longtask": {
+      "pass": true,
+      "detail": "longest 424 ms (limit <500); top3 424ms @2151ms, 339ms @3453ms, 294ms @2584ms; 20 long tasks"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 1756,
+    "simSecondsPerWallSecond": 0.258,
+    "fpsWindowS": 9.7,
+    "avgFps": 5.95,
+    "drawsPerFrameHookWindow": 64.4,
+    "ttffMs": 4310,
+    "shaders": 44,
+    "programsHook": 22,
+    "programsPage": 22,
+    "drawsPerFramePage": 64,
+    "drawsPerFrameHook": 84.6,
+    "longestTaskMs": 424,
+    "top3LongTasks": [
+      "424ms @2151ms",
+      "339ms @3453ms",
+      "294ms @2584ms"
+    ],
+    "longTaskCount": 20,
+    "loaderTimeline": [
+      [
+        326,
+        "Loading the backroom…",
+        0,
+        0
+      ],
+      [
+        2578,
+        "(gone)",
+        16,
+        8
+      ]
+    ],
+    "loaderGoneMs": 2578,
+    "loaderSeen": true,
+    "globals": {
+      "renderer": "__R.renderer",
+      "camera": "__R.camera",
+      "scene": "__R.scene"
+    },
+    "windowGlobals": [
+      "__THREE__",
+      "__quality",
+      "__yt",
+      "__R",
+      "__stairs",
+      "__sim",
+      "__goStep",
+      "__step",
+      "__ready"
+    ],
+    "quality": "low"
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [],
+  "state0": {
+    "globals": {
+      "renderer": "__R.renderer",
+      "camera": "__R.camera",
+      "scene": "__R.scene"
+    },
+    "hooks": {
+      "shaders": 34,
+      "programsLinked": 17,
+      "draws": 49,
+      "framesWithDraws": 0,
+      "firstDrawFrameAt": null
+    },
+    "windowGlobals": [
+      "__THREE__",
+      "__quality",
+      "__yt",
+      "__R",
+      "__stairs",
+      "__sim",
+      "__goStep",
+      "__step"
+    ],
+    "ready": false,
+    "quality": "low",
+    "renderer": {
+      "programs": 17,
+      "calls": 1,
+      "triangles": 216,
+      "frame": 29,
+      "geometries": 39,
+      "textures": 11
+    },
+    "camera": {
+      "p": [
+        37.75,
+        47.5,
+        65.5
+      ],
+      "q": [
+        -0.3329,
+        0.2729,
+        0.1013,
+        0.8969
+      ],
+      "zoom": 1,
+      "fov": 50
+    }
+  },
+  "navControls": {
+    "next": {
+      "key": "› | Next step | | next | | {\"smoke\":\"next\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"next\"]",
+      "n": 1
+    },
+    "prev": {
+      "key": "‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"prev\"]",
+      "n": 1
+    },
+    "dots": 0,
+    "dotKeys": []
+  },
+  "stateEnd": {
+    "globals": {
+      "renderer": "__R.renderer",
+      "camera": "__R.camera",
+      "scene": "__R.scene"
+    },
+    "hooks": {
+      "shaders": 44,
+      "programsLinked": 22,
+      "draws": 18421,
+      "framesWithDraws": 216,
+      "firstDrawFrameAt": 4310
+    },
+    "windowGlobals": [
+      "__THREE__",
+      "__quality",
+      "__yt",
+      "__R",
+      "__stairs",
+      "__sim",
+      "__goStep",
+      "__step",
+      "__ready"
+    ],
+    "ready": true,
+    "quality": "low",
+    "renderer": {
+      "programs": 22,
+      "calls": 64,
+      "triangles": 566960,
+      "frame": 255,
+      "geometries": 162,
+      "textures": 16
+    },
+    "camera": {
+      "p": [
+        -20.375,
+        3.4,
+        8.152
+      ],
+      "q": [
+        -0.2656,
+        -0.3699,
+        -0.1112,
+        0.8833
+      ],
+      "zoom": 1,
+      "fov": 63.355943770776065
+    }
+  },
+  "pass": true
+}

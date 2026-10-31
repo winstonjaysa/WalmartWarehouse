@@ -1,0 +1,330 @@
+{
+  "viewport": "desktop",
+  "profile": "v4",
+  "url": "file:///workspace/gateflow/qa/fixtures/fake_story_v4.html",
+  "checks": {
+    "frame": {
+      "pass": true,
+      "detail": "stats {\"mean\":226.2,\"sd\":15.97,\"colours\":51,\"blank\":false}; 1 s diff {\"changedFrac\":0.01692,\"meanAbs\":3.526}"
+    },
+    "movers": {
+      "pass": true,
+      "sources": [
+        "__sim.vehicles",
+        "__sim.workers"
+      ],
+      "wall": {
+        "vehicles": "4/4",
+        "workers": "6/6",
+        "any": true,
+        "simT": [
+          4.501,
+          6.518
+        ],
+        "rate": 1.007
+      },
+      "sample": [
+        {
+          "id": "forklift0",
+          "kind": "vehicle",
+          "d": 1.786
+        },
+        {
+          "id": "forklift1",
+          "kind": "vehicle",
+          "d": 2.264
+        },
+        {
+          "id": "forklift2",
+          "kind": "vehicle",
+          "d": 1.618
+        },
+        {
+          "id": "forklift3",
+          "kind": "vehicle",
+          "d": 1.3
+        },
+        {
+          "id": "worker0",
+          "kind": "worker",
+          "d": 1.436
+        },
+        {
+          "id": "worker1",
+          "kind": "worker",
+          "d": 2.108
+        },
+        {
+          "id": "worker2",
+          "kind": "worker",
+          "d": 2.282
+        },
+        {
+          "id": "worker3",
+          "kind": "worker",
+          "d": 1.743
+        },
+        {
+          "id": "worker4",
+          "kind": "worker",
+          "d": 2.129
+        },
+        {
+          "id": "worker5",
+          "kind": "worker",
+          "d": 1.185
+        }
+      ],
+      "detail": "2 s wall: vehicles 4/4, workers 6/6 moved; sim 4.501->6.518 (1.007 sim-s/wall-s)"
+    },
+    "nav": {
+      "pass": true,
+      "required": [
+        "next",
+        "prev",
+        "wheel"
+      ],
+      "controls": {
+        "next": {
+          "key": "› | Next step | | nextBtn | | {\"smoke\":\"next\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"next\"]",
+          "n": 1
+        },
+        "prev": {
+          "key": "‹ | Previous step | | prevBtn | | {\"smoke\":\"prev\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"prev\"]",
+          "n": 1
+        },
+        "dots": 4,
+        "dotKeys": [
+          "| Go to step 1 | | | dot | {\"smokeDot\":\"0\"} |",
+          "| Go to step 2 | | | dot | {\"smokeDot\":\"1\"} |",
+          "| Go to step 3 | | | dot | {\"smokeDot\":\"2\"} |"
+        ]
+      },
+      "inputs": [
+        {
+          "input": "next",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 8.598,
+          "imgDiff": 0.98796,
+          "captionBefore": "Receiving dock Trucks back in. ¦ Receiving dock",
+          "captionAfter": "Unloading Pallets come off. ¦ Unloading",
+          "scrollY": [
+            0,
+            0
+          ],
+          "err": null
+        },
+        {
+          "input": "prev",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 8.595,
+          "imgDiff": 0.98747,
+          "captionBefore": "Unloading Pallets come off. ¦ Unloading",
+          "captionAfter": "Receiving dock Trucks back in. ¦ Receiving dock",
+          "scrollY": [
+            0,
+            0
+          ],
+          "err": null
+        },
+        {
+          "input": "dot",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 17.193,
+          "imgDiff": 0.98362,
+          "captionBefore": "Receiving dock Trucks back in. ¦ Receiving dock",
+          "captionAfter": "Backroom Stockers stage freight. ¦ Backroom",
+          "scrollY": [
+            0,
+            0
+          ],
+          "err": null
+        },
+        {
+          "input": "wheel",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 8.609,
+          "imgDiff": 0.98526,
+          "captionBefore": "Backroom Stockers stage freight. ¦ Backroom",
+          "captionAfter": "Sales floor Workers fill shelves. ¦ Sales floor",
+          "scrollY": [
+            0,
+            0
+          ],
+          "err": null
+        }
+      ],
+      "detail": "next:ok caption changed, cam 8.598; prev:ok caption changed, cam 8.595; dot:ok caption changed, cam 17.193; wheel:ok caption changed, cam 8.609"
+    },
+    "loader": {
+      "pass": true,
+      "detail": "loader gone at 1110 ms (limit 3000); last text \"Loading…\""
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs=n/a, GL hook linkProgram=1, shaders=2 (limit <25)"
+    },
+    "draws": {
+      "pass": true,
+      "detail": "GL hook 10/frame (window avg 10), page renderer.info.render.calls n/a (limit <300)"
+    },
+    "longtask": {
+      "pass": true,
+      "detail": "longest 207 ms (limit <500); top3 207ms @11ms; 1 long tasks"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 444,
+    "simSecondsPerWallSecond": 1.007,
+    "fpsWindowS": 10,
+    "avgFps": 59.98,
+    "drawsPerFrameHookWindow": 10,
+    "ttffMs": 267,
+    "shaders": 2,
+    "programsHook": 1,
+    "programsPage": null,
+    "drawsPerFramePage": null,
+    "drawsPerFrameHook": 10,
+    "longestTaskMs": 207,
+    "top3LongTasks": [
+      "207ms @11ms"
+    ],
+    "longTaskCount": 1,
+    "loaderTimeline": [
+      [
+        268,
+        "Loading…",
+        2,
+        1
+      ],
+      [
+        1110,
+        "(gone)",
+        2,
+        1
+      ]
+    ],
+    "loaderGoneMs": 1110,
+    "loaderSeen": true,
+    "globals": {
+      "renderer": null,
+      "camera": "__R.camera",
+      "scene": null
+    },
+    "windowGlobals": [
+      "__sim",
+      "__R",
+      "__step"
+    ]
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [],
+  "state0": {
+    "globals": {
+      "renderer": null,
+      "camera": "__R.camera",
+      "scene": null
+    },
+    "hooks": {
+      "shaders": 2,
+      "programsLinked": 1,
+      "draws": 1940,
+      "framesWithDraws": 194,
+      "firstDrawFrameAt": 267
+    },
+    "windowGlobals": [
+      "__sim",
+      "__R",
+      "__step"
+    ],
+    "ready": false,
+    "camera": {
+      "p": [
+        0,
+        10,
+        20
+      ],
+      "q": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "zoom": 1,
+      "fov": 50
+    }
+  },
+  "navControls": {
+    "next": {
+      "key": "› | Next step | | nextBtn | | {\"smoke\":\"next\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"next\"]",
+      "n": 1
+    },
+    "prev": {
+      "key": "‹ | Previous step | | prevBtn | | {\"smoke\":\"prev\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"prev\"]",
+      "n": 1
+    },
+    "dots": 4,
+    "dotKeys": [
+      "| Go to step 1 | | | dot | {\"smokeDot\":\"0\"} |",
+      "| Go to step 2 | | | dot | {\"smokeDot\":\"1\"} |",
+      "| Go to step 3 | | | dot | {\"smokeDot\":\"2\"} |"
+    ]
+  },
+  "stateEnd": {
+    "globals": {
+      "renderer": null,
+      "camera": "__R.camera",
+      "scene": null
+    },
+    "hooks": {
+      "shaders": 2,
+      "programsLinked": 1,
+      "draws": 13350,
+      "framesWithDraws": 1335,
+      "firstDrawFrameAt": 267
+    },
+    "windowGlobals": [
+      "__sim",
+      "__R",
+      "__step"
+    ],
+    "ready": false,
+    "camera": {
+      "p": [
+        24,
+        13,
+        11
+      ],
+      "q": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "zoom": 1,
+      "fov": 50
+    }
+  },
+  "pass": true
+}

@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fake v4 story (smoke fixture)</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;font-family:sans-serif}canvas{position:fixed;inset:0;width:100%;height:100%}
+#cap{position:fixed;left:20px;bottom:90px;background:#fff;padding:12px;max-width:300px}#nav{position:fixed;right:20px;bottom:20px}
+#dots{position:fixed;left:20px;bottom:20px}.dot{display:inline-block;width:12px;height:12px;border-radius:6px;background:#888;margin:4px;cursor:pointer}
+#loader{position:fixed;inset:0;background:#123;color:#fff;display:flex;align-items:center;justify-content:center}</style></head><body>
+<canvas id="c"></canvas><div id="loader">Loading…</div>
+<div id="cap" class="caption" aria-live="polite"><h2 class="step-title"></h2><p></p></div>
+<div id="dots"></div><div id="nav"><button id="prevBtn" aria-label="Previous step">‹</button> <button id="nextBtn" aria-label="Next step">›</button></div>
+<script>
+// Test fixture for qa/smoke.js only: fake "scroll story" with raw WebGL2 + three-like globals.
+const STEPS=[['Receiving dock','Trucks back in.'],['Unloading','Pallets come off.'],['Backroom','Stockers stage freight.'],['Sales floor','Workers fill shelves.']];
+let step=0, camT=0, camP=[0,10,20];
+const V=(x,y,z)=>({x,y,z,toArray(){return[this.x,this.y,this.z]}});
+const camera={isCamera:true,zoom:1,fov:50,position:V(0,10,20),quaternion:{a:[0,0,0,1],toArray(){return this.a.slice()}}};
+const mk=(name)=>{const o={isObject3D:true,name,x:Math.random()*10,z:Math.random()*10,matrixWorld:{elements:new Array(16).fill(0)},updateWorldMatrix(){this.matrixWorld.elements[12]=this.x;this.matrixWorld.elements[14]=this.z;}};return o;};
+const sim={t:0,vehicles:[],workers:[]};for(let i=0;i<4;i++)sim.vehicles.push({id:'forklift'+i,type:'forklift',obj:mk('forklift'+i)});for(let i=0;i<6;i++)sim.workers.push({id:'worker'+i,type:'associate',obj:mk('worker'+i)});
+window.__sim=sim; window.__R={camera}; window.__step=(s)=>adv(s);
+function adv(dt){sim.t+=dt;for(const e of [...sim.vehicles,...sim.workers]){e.obj.x+=Math.cos(sim.t+e.obj.z)*dt;e.obj.z+=Math.sin(sim.t)*dt;}}
+function go(n){step=Math.max(0,Math.min(STEPS.length-1,n));document.querySelector('#cap h2').textContent=STEPS[step][0];document.querySelector('#cap p').textContent=STEPS[step][1];
+ camP=[step*8,10+step,20-step*3];[...document.querySelectorAll('.dot')].forEach((d,i)=>d.style.background=i===step?'#06f':'#888');}
+STEPS.forEach((s,i)=>{const d=document.createElement('span');d.className='dot';d.setAttribute('aria-label','Go to step '+(i+1));d.onclick=()=>go(i);dots.appendChild(d);});
+nextBtn.onclick=()=>go(step+1); prevBtn.onclick=()=>go(step-1);
+let wheelLock=0;addEventListener('wheel',e=>{if(performance.now()<wheelLock)return;wheelLock=performance.now()+600;go(step+(e.deltaY>0?1:-1));},{passive:true});
+let ty=null;addEventListener('touchstart',e=>ty=e.touches[0].clientY);addEventListener('touchend',e=>{if(ty==null)return;const dy=ty-(e.changedTouches[0]||{clientY:ty}).clientY;if(Math.abs(dy)>50)go(step+(dy>0?1:-1));ty=null;});
+go(0);
+const c=document.getElementById('c'),gl=c.getContext('webgl2');
+const sh=(t,src)=>{const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);return s;};
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'#version 300 es\nuniform vec2 o;void main(){gl_PointSize=40.0;gl_Position=vec4(o,0,1);}'));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,'#version 300 es\nprecision mediump float;out vec4 c;uniform vec3 k;void main(){c=vec4(k,1);}'));gl.linkProgram(pr);
+const uo=gl.getUniformLocation(pr,'o'),uk=gl.getUniformLocation(pr,'k');let last=performance.now();
+function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;adv(dt);
+ for(let i=0;i<3;i++)camera.position[['x','y','z'][i]]+=(camP[i]-camera.position[['x','y','z'][i]])*0.1;
+ c.width=c.clientWidth;c.height=c.clientHeight;gl.viewport(0,0,c.width,c.height);gl.clearColor(0.85-step*0.1,0.9,0.95,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(pr);
+ for(const e of [...sim.vehicles,...sim.workers]){gl.uniform2f(uo,(e.obj.x-camera.position.x)/20,(e.obj.z-camera.position.z+10)/20);gl.uniform3f(uk,e.type==='forklift'?1:0,0.3,e.type==='forklift'?0:1);gl.drawArrays(gl.POINTS,0,1);}
+ requestAnimationFrame(frame);}
+requestAnimationFrame(frame);setTimeout(()=>loader.remove(),800);
+</script></body></html>

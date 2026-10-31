@@ -1,0 +1,74 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "loader": true,
+      "frame": false,
+      "vehicles": true,
+      "buttons": false,
+      "programs": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffMs": null,
+      "ttffPolls": 39,
+      "loaderGoneMs": 104,
+      "loaderTimeline": [
+        [
+          104,
+          "(gone)",
+          0,
+          0
+        ]
+      ],
+      "longTasksFirst": [],
+      "longTaskTotalMs": 0,
+      "longestTaskMs": 0,
+      "fpsWindowS": 10,
+      "avgFps": 0,
+      "rendererFrameFps": null,
+      "drawCallsPerFrameHooked": null,
+      "drawCallsRendererInfo": null,
+      "programsRendererInfo": null,
+      "programsLinkedHook": 0,
+      "shadersCompiledHook": 0
+    }
+  },
+  {
+    "viewport": "phone",
+    "pass": false,
+    "checks": {
+      "loader": true,
+      "frame": false,
+      "vehicles": true,
+      "buttons": false,
+      "programs": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffMs": null,
+      "ttffPolls": 39,
+      "loaderGoneMs": 102,
+      "loaderTimeline": [
+        [
+          102,
+          "(gone)",
+          0,
+          0
+        ]
+      ],
+      "longTasksFirst": [],
+      "longTaskTotalMs": 0,
+      "longestTaskMs": 0,
+      "fpsWindowS": 10,
+      "avgFps": 0,
+      "rendererFrameFps": null,
+      "drawCallsPerFrameHooked": null,
+      "drawCallsRendererInfo": null,
+      "programsRendererInfo": null,
+      "programsLinkedHook": 0,
+      "shadersCompiledHook": 0
+    }
+  }
+]

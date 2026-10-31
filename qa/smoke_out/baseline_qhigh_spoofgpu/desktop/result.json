@@ -1,0 +1,140 @@
+{
+  "viewport": "desktop",
+  "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 5354ms",
+      "found": []
+    },
+    "frame": {
+      "pass": false,
+      "detail": "no canvas",
+      "ttffMs": 5319.39990234375
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    },
+    "vehicles": {
+      "pass": false,
+      "detail": "not reached (viewport budget 60s exceeded before vehicle check)"
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "not reached (viewport budget 60s exceeded before vehicle check)"
+    },
+    "programs": {
+      "pass": false,
+      "detail": "not reached (viewport budget 60s exceeded before vehicle check)"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 5319.39990234375,
+    "ttffPolls": 2
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\"",
+    "poll error: timeout: screenshot >8000ms",
+    "t10 screenshot: timeout: screenshot t10 >15000ms",
+    "snap a: timeout: screenshot >8000ms",
+    "snap b: timeout: screenshot >8000ms",
+    "FATAL: viewport budget 60s exceeded before vehicle check",
+    "final dump failed: Protocol error (Runtime.callFunctionOn): Target closed"
+  ],
+  "state10": {
+    "hooks": {
+      "shaders": 124,
+      "programsLinked": 62,
+      "programsCreated": 62,
+      "draws": 55647,
+      "raf": 3,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 12956,
+      "lastLinkAt": 12956,
+      "firstDrawFrameAt": 12971,
+      "framesWithDraws": 3
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "high",
+    "renderer": {
+      "programs": 62,
+      "calls": 1,
+      "triangles": 1,
+      "frame": 30,
+      "geometries": 1822,
+      "textures": 69,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "fatal": "viewport budget 60s exceeded before vehicle check",
+  "hangDump": "page unresponsive: timeout: hang dump >3000ms",
+  "infoLog": [
+    {
+      "t": 1.96,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version) -> quality high",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high"
+    },
+    {
+      "t": 4.03,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high"
+    },
+    {
+      "t": 5.68,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high"
+    },
+    {
+      "t": 6.03,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high"
+    },
+    {
+      "t": 6.26,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html?q=high"
+    },
+    {
+      "t": 6.35,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  ],
+  "pass": false
+}

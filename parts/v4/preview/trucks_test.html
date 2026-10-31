@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#2b2f36;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body><script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { build as boxTruck, setRearDoor } from '../dsdBoxTruck.js';
+import { build as tt, setCurtain } from '../dsdTractorTrailer.js';
+import { build as worker, walkPose, carryPose, seatedDrivePose } from '../worker.js';
+const W = 1600, H = 1000;
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true;
+r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0x3a3f47);
+sc.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(12, 20, 14); sun.castShadow = true;
+Object.assign(sun.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25 }); sun.shadow.mapSize.set(2048, 2048); sc.add(sun, new THREE.HemisphereLight(0xdfe8ff, 0x404040, 0.6));
+const fl = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x6d6f73, roughness: 0.9 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; sc.add(fl);
+const mats = {};
+const q = new URLSearchParams(location.search), view = q.get('view') || 'all';
+const bt = boxTruck(THREE, mats); setRearDoor(bt, 0.5); bt.userData.pivots.steer_L.rotation.y = bt.userData.pivots.steer_R.rotation.y = 0.25;
+bt.position.set(-7, 0, 4); bt.rotation.y = -2.2; sc.add(bt);
+const T = tt(THREE, mats); T.userData.pivots.hitch.rotation.y = 15 * Math.PI / 180; T.userData.pivots.rearDoor_R.rotation.y = 2.4; setCurtain(T, 'L', 0); setCurtain(T, 'R', 0.5);
+seatedDrivePose(worker(THREE, mats, { seed: 4 }), bt.getObjectByName('seat')); seatedDrivePose(worker(THREE, mats, { seed: 6 }), T.getObjectByName('seat'));
+T.position.set(6, 0, -3); T.rotation.y = 0.55; sc.add(T);
+const wk = worker(THREE, mats, { seed: 3 }); walkPose(wk, 0.2); wk.position.set(-1.2, 0, 7); wk.rotation.y = 0.6; sc.add(wk);
+const wk2 = worker(THREE, mats, { seed: 8 }); carryPose(wk2); wk2.position.set(-0.2, 0, 7.4); wk2.rotation.y = -0.4; sc.add(wk2);
+const cam = new THREE.PerspectiveCamera(40, W / H, 0.05, 200);
+const views = { all: [[4, 9, 24], [0, 1.5, 0]], box: [[-12, 4, -2], [-7, 1.6, 4]], boxf: [[-1, 3, 9], [-7, 1.6, 4]], tt: [[22, 6, 12], [6, 2, -3]], ttr: [[-14, 5, -20], [4, 2, -8]], worker: [[-0.4, 1.3, 10], [-0.7, 1.0, 7.2]], btcab: [[-13.3, 2.7, 4.6], [-9.3, 2.1, 2.3]], ttcab: [[15.3, 3.7, 3.6], [10.9, 3.1, 3.8]] };
+const [p, t] = views[view]; cam.position.set(...p); cam.lookAt(...t);
+r.render(sc, cam); r.info.autoReset = false;
+const info = { bt: bt.userData.drawCalls, tt: T.userData.drawCalls, wk: wk.userData.drawCalls, calls: r.info.render.calls, dims: [bt.userData.dims, T.userData.dims, wk.userData.dims] };
+const bb = (o) => { const b = new THREE.Box3().setFromObject(o); const s = b.getSize(new THREE.Vector3()); return s.toArray().map(v => +v.toFixed(2)); };
+bt.rotation.y = 0; T.rotation.y = 0; T.userData.pivots.hitch.rotation.y = 0; bt.updateMatrixWorld(); T.updateMatrixWorld(); info.bbox = { bt: bb(bt), tt: bb(T), wk: bb(wk) };
+bt.rotation.y = -2.2; T.rotation.y = 0.55; T.userData.pivots.hitch.rotation.y = 15 * Math.PI / 180;
+r.render(sc, cam);
+window.__info = info; window.__done = true;
+</script></body></html>

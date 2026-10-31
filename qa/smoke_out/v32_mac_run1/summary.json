@@ -1,0 +1,148 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "loader": true,
+      "buttons": false,
+      "frame": false,
+      "programs": true,
+      "console": true,
+      "vehicles": false
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 4954.300048828125,
+      "ttffPolls": 2,
+      "loaderProbeAtMs": 40898.300048828125,
+      "ttffMs": 12905,
+      "loaderTimeline": [
+        [
+          482,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2667,
+          "Loading 3D scene · environment…",
+          0,
+          0
+        ],
+        [
+          3040,
+          "Loading 3D scene · vehicles…",
+          0,
+          0
+        ],
+        [
+          4854,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          5022,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          5168,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "longTasks": [
+        [
+          369,
+          94
+        ],
+        [
+          895,
+          1000
+        ],
+        [
+          1899,
+          305
+        ],
+        [
+          2690,
+          325
+        ],
+        [
+          3046,
+          794
+        ],
+        [
+          3846,
+          989
+        ],
+        [
+          4858,
+          151
+        ],
+        [
+          5022,
+          76
+        ],
+        [
+          5333,
+          7574
+        ],
+        [
+          12908,
+          2295
+        ],
+        [
+          15209,
+          3872
+        ],
+        [
+          19082,
+          5807
+        ],
+        [
+          24890,
+          5018
+        ],
+        [
+          29909,
+          4564
+        ],
+        [
+          34480,
+          3973
+        ],
+        [
+          38455,
+          3455
+        ],
+        [
+          44924,
+          2141
+        ],
+        [
+          47080,
+          4439
+        ],
+        [
+          51521,
+          5641
+        ],
+        [
+          58106,
+          3964
+        ]
+      ],
+      "longestTaskMs": 7574,
+      "loaderGoneMs": 5168,
+      "programsLinkedHook": 55,
+      "shadersCompiledHook": 110,
+      "programsRendererInfo": 55,
+      "quality": "high",
+      "drawCallsPerFrameHooked": 9275,
+      "avgFps": 0.24
+    }
+  }
+]

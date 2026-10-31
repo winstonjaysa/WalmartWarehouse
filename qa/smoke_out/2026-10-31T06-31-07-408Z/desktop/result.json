@@ -1,0 +1,737 @@
+{
+  "viewport": "desktop",
+  "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 5890ms",
+      "found": []
+    },
+    "frame": {
+      "pass": true,
+      "detail": "stats {\"mean\":208.2,\"sd\":40.65,\"colours\":500,\"blank\":false} diff1s {\"changedFrac\":0.00332,\"meanAbs\":0.191}",
+      "ttffMs": 5935.60009765625
+    },
+    "vehicles": {
+      "pass": false,
+      "method": "world positions via __sim.VEH",
+      "detail": "0/21 vehicles moved >5cm in 2s",
+      "sample": [
+        {
+          "id": "TRL-48213",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50177",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-71540",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-53390",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-66102",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50311",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "FL-07",
+          "type": "Counterbalance forklift",
+          "d": 0.005
+        },
+        {
+          "id": "FL-03",
+          "type": "Counterbalance forklift",
+          "d": 0
+        }
+      ]
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "zoomIn: NOT FOUND in DOM; zoomOut: NOT FOUND in DOM; explore: NOT FOUND in DOM",
+      "found": {
+        "zoomIn": null,
+        "zoomOut": null,
+        "explore": null
+      }
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs.length=30 (limit 60); hooked linkProgram=30, compileShader=60"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 5935.60009765625,
+    "ttffPolls": 2,
+    "fpsWindowS": 3.5,
+    "avgFps": 0.57,
+    "rendererFrameFps": 0.57,
+    "drawCallsPerFrameHooked": 9282,
+    "drawCallsRendererInfo": 5480,
+    "programsRendererInfo": 30,
+    "programsLinkedHook": 30,
+    "shadersCompiledHook": 60,
+    "quality": "low",
+    "ttffMs": 5887,
+    "loaderTimeline": [
+      [
+        497,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2690,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3067,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        5056,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5218,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5890,
+        "(gone)",
+        60,
+        30
+      ]
+    ],
+    "longTasks": [
+      [
+        380,
+        102
+      ],
+      [
+        1960,
+        585
+      ],
+      [
+        2550,
+        133
+      ],
+      [
+        2693,
+        349
+      ],
+      [
+        3068,
+        920
+      ],
+      [
+        4000,
+        1039
+      ],
+      [
+        5062,
+        153
+      ],
+      [
+        5220,
+        84
+      ],
+      [
+        5353,
+        536
+      ],
+      [
+        5890,
+        5125
+      ],
+      [
+        11028,
+        1676
+      ],
+      [
+        12706,
+        2768
+      ],
+      [
+        15481,
+        1756
+      ],
+      [
+        17825,
+        3395
+      ],
+      [
+        21223,
+        2074
+      ],
+      [
+        23299,
+        1849
+      ],
+      [
+        25160,
+        1293
+      ],
+      [
+        26455,
+        2501
+      ],
+      [
+        28957,
+        2011
+      ],
+      [
+        30969,
+        1224
+      ],
+      [
+        32194,
+        2705
+      ],
+      [
+        34911,
+        1216
+      ],
+      [
+        36128,
+        2634
+      ],
+      [
+        38763,
+        1858
+      ],
+      [
+        40624,
+        1984
+      ],
+      [
+        42609,
+        1880
+      ],
+      [
+        44490,
+        1887
+      ],
+      [
+        46387,
+        1903
+      ],
+      [
+        48290,
+        1647
+      ],
+      [
+        49942,
+        1865
+      ],
+      [
+        51808,
+        2006
+      ],
+      [
+        53824,
+        1918
+      ],
+      [
+        55747,
+        2138
+      ],
+      [
+        57886,
+        1614
+      ],
+      [
+        59501,
+        1932
+      ]
+    ],
+    "longestTaskMs": 5125,
+    "loaderGoneMs": 5890
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\"",
+    "poll error: timeout: screenshot >8000ms"
+  ],
+  "state10": {
+    "hooks": {
+      "shaders": 60,
+      "programsLinked": 30,
+      "programsCreated": 30,
+      "draws": 46410,
+      "raf": 5,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 5748,
+      "lastLinkAt": 5748,
+      "firstDrawFrameAt": 5887,
+      "framesWithDraws": 5
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "low",
+    "renderer": {
+      "programs": 30,
+      "calls": 5480,
+      "triangles": 8642168,
+      "frame": 5,
+      "geometries": 1823,
+      "textures": 57,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "stateEnd": {
+    "hooks": {
+      "shaders": 60,
+      "programsLinked": 30,
+      "programsCreated": 30,
+      "draws": 222768,
+      "raf": 24,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 5748,
+      "lastLinkAt": 5748,
+      "firstDrawFrameAt": 5887,
+      "framesWithDraws": 24
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "low",
+    "renderer": {
+      "programs": 30,
+      "calls": 5480,
+      "triangles": 8642168,
+      "frame": 24,
+      "geometries": 1823,
+      "textures": 57,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "final": {
+    "shaders": 60,
+    "programsLinked": 30,
+    "draws": 269178,
+    "framesWithDraws": 29,
+    "firstDrawFrameAt": 5887,
+    "frames": [
+      [
+        5887,
+        9282
+      ],
+      [
+        11012,
+        9282
+      ],
+      [
+        12696,
+        9282
+      ],
+      [
+        15472,
+        9282
+      ],
+      [
+        17234,
+        9282
+      ],
+      [
+        17820,
+        9282
+      ],
+      [
+        21220,
+        9282
+      ],
+      [
+        23295,
+        9282
+      ],
+      [
+        25148,
+        9282
+      ],
+      [
+        26446,
+        9282
+      ],
+      [
+        28955,
+        9282
+      ],
+      [
+        30962,
+        9282
+      ],
+      [
+        32190,
+        9282
+      ],
+      [
+        34898,
+        9282
+      ],
+      [
+        36120,
+        9282
+      ],
+      [
+        38762,
+        9282
+      ],
+      [
+        40618,
+        9282
+      ],
+      [
+        42598,
+        9282
+      ],
+      [
+        44487,
+        9282
+      ],
+      [
+        46376,
+        9282
+      ],
+      [
+        48289,
+        9282
+      ],
+      [
+        49937,
+        9282
+      ],
+      [
+        51806,
+        9282
+      ],
+      [
+        53814,
+        9282
+      ],
+      [
+        55737,
+        9282
+      ],
+      [
+        57884,
+        9282
+      ],
+      [
+        59499,
+        9282
+      ],
+      [
+        61432,
+        9282
+      ],
+      [
+        63384,
+        9282
+      ]
+    ],
+    "loader": [
+      [
+        497,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        2690,
+        "Loading 3D scene · environment…",
+        0,
+        0
+      ],
+      [
+        3067,
+        "Loading 3D scene · vehicles…",
+        0,
+        0
+      ],
+      [
+        5056,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        5218,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        5890,
+        "(gone)",
+        60,
+        30
+      ]
+    ],
+    "longTasks": [
+      [
+        380,
+        102
+      ],
+      [
+        1960,
+        585
+      ],
+      [
+        2550,
+        133
+      ],
+      [
+        2693,
+        349
+      ],
+      [
+        3068,
+        920
+      ],
+      [
+        4000,
+        1039
+      ],
+      [
+        5062,
+        153
+      ],
+      [
+        5220,
+        84
+      ],
+      [
+        5353,
+        536
+      ],
+      [
+        5890,
+        5125
+      ],
+      [
+        11028,
+        1676
+      ],
+      [
+        12706,
+        2768
+      ],
+      [
+        15481,
+        1756
+      ],
+      [
+        17825,
+        3395
+      ],
+      [
+        21223,
+        2074
+      ],
+      [
+        23299,
+        1849
+      ],
+      [
+        25160,
+        1293
+      ],
+      [
+        26455,
+        2501
+      ],
+      [
+        28957,
+        2011
+      ],
+      [
+        30969,
+        1224
+      ],
+      [
+        32194,
+        2705
+      ],
+      [
+        34911,
+        1216
+      ],
+      [
+        36128,
+        2634
+      ],
+      [
+        38763,
+        1858
+      ],
+      [
+        40624,
+        1984
+      ],
+      [
+        42609,
+        1880
+      ],
+      [
+        44490,
+        1887
+      ],
+      [
+        46387,
+        1903
+      ],
+      [
+        48290,
+        1647
+      ],
+      [
+        49942,
+        1865
+      ],
+      [
+        51808,
+        2006
+      ],
+      [
+        53824,
+        1918
+      ],
+      [
+        55747,
+        2138
+      ],
+      [
+        57886,
+        1614
+      ],
+      [
+        59501,
+        1932
+      ]
+    ],
+    "lastCompileAt": 5748,
+    "parallelExt": false,
+    "linkFail": 0,
+    "ready": true,
+    "programsInfo": 30,
+    "quality": "low",
+    "now": 63386
+  },
+  "infoLog": [
+    {
+      "t": 2.42,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) -> quality low",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 3.37,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.17,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.58,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.81,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://rawcdn.githack.com/winstonjaysa/WalmartWarehouse/1959a12/index.html"
+    },
+    {
+      "t": 5.9,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+  ],
+  "pass": false
+}

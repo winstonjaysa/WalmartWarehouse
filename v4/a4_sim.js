@@ -130,7 +130,7 @@ const snackTrailerV = { id: 'snack-vendor-trailer', type: 'trailer', obj: SNACK.
 // Red beverage-vendor box truck parked at the DSD door (rear door rolled up), driver in the cab.
 const BOXT = buildBoxTruck(THREE, PM, {}); BOXT.position.set(DOORS.DSD.x, GROUND, 12.3 + 4.3); setRearDoor(BOXT, 1); scene.add(BOXT);
 // pop skids (Inky) and pharmacy totes (Inky), handheld scanner (Inky)
-const POPS = [buildPopSkid(THREE, PM, { seed: 3 }), buildPopSkid(THREE, PM, { seed: 8 })]; for (const p of POPS) scene.add(p);
+const POPS = [['mixed', 3], ['mixed', 8], ['uniform', 5]].map(([mix, seed]) => { const g = buildBev(THREE, PM, { seed, mix, wrapped: true, palletColor: 'blue', detail: 'low' }); scene.add(g); return g; }); // beverage DSD skids (no logos)
 // McKesson pharmacy pallet: 3 sealed totes per layer (2 or 3 layers by seed), 2-4 cartons on top, whole stack stretch-wrapped, delivery memo on top of the film
 const MEMO_CELL = textSign(['DELIVERY MEMO', 'count totes · sign'], { w: 384, h: 256, bg: '#fbfbf7', fg: '#222', sub: '#555', border: '#9aa', size: 0.42 }); atlasTex.needsUpdate = true;
 function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() => { let q = seedN * 7919 + 13; return () => ((q = (q * 9301 + 49297) % 233280) / 233280); })();
@@ -142,13 +142,15 @@ function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() 
   for (let i = 0; i < nC; i++) { const w = 0.5, d = 0.42, h = 0.22 + r() * 0.12; const b = new THREE.BoxGeometry(w * (0.8 + r() * 0.2), h, d * (0.85 + r() * 0.15)); b.translate(((i % 2) - 0.5) * 0.56, top + h / 2, (((i / 2) | 0) - 0.5) * (nC > 2 ? 0.46 : 0) + (nC > 2 ? 0 : (i - 0.5) * 0.08)); cg.push(paint(b, KRAFT[(r() * 4) | 0])); }
   G.add(new THREE.Mesh(mergeGeometries(cg, false), PM.cardboardVC));
   const H = top + 0.36, ws = buildWrapped(THREE, PM, { seed: seedN, height: H }); const wrapMs = []; for (const c of [...ws.children]) if (c.name !== 'pallet' && c.name !== 'cartons') { G.add(c); wrapMs.push(c); }
-  const pg = new THREE.PlaneGeometry(0.3, 0.2); const uv = pg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (MEMO_CELL.x + uv.getX(i) * MEMO_CELL.w) / ATL, 1 - (MEMO_CELL.y + (1 - uv.getY(i)) * MEMO_CELL.h) / ATL);
+  const pg = new THREE.PlaneGeometry(0.3, 0.2); const uv = pg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (MEMO_CELL.x + uv.getX(i) * MEMO_CELL.w) / ATL, 1 - (MEMO_CELL.y + (1 - uv.getY(i)) * MEMO_CELL.h) / ATLH);
   pg.rotateX(-Math.PI / 2); pg.translate(0.12, H + 0.03, 0.05); const memo = new THREE.Mesh(norm(paint(pg, '#ffffff')), MAT.sign); G.add(memo);
   G.userData = { wrap: wrapMs, memo, H, layers, totes: layers * 3 }; G.visible = false; scene.add(G); return G; }
 const MCP = [mkMcPallet(2, 3), mkMcPallet(3, 8)];
 const INKY_WR = [];
+// milk-crate lattice on the shared carton (Lambert+map) shader: dark lattice, grey openings, white jug caps
+const CRATE_M = MAT.carton.clone(); CRATE_M.map = canvasTex(128, 128, (g, w, h) => { g.fillStyle = '#1c1c1e'; g.fillRect(0, 0, w, h); g.fillStyle = '#3a3b3e'; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) g.fillRect(6 + i * 30, 6 + j * 30, 24, 24); g.fillStyle = '#f2f2ee'; for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { g.beginPath(); g.arc(34 + i * 60, 34 + j * 60, 14, 0, 7); g.fill(); } });
 // FDS milk: 5 skids of black crates (3x3 per layer): one 6-layer, one 4-layer, three 5-layer
-const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { o.material = MAT.iv; o.visible = false; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = MAT.carton; o.customDepthMaterial = undefined; } }); // program budget: reuse the carton shader for the crates (jugs hidden)
+const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { const ge = o.geometry; if (!ge.attributes.color) ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(ge.attributes.position.count * 3).fill(0.96), 3)); o.material = MAT.iv; o.customDepthMaterial = undefined; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = CRATE_M; o.customDepthMaterial = undefined; const ic = o.instanceColor; if (ic) { for (let k = 0; k < ic.count; k++) { const b = ic.getZ(k) > ic.getX(k) * 2 + 0.02; ic.setXYZ(k, b ? 0.45 : 1, b ? 0.6 : 1, 1); } ic.needsUpdate = true; } } }); // program budget: reuse the carton shader for the crates (jugs hidden)
   scene.add(g); return g; });
 // EGGS slot: 1 always-wrapped pallet of tall 15-dozen cases (~1.90 m, taller than 6-layer milk at ~1.80 m). parts/v4/eggPallet.js (Inky), 6 layers of 4x3
 const EGGS = [buildEggs(THREE, PM, { seed: 21, layers: 6, palletColor: 'natural' })]; for (const g of EGGS) scene.add(g);

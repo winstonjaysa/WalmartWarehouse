@@ -17,6 +17,14 @@ import { build as buildWrapped } from '../parts/v4/wrappedSkid.js';
 import { build as buildMilk } from '../parts/v4/milkCrateSkid.js';
 import { build as buildSnackStack } from '../parts/v4/snackCaseStack.js';
 import { build as buildEggs } from '../parts/v4/eggPallet.js';
+import { build as buildDiv } from '../parts/v4/divShelving.js';
+import { build as buildOffice } from '../parts/v4/officeKit.js';
+import { build as buildTraining } from '../parts/v4/trainingRoom.js';
+import { build as buildLunch } from '../parts/v4/lunchRoom.js';
+import { build as buildSick } from '../parts/v4/sickRoom.js';
+import { build as buildCleaning } from '../parts/v4/cleaningRoom.js';
+import { build as buildStairs } from '../parts/v4/stairs.js';
+import { build as buildBev, setWrapped as bevSetWrapped } from '../parts/v4/beverageSkid.js';
 
 // ---------------- quality / renderer ----------------
 const QS = new URLSearchParams(location.search);
@@ -103,7 +111,7 @@ const blobTex = canvasTex(64, 64, (g, w, h) => { const gr = g.createRadialGradie
 MAT.blob = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, color: '#ffffff' });
 
 // ---------------- sign atlas (one texture, one draw call for every sign / decal) ----------------
-const ATL = 2048; const atlasCv = document.createElement('canvas'); atlasCv.width = atlasCv.height = ATL; const AG = atlasCv.getContext('2d');
+const ATL = 2048, ATLH = 3072; const atlasCv = document.createElement('canvas'); atlasCv.width = ATL; atlasCv.height = ATLH; const AG = atlasCv.getContext('2d');
 let ax = 0, ay = 0, arow = 0;
 function atlasCell(w, h, draw) { if (ax + w > ATL) { ax = 0; ay += arow + 2; arow = 0; } const r = { x: ax, y: ay, w, h }; AG.save(); AG.translate(ax, ay); AG.beginPath(); AG.rect(0, 0, w, h); AG.clip(); draw(AG, w, h); AG.restore(); ax += w + 2; arow = Math.max(arow, h); return r; }
 const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -147,7 +155,7 @@ class Builder {
 }
 // sign quads -> atlas UVs
 const signGeos = [];
-function sign(cell, w, h, x, y, z, ry = 0, rx = 0) { const g = new THREE.PlaneGeometry(w, h); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) { uv.setXY(i, (cell.x + uv.getX(i) * cell.w) / ATL, 1 - (cell.y + (1 - uv.getY(i)) * cell.h) / ATL); } if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); signGeos.push(norm(paint(g, '#ffffff'))); }
+function sign(cell, w, h, x, y, z, ry = 0, rx = 0) { const g = new THREE.PlaneGeometry(w, h); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) { uv.setXY(i, (cell.x + uv.getX(i) * cell.w) / ATL, 1 - (cell.y + (1 - uv.getY(i)) * cell.h) / ATLH); } if (rx) g.rotateX(rx); g.rotateY(ry); g.translate(x, y, z); signGeos.push(norm(paint(g, '#ffffff'))); }
 
 await __yield("a1");
 // ======================= STATIC SCENE =======================
@@ -189,7 +197,14 @@ function wallWithDoors(isExterior) {
   if (isExterior) { UP.box(40, 0.6, 0.05, 0, 5.6, 12.3, '#0071ce'); UP.box(40, 0.12, 0.05, 0, 5.15, 12.3, '#ffc220'); S.box(40.6, 0.1, 0.36, 0, 0.95, 12.15, '#cfd5dc'); }
 }
 wallWithDoors(false); wallWithDoors(true);
-wallC(-20, -12, 20, -12, 0, BR.H, '#f6f6f4');                  // north (cooler wall, insulated panel white)
+wallC(-20, -12, -4.9, -12, 0, BR.H, '#f6f6f4'); wallC(-2.3, -12, 20, -12, 0, BR.H, '#f6f6f4'); wallC(-4.9, -12, -2.3, -12, 3.0, BR.H, '#f6f6f4'); // north (cooler wall) with the walk-in cooler doorway open
+// walk-in cooler interior: stainless panels, sealed floor, strip curtain in the doorway
+S.box(13.8, 0.04, 4.9, -3.6, 0.0, -14.45, '#c7ccd0');
+wallC(-10.5, -12, -10.5, -16.9, 0, 3.2, '#b9c0c6'); wallC(-10.5, -16.9, 3.3, -16.9, 0, 3.2, '#c3c9ce'); wallC(3.3, -16.9, 3.3, -12, 0, 3.2, '#b9c0c6');
+for (let x = -10; x < 3.3; x += 1.15) S.box(0.03, 3.1, 0.02, x, 1.55, -16.86, '#a9b0b6');
+S.box(13.8, 0.12, 0.06, -3.6, 0.06, -16.85, '#8e959b'); S.cyl(0.14, 1.2, -9.9, 0.6, -12.6, YEL, 12);
+for (let i = 0; i < 9; i++) S.box(0.24, 2.6, 0.012, -4.75 + 0.18 + i * 0.29, 1.65, -12.06 - (i % 2) * 0.02, i % 2 ? '#dfe9ee' : '#d3e0e7');
+sign(SIGN.cooler, 1.0, 0.25, -3.6, 3.25, -11.89, 0);
 wallC(-20, 12, -20, -12, 0, BR.H, WALL);                         // west
 wallC(20, -12, 20, -1.6, 0, BR.H, WALL); wallC(20, 1.6, 20, 12, 0, BR.H, WALL); wallC(20, -1.6, 20, 1.6, 3.2, BR.H, WALL); // east (backroom side)
 wallC(20, 12, 20, 1.6, 0, 5.5, '#f3f1ec'); wallC(20, -1.6, 20, -12, 0, 5.5, '#f3f1ec'); wallC(20, 1.6, 20, -1.6, 3.2, 5.5, '#f3f1ec'); // east wall, sales-floor side
@@ -226,6 +241,7 @@ for (const [k, d] of Object.entries(DOORS)) {
   S.box(d.w + 1, GROUND * -1, 0.2, d.x, GROUND / 2, 12.3, '#8e8f8c'); // dock face concrete
 }
 // ---- cooler + freezer doors with yellow guard rails (north wall, like the refs) ----
+function coldDoorRails(x) { for (const s of [-1, 1]) { S.cyl(0.05, 1.05, x + s * 3.0, 0.53, -10.9, YEL, 8); S.box(1.2, 0.06, 0.06, x + s * 2.4, 1.0, -10.9, YEL); S.box(1.2, 0.06, 0.06, x + s * 2.4, 0.55, -10.9, YEL); } S.cyl(0.14, 1.3, x - 2.0, 0.65, -10.3, YEL, 12); S.cyl(0.14, 1.3, x + 2.0, 0.65, -10.3, YEL, 12); }
 function coldDoor(x, label) {
   S.box(2.7, 3.0, 0.08, x, 1.5, -11.95, '#d6dadc'); S.box(2.4, 2.75, 0.1, x, 1.4, -11.92, '#b4bbc0');
   for (let i = 0; i < 10; i++) S.box(2.38, 0.015, 0.105, x, 0.2 + i * 0.27, -11.91, '#a5acb2');
@@ -234,7 +250,7 @@ function coldDoor(x, label) {
     S.cyl(0.05, 1.05, x + s * 3.0, 0.53, -10.9, YEL, 8); S.box(1.2, 0.06, 0.06, x + s * 2.4, 1.0, -10.9, YEL); S.box(1.2, 0.06, 0.06, x + s * 2.4, 0.55, -10.9, YEL); }
   S.cyl(0.14, 1.3, x - 2.0, 0.65, -10.3, YEL, 12); S.cyl(0.14, 1.3, x + 2.0, 0.65, -10.3, YEL, 12);
 }
-coldDoor(-3.6, SIGN.cooler); coldDoor(3.0, SIGN.freezer);
+coldDoorRails(-3.6); coldDoor(3.0, SIGN.freezer);
 
 // ---- roller conveyor: Inky's skate-wheel line (parts/v4/skateConveyor.js), runs along z from inside trailer B to the sort area ----
 { const cv = buildConveyor(THREE, PM, { length: ROLLER.zHead - ROLLER.zTail, height: 0.84 }); cv.rotation.y = Math.PI / 2; cv.position.set(ROLLER.x, 0, (ROLLER.zHead + ROLLER.zTail) / 2); scene.add(cv); }
@@ -353,6 +369,32 @@ const YARD = [{ x: -22, z: 47, pl: 'ADS' }, { x: 6, z: 47, pl: 'MP' }];
 for (const y of YARD) xform(() => { trailer(S, 0, 0, { roof: true, placard: y.pl }); tractorBody(S, 0, 15); }, new THREE.Matrix4().makeTranslation(y.x, 0, y.z).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)));
 
 // static scene meshes
+// ---------------- 1st floor (upstairs) shell: room walls, labels, simple box placeholders ----------------
+// Inky models: divShelving, officeKit (manager, personnel, upc, storeManager), trainingRoom, lunchRoom, sickRoom, cleaningRoom, stairs (U-turn).
+const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
+{ const F = UPF.y, WC = '#e9e7e2', ROOMS = [];
+  for (const [x, z] of [[-45.6, -11.6], [-22.4, -11.6], [-45.6, 11.6], [-22.4, 11.6], [-34, -11.6], [-34, 11.6], [-45.6, 0], [-22.4, 0]]) S.box(0.35, F, 0.35, x, F / 2, z, '#9aa0a6');
+  S.box(24, 0.25, 24, -34, F - 0.125, 0, '#bfc3c7'); S.box(24, 0.02, 24, -34, F + 0.01, 0, '#d9d6cf');
+  const wall = (x0, z0, x1, z1) => S.wall(x0, z0, x1, z1, F, F + UPF.wh, WC);
+  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 12);
+  wall(-22, -12, -22, 6.4); // stair landing opening on the backroom side
+  const ROW = [[-46, -38, 'Training room', 'trainingRoom'], [-38, -30, 'Lunch room', 'lunchRoom'], [-30, -26, 'Sick room', 'sickRoom'], [-26, -22, 'Cleaning', 'cleaningRoom']];
+  const ROW2 = [[-46, -40.5, 'Store manager', 'officeKit'], [-40.5, -35.5, 'Personnel', 'officeKit'], [-35.5, -31, 'UPC office', 'officeKit'], [-31, -26.5, 'Variants manager', 'officeKit'], [-26.5, -24.6, 'Div shelving', 'divShelving']];
+  for (const [rz0, rz1, list] of [[-12, -1, ROW], [1, 12, ROW2]]) { const zc = rz1 > 0 ? 1 : -1; // corridor walls with a door gap per room
+    for (const [a, b, name] of list) { const m = (a + b) / 2; wall(a, zc, m - 0.5, zc); wall(m + 0.5, zc, b, zc); if (b < -22.1) wall(b, rz0, b, rz1);
+      ROOMS.push([name, m, (rz0 + rz1) / 2]); sign(textSign([name], { w: 512, h: 96, bg: '#041e42', fg: '#fff', size: 0.5 }), Math.min(2.6, b - a - 0.4), 0.42, m, F + UPF.wh + 0.3, zc + (zc > 0 ? -0.07 : 0.07) * -1, zc > 0 ? Math.PI : 0); } }
+  // Inky's floor-1 models (parts/v4/*.js, shared PM materials so no new programs)
+  const put = (g, x, z, ry = 0) => { g.position.set(x, F, z); g.rotation.y = ry; scene.add(g); return g; };
+  put(buildTraining(THREE, PM, { seed: 3, tables: 4 }), -42, -6.6);
+  put(buildLunch(THREE, PM, { seed: 4, tables: 3, fridgeOpen: 0 }), -34, -6.6);
+  put(buildSick(THREE, PM, { seed: 5 }), -28, -7.0);
+  put(buildCleaning(THREE, PM, { seed: 6, cartColor: 'yellow' }), -24, -7.0);
+  for (const [name, v, sd] of [['Store manager', 'storeManager', 1], ['Personnel', 'personnel', 2], ['UPC office', 'upc', 3], ['Variants manager', 'manager', 4]]) { const r = ROOMS.find((q) => q[0] === name); put(buildOffice(THREE, PM, { variant: v, seed: sd }), r[1], 7.2); }
+  for (const [z, sd] of [[4.0, 11], [8.6, 12]]) put(buildDiv(THREE, PM, { seed: sd, bays: 3, colorRate: 0.1 }), -25.55, z, Math.PI / 2);
+  // U-turn stairs from the backroom floor up to the 1st-floor opening (west side)
+  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; scene.add(ST); window.__stairs = ST;
+  sign(textSign(['1st floor · offices & staff rooms'], { w: 1024, h: 128, bg: '#0071ce', fg: '#fff', size: 0.46 }), 6, 0.75, -34, F + UPF.wh + 1.2, 12.05, 0);
+}
 scene.add(S.merge(MAT.v, 'static'));
 const LIGHTS_MESH = tubes.merge(MAT.e, 'lights'); scene.add(LIGHTS_MESH);
 const UPPER = UP.merge(MAT.v, 'upper'); scene.add(UPPER);
@@ -544,7 +586,7 @@ const snackTrailerV = { id: 'snack-vendor-trailer', type: 'trailer', obj: SNACK.
 // Red beverage-vendor box truck parked at the DSD door (rear door rolled up), driver in the cab.
 const BOXT = buildBoxTruck(THREE, PM, {}); BOXT.position.set(DOORS.DSD.x, GROUND, 12.3 + 4.3); setRearDoor(BOXT, 1); scene.add(BOXT);
 // pop skids (Inky) and pharmacy totes (Inky), handheld scanner (Inky)
-const POPS = [buildPopSkid(THREE, PM, { seed: 3 }), buildPopSkid(THREE, PM, { seed: 8 })]; for (const p of POPS) scene.add(p);
+const POPS = [['mixed', 3], ['mixed', 8], ['uniform', 5]].map(([mix, seed]) => { const g = buildBev(THREE, PM, { seed, mix, wrapped: true, palletColor: 'blue', detail: 'low' }); scene.add(g); return g; }); // beverage DSD skids (no logos)
 // McKesson pharmacy pallet: 3 sealed totes per layer (2 or 3 layers by seed), 2-4 cartons on top, whole stack stretch-wrapped, delivery memo on top of the film
 const MEMO_CELL = textSign(['DELIVERY MEMO', 'count totes · sign'], { w: 384, h: 256, bg: '#fbfbf7', fg: '#222', sub: '#555', border: '#9aa', size: 0.42 }); atlasTex.needsUpdate = true;
 function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() => { let q = seedN * 7919 + 13; return () => ((q = (q * 9301 + 49297) % 233280) / 233280); })();
@@ -556,13 +598,15 @@ function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() 
   for (let i = 0; i < nC; i++) { const w = 0.5, d = 0.42, h = 0.22 + r() * 0.12; const b = new THREE.BoxGeometry(w * (0.8 + r() * 0.2), h, d * (0.85 + r() * 0.15)); b.translate(((i % 2) - 0.5) * 0.56, top + h / 2, (((i / 2) | 0) - 0.5) * (nC > 2 ? 0.46 : 0) + (nC > 2 ? 0 : (i - 0.5) * 0.08)); cg.push(paint(b, KRAFT[(r() * 4) | 0])); }
   G.add(new THREE.Mesh(mergeGeometries(cg, false), PM.cardboardVC));
   const H = top + 0.36, ws = buildWrapped(THREE, PM, { seed: seedN, height: H }); const wrapMs = []; for (const c of [...ws.children]) if (c.name !== 'pallet' && c.name !== 'cartons') { G.add(c); wrapMs.push(c); }
-  const pg = new THREE.PlaneGeometry(0.3, 0.2); const uv = pg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (MEMO_CELL.x + uv.getX(i) * MEMO_CELL.w) / ATL, 1 - (MEMO_CELL.y + (1 - uv.getY(i)) * MEMO_CELL.h) / ATL);
+  const pg = new THREE.PlaneGeometry(0.3, 0.2); const uv = pg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, (MEMO_CELL.x + uv.getX(i) * MEMO_CELL.w) / ATL, 1 - (MEMO_CELL.y + (1 - uv.getY(i)) * MEMO_CELL.h) / ATLH);
   pg.rotateX(-Math.PI / 2); pg.translate(0.12, H + 0.03, 0.05); const memo = new THREE.Mesh(norm(paint(pg, '#ffffff')), MAT.sign); G.add(memo);
   G.userData = { wrap: wrapMs, memo, H, layers, totes: layers * 3 }; G.visible = false; scene.add(G); return G; }
 const MCP = [mkMcPallet(2, 3), mkMcPallet(3, 8)];
 const INKY_WR = [];
+// milk-crate lattice on the shared carton (Lambert+map) shader: dark lattice, grey openings, white jug caps
+const CRATE_M = MAT.carton.clone(); CRATE_M.map = canvasTex(128, 128, (g, w, h) => { g.fillStyle = '#1c1c1e'; g.fillRect(0, 0, w, h); g.fillStyle = '#3a3b3e'; for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) g.fillRect(6 + i * 30, 6 + j * 30, 24, 24); g.fillStyle = '#f2f2ee'; for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { g.beginPath(); g.arc(34 + i * 60, 34 + j * 60, 14, 0, 7); g.fill(); } });
 // FDS milk: 5 skids of black crates (3x3 per layer): one 6-layer, one 4-layer, three 5-layer
-const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { o.material = MAT.iv; o.visible = false; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = MAT.carton; o.customDepthMaterial = undefined; } }); // program budget: reuse the carton shader for the crates (jugs hidden)
+const MILK = [5, 6, 5, 4, 5].map((L, i) => { const g = buildMilk(THREE, PM, { seed: 11 + i, layers: L, base: 'pallet', palletColor: i % 2 ? 'blue' : 'natural' }); g.traverse((o) => { if (!o.isMesh) return; if (o.name === 'jugs') { const ge = o.geometry; if (!ge.attributes.color) ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(ge.attributes.position.count * 3).fill(0.96), 3)); o.material = MAT.iv; o.customDepthMaterial = undefined; return; } if (o.name === 'crates') { const ge = o.geometry; if (!ge.attributes.color) { const n = ge.attributes.position.count; ge.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3).fill(1), 3)); } o.material = CRATE_M; o.customDepthMaterial = undefined; const ic = o.instanceColor; if (ic) { for (let k = 0; k < ic.count; k++) { const b = ic.getZ(k) > ic.getX(k) * 2 + 0.02; ic.setXYZ(k, b ? 0.45 : 1, b ? 0.6 : 1, 1); } ic.needsUpdate = true; } } }); // program budget: reuse the carton shader for the crates (jugs hidden)
   scene.add(g); return g; });
 // EGGS slot: 1 always-wrapped pallet of tall 15-dozen cases (~1.90 m, taller than 6-layer milk at ~1.80 m). parts/v4/eggPallet.js (Inky), 6 layers of 4x3
 const EGGS = [buildEggs(THREE, PM, { seed: 21, layers: 6, palletColor: 'natural' })]; for (const g of EGGS) scene.add(g);
@@ -598,7 +642,7 @@ const BRAINS = []; // [worker, generator]
 function brain(w, g) { BRAINS.push({ w, g }); }
 const ROLES = []; // html label targets {w, text}
 function role(w, text) { ROLES.push({ w, text }); return w; }
-let FLAGS = {}, NIGHTN = 0, PHSK = null;
+let FLAGS = {}, NIGHTN = 0, PHSK = null, BEVCUR = null, MILKCUR = null;
 
 function initSim() {
   W.length = 0; BX.length = 0; SK.length = 0; CT.length = 0; GA.length = 0; OT.length = 0; BRAINS.length = 0; ROLES.length = 0; FLAGS = {}; T = 0; DSK = {};
@@ -609,7 +653,7 @@ function initSim() {
   // ---- trailer B: floor-loaded cases (hand-unloaded onto the roller head) ----
   const COLS = []; for (let r = 0; r < 10; r++) for (let c = 0; c < 4; c++) { const col = { x: DOORS.B.x - 0.84 + c * 0.56, z: 16.4 + r * 0.6, r, stack: [] }; let y = 0; const nh = r === 0 ? 3 : 6; for (let k = 0; k < nh; k++) { const sz = { w: 0.5, h: 0.3 + rnd() * 0.08, d: 0.54 }; const b = mkBox(Object.assign(sz, { x: col.x + (rnd() - 0.5) * 0.03, z: col.z, y: y + sz.h / 2, ry: (rnd() - 0.5) * 0.05 })); y += sz.h; col.stack.push(b); } COLS.push(col); }
   // ---- trailer A: wrapped mixed skids (~1.9 m) ----
-  const wrapped = []; for (const [x, z] of [[-5.55, 13.5], [-4.45, 13.5], [-5.0, 15.0], [-5.55, 16.6], [-4.45, 16.6]]) { const s = mkSkid({ x, z, col: PCOL[(rnd() * 4) | 0], wrapped: true }); while (skidTopY(s) < 1.62) { const b = mkBox(caseM()); attachToSkid(b, s, 0.05); } s.wrapH = skidTopY(s) + 0.04; s.wrap0 = s.wrapH; { const wi = wrapped.length; s.inky = INKY_WR[wi] || (INKY_WR[wi] = buildWrapped(THREE, PM, { seed: 11 + wrapped.length * 7, height: 1.9, palletColor: s.col === COL.blue || s.col === COL.chep ? 'blue' : (s.col === COL.red ? 'red' : 'natural') })); if (!s.inky.parent) scene.add(s.inky); } wrapped.push(s); }
+  const wrapped = []; for (const [x, z] of [[-4.45, 13.5], [-4.45, 15.1], [-4.45, 16.7], [-4.45, 18.3], [-4.45, 19.9]]) { const s = mkSkid({ x, z, col: PCOL[(rnd() * 4) | 0], wrapped: true }); while (skidTopY(s) < 1.62) { const b = mkBox(caseM()); attachToSkid(b, s, 0.05); } s.wrapH = skidTopY(s) + 0.04; s.wrap0 = s.wrapH; { const wi = wrapped.length; s.inky = INKY_WR[wi] || (INKY_WR[wi] = buildWrapped(THREE, PM, { seed: 11 + wrapped.length * 7, height: 1.9, palletColor: s.col === COL.blue || s.col === COL.chep ? 'blue' : (s.col === COL.red ? 'red' : 'natural') })); if (!s.inky.parent) scene.add(s.inky); } wrapped.push(s); }
   // one skid already at breakdown spot 1 (wrap cut, being worked)
   const BD = [{ x: 4.6, z: 9.6 }, { x: 4.6, z: 11.0 }];
   const bd1 = mkSkid({ x: BD[0].x, z: BD[0].z, ry: Math.PI / 2, col: COL.blue }); fillSkid(bd1, 14, caseM);
@@ -668,15 +712,15 @@ function initSim() {
   const s2 = role(mkWorker({ x: 45, z: 8.0, yaw: 0, torso: COL.st3 }), ''); brain(s2, stockLoop(s2, S4, 8.75));
   // ===== 7. DSD: beverage vendor + receiver check-in =====
   const recv = role(mkWorker({ x: -18.7, z: 7.6, yaw: -Math.PI / 2, torso: COL.dsd, tool: true }), 'DSD associate · receiving');
-  const POPSK = POPS.map((g, i) => mkSkid({ x: DOORS.DSD.x, z: 13.2 + i * 1.45, y: 0.0, col: COL.red, grp: g, pop: true }));
+  const POPSK = POPS.map((g, i) => mkSkid({ x: DOORS.DSD.x, z: 13.0 + i * 1.3, y: 0.0, col: COL.blue, grp: g, pop: true }));
   const bev = role(mkWorker({ x: -16.5, z: 9.2, yaw: Math.PI, torso: COL.bev }), 'Beverage vendor');
   const checkQ = [];
   function* checkIn(w, sk, label) { const req = { sk, done: false, label }; checkQ.push(req); yield* until(w, () => req.done, 'idle'); }
   brain(bev, (function* () { yield* wait(bev, 1.5);
-    for (let i = 0; i < 2; i++) { const sk = POPSK[i]; yield* jackFetch(bev, jBev, sk, Math.PI, i ? [[DOORS.DSD.x, 10.8]] : []);
+    for (let i = 0; i < POPSK.length; i++) { const sk = POPSK[i]; yield* jackFetch(bev, jBev, sk, Math.PI, i ? [[DOORS.DSD.x, 10.8]] : []);
       yield* jackPull(bev, jBev, [[DOORS.DSD.x, 9.4], [-15.6, 6.2]]); yield* jackRelease(bev, jBev); yield* walkTo(bev, -14.2, 7.2); yield* face(bev, sk.x, sk.z);
       yield* checkIn(bev, sk, 'pop');
-      yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.5]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
+      yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.4]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
     yield* walkTo(bev, -16.3, 9.0); for (;;) yield* wait(bev, 5, 'idle'); })());
   // ===== 8. SNACK vendor (reverses in, then pulls a skid) =====
   const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, grp: SNACKS[0] }); const SNC = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, flz: -5.4, grp: SNACKS[1] });
@@ -688,14 +732,16 @@ function initSim() {
     // second stack rides a wire case cart: wheel it out of the trailer and onto the sales floor
     yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
   // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
-  const MSK = [[-5.55, 18.4], [-4.45, 18.4], [-5.55, 20.0], [-4.45, 20.0], [-5.55, 21.6], [-4.45, 21.6]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
+  const MSK = [[-5.55, 13.5], [-5.55, 15.1], [-5.55, 16.7], [-5.55, 18.3], [-5.55, 19.9], [-5.55, 21.5]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
   const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
   const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
-  const CPARK = [[-5.0, -13.3], [-3.8, -13.3], [-2.6, -13.3], [-5.0, -14.6], [-3.8, -14.6], [-2.6, -14.6]];
-  brain(mk, (function* () { yield* until(mk, () => wrapped.every((s) => s.z < 12.0), 'idle');
-    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i]; const [px, pz] = CPARK[i];
+  const CPARK = [-9.4, 2.2, -7.7, 0.5, -6.0, -1.2];
+  MILKCUR = MSK[0];
+  brain(mk, (function* () { yield* wait(mk, 4);
+    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i], px = CPARK[i]; MILKCUR = sk;
       yield* jackFetch(mk, jMk, sk, Math.PI, [[sk.x, 9.0], [sk.x, 11.0]]);
-      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.0], [px, pz + 1.2], [px, pz]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 1.4); }
+      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.2], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
+      yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -16.1); yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -13.0); yield* walkTo(mk, -3.6, -11.0); }
     yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
   NIGHTN = (NIGHTN | 0) + 1; for (const g of MCP) g.visible = false; const MG = MCP[NIGHTN % 2]; MG.visible = true; for (const m of MG.userData.wrap) { m.visible = true; m.scale.set(1, 1, 1); }
@@ -703,7 +749,8 @@ function initSim() {
   FLAGS.pharmSigned = true; PHSK = PH;
   brain(recv, (function* () {
     for (;;) { const q = checkQ.shift(); if (!q) { yield* walkTo(recv, -18.75, 7.6); yield* face(recv, -19.6, 7.6); yield* wait(recv, 0.5, 'idle'); continue; }
-      const s = q.sk; const p = approach(s, -18, s.z + 0.3, 1.0); yield* walkTo(recv, p[0], p[1]); yield* face(recv, s.x, s.z); recv.scanning = true; yield* wait(recv, 3.5, 'scan');
+      const s = q.sk; if (s.pop && s.grp && s.grp.userData.wrapped) { BEVCUR = s; const wm = s.grp.userData.wrap; const R = 1.05; let a = 0; yield* walkTo(recv, s.x + R, s.z); while (a < Math.PI * 2.1) { a += DT * 0.9; recv.x = s.x + Math.cos(a) * R; recv.z = s.z + Math.sin(a) * R; recv.yaw = yawTo(s.x - recv.x, s.z - recv.z); recv.pose = 'reach'; if (wm) wm.scale.y = Math.max(0.03, 1 - a / (Math.PI * 2.1)); yield; } if (wm) wm.scale.y = 1; bevSetWrapped(s.grp, false); FLAGS.bevUnwrapped = (FLAGS.bevUnwrapped | 0) + 1; }
+      const p = approach(s, -18, s.z + 0.3, 1.0); yield* walkTo(recv, p[0], p[1]); yield* face(recv, s.x, s.z); recv.scanning = true; yield* wait(recv, 3.5, 'scan');
       const p2 = approach(s, s.x + 1, s.z - 1, 1.0); yield* walkTo(recv, p2[0], p2[1]); yield* face(recv, s.x, s.z); yield* wait(recv, 2.5, 'scan'); recv.scanning = false;
       yield* walkTo(recv, -18.75, 7.6); yield* face(recv, -19.6, 7.6); yield* wait(recv, 3, 'reach'); q.done = true; } })());
   const run = role(mkWorker({ x: -15.6, z: 4.2, yaw: Math.PI, torso: COL.st2 }), 'Pharmacy pallet · jack to pharmacy');
@@ -812,7 +859,7 @@ function drawWorker(w, i) {
   } else {
     R.position.set(x, y, z); R.rotation.set(0, yaw, 0);
     const gw = (p === 'pull' || p === 'push') ? gripOf(w.jack) : null;
-    if (p === 'pull') { R.updateMatrixWorld(true); wPull(R, gw ? gw.clone() : undefined); if (moving) { const a = ph * Math.PI * 2; P.hip_L.rotation.x = -0.4 * Math.sin(a); P.hip_R.rotation.x = 0.4 * Math.sin(a); } }
+    if (p === 'pull') { if (gw) { const cy = Math.cos(yaw), sy = Math.sin(yaw); R.position.x = gw.x + 0.2 * cy + 0.36 * sy; R.position.z = gw.z - 0.2 * sy + 0.36 * cy; } R.updateMatrixWorld(true); wPull(R, gw ? gw.clone() : undefined); P.spine.rotation.x = 0.04; P.hips.rotation.x = 0; P.spine.rotation.y = 0.08; P.neck.rotation.x = 0; if (gw) { R.updateMatrixWorld(true); wHands(R, gw.clone(), 'R'); } if (moving) { const a = ph * Math.PI * 2; P.hip_L.rotation.x = -0.4 * Math.sin(a); P.hip_R.rotation.x = 0.4 * Math.sin(a); } }
     else { if (moving) wWalk(R, ph); else wRest(R);
       const arm = (l, r, el = -0.3) => { P.shoulder_L.rotation.x = l; P.shoulder_R.rotation.x = r; P.elbow_L.rotation.x = P.elbow_R.rotation.x = el; };
       if (p === 'carry') { arm(-0.75, -0.75, -0.75); P.shoulder_L.rotation.z = -0.12; P.shoulder_R.rotation.z = 0.12; }
@@ -855,7 +902,7 @@ function render3d() {
   for (const g of GA) { if (g.st === 'carry') { const [x, y, z] = _hp(g.carrier); GARM.put(TRS(x, y + 0.45, z, g.carrier.yaw + Math.PI / 2), g.col); } else GARM.put(TRS(g.x, g.y, g.z, 0), g.col); }
   // Zebra handhelds: one in the receiver's hand while scanning, one riding on top of the first pop skid
   { const r = W.find((w) => w.torso === COL.dsd && w.tool); if (r && r.pose === 'scan') { const [x, y, z] = _hp(r); ZEBRA.visible = true; ZEBRA.position.set(x, y + 0.1, z); ZEBRA.rotation.set(-0.9, r.yaw, 0, 'YXZ'); } else ZEBRA.visible = false;
-    const ps = SK.find((s) => s.pop); if (ps) { ZEBRA2.position.set(ps.x + 0.1, ps.y + 0.5, ps.z + 0.15); ZEBRA2.rotation.set(-Math.PI / 2, ps.ry + 0.4, 0, 'YXZ'); } }
+    ZEBRA2.visible = false; const ps = null; if (ps) { ZEBRA2.position.set(ps.x + 0.1, ps.y + 0.5, ps.z + 0.15); ZEBRA2.rotation.set(-Math.PI / 2, ps.ry + 0.4, 0, 'YXZ'); } }
   for (const p of [PAL, CART, WRAP, BLOB, TOTE, DEV, CARTS, GARM]) p.end();
 }
 window.__sim = { get t() { return T; }, get JK() { return JK; }, get W() { return W; }, VEH, renderer, camera, scene, get workers() { return W.filter((w) => !w.sit).map((w) => ({ id: 'worker', type: 'associate', obj: w.obj })); } };
@@ -867,18 +914,21 @@ const STEPS = [...document.querySelectorAll('.step')].map((el) => ({ el, id: el.
 const CAMS = {
   hero: [[24, 31, 45], [-3.5, -2, 4]],
   truck: [[7.2, 1.6, 8.6], [8.2, 1.25, 17.5]],
-  breakdown: [[0.4, 1.7, 6.4], [4.8, 1.0, 10.4]],
-  roller: [[6.0, 1.65, 11.4], [8.8, 1.0, -5]],
-  sort: [[13.6, 3.6, 7.4], [7.6, 0.4, 0.8]],
+  breakdown: [[-2.2, 2.3, 7.6], [-5.9, 1.0, 14.6]],
+  roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
+  sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
   floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [-3.5, 5.2, 3.5]],
   stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · Dept 46 skid (1 person)', [-3.0, 4.9, 2.8]],
   dsd: [[-10.4, 1.75, 3.6], [-16.2, 0.9, 9.6]],
+  bev: [[-13.0, 3.2, 10.4], [-16.3, 0.8, 7.0], '@bev', [2.6, 2.9, 2.4]],
+  milk: [[-3.6, 7.6, -6.4], [-3.6, 0.4, -14.2], '@milk', [1.8, 6.6, 4.2]],
   snack: [[3, 8.5, 37], [-11.5, 0, 22]],
   pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6]],
   baler: [[-13.0, 1.8, -5.4], [-19, 1.3, -1.6]],
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
+  upstairs: [[-29, 23, 23], [-34.5, 4.2, 0]],
   overview: [[-26, 30, 40], [6, -1, 2]],
 };
 const LBL = { // fixed points of interest per step
@@ -898,7 +948,7 @@ const LBL = { // fixed points of interest per step
   claims: [['Claims cage', -17.2, 2.6, -10.2]],
   overview: [],
 };
-const ROLE_STEPS = { hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
+const ROLE_STEPS = { bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
   floor: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · Dept 92 (big skid, 2 people)'], stock: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · overnight stocking'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
   pharm: ['DSD associate · receiving', 'Pharmacy pallet · jack to pharmacy'], baler: ['Baler & compactor pre-op'], omni: ['OMNI customer fulfillment'], fashion: ['Fashion · hanging apparel'], claims: ['Claims & returns'], overview: [] };
 const labelsEl = document.getElementById('labels');
@@ -928,7 +978,7 @@ function camLook() { // fov: narrow (iso-like) when high, wide at eye level; cut
   const cut = y > 4.6; if (cut !== cutaway) { cutaway = cut; UPPER.visible = !cut; LIGHTS_MESH.visible = !cut; } }
 addEventListener('resize', resize);
 const _lv = new THREE.Vector3();
-function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
+function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
   if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) items.push({ t: r.text, x: r.w.x, y: 2.05, z: r.w.z, k: 'who' });
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;

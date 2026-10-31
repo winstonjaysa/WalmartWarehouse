@@ -1,0 +1,120 @@
+<!doctype html><html><head><meta charset="utf-8"><title>v4 models contact sheet</title>
+<style>html,body{margin:0;background:#d9d7d2;font-family:system-ui,sans-serif}#grid{position:relative;width:1800px;height:1260px}canvas{position:absolute;left:0;top:0}
+.lab{position:absolute;color:#222;font-size:13px;background:rgba(255,255,255,.78);padding:3px 7px;border-radius:4px;line-height:1.3}.lab b{font-size:14px}</style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+</head><body><div id="grid"></div>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { makeMats } from '../materials.js';
+window.__errors = [];
+const LIST = [
+  ['wrappedSkid', { seed: 1 }], ['popSkid', {}, { dir: [0.9, 1.15, 1.3], zoom: 1.05 }], ['mckessonTote', {}], ['skateConveyor', { length: 2.6, compress: 0.25 }, { dir: [0.45, 0.38, 1.0], zoom: 0.97 }],
+  ['palletJack', {}], ['zebraHandheld', {}], ['baler', { doorOpen: 0.35, platenY: 1 }], ['compactor', {}], ['cardboardBale', { seed: 1 }], ['cardboardBale', { seed: 2 }],
+  ['dsdBoxTruck', {}], ['dsdTractorTrailer', {}], ['worker', {}], ['wrappedSkid', { seed: 7 }],
+  ['@boxTruckDriver', {}], ['@tractorDriver', {}], ['@jackPull', {}, { dir: [1.2, 0.55, -1.1], zoom: 0.9 }], ['wrappedSkid', { seed: 4, palletColor: 'red' }],
+  ['milkCrateSkid', { seed: 1 }], ['milkCrateSkid', { seed: 3, base: 'pallet', layers: 4 }], ['snackCaseStack', { seed: 2 }], ['snackCaseStack', { seed: 5, cart: true }],
+  ['eggPallet', { seed: 1 }], ['eggPallet', { seed: 2, layers: 5, palletColor: 'blue' }], ['milkCrateSkid', { seed: 5, layers: 6 }],
+  ['beverageSkid', { seed: 1 }], ['beverageSkid', { seed: 4, wrapped: false }], ['beverageSkid', { seed: 2, mix: 'uniform', wrapped: false }], ['beverageSkid', { seed: 7, wrapped: false }], ['beverageSkid', { seed: 1, detail: 'high', wrapped: false }],
+  ['divShelving', { seed: 1, bays: 3 }], ['officeKit', { variant: 'manager' }], ['officeKit', { variant: 'storeManager' }], ['trainingRoom', {}, { dir: [1.0, 1.1, 1.35] }],
+  ['lunchRoom', { fridgeOpen: 0.6 }, { dir: [1.0, 1.1, 1.35] }], ['sickRoom', {}], ['cleaningRoom', {}], ['stairs', { landing: true }, { dir: [1.3, 0.7, 1.1] }],
+];
+const mod_ = (name) => import('../' + name + '.js');
+const v3 = (o) => new THREE.Vector3().copy(o);
+function seatOf(truck) {
+  const u = truck.userData, cand = [u.seatPoint, u.parts && u.parts.tractor && u.parts.tractor.userData.seatPoint];
+  for (const c of cand) { if (!c) continue; if (c.isObject3D) return c; if (c.object && c.object.isObject3D) return c.object; }
+  return truck.getObjectByName('seat');
+}
+function handOf(w, side) {
+  const P = w.userData.pivots, h = w.getObjectByName('hand_' + side) || w.getObjectByName('wrist_' + side) || P['hand_' + side] || P['wrist_' + side];
+  if (h) return h.getWorldPosition(new THREE.Vector3());
+  return P['elbow_' + side].localToWorld(new THREE.Vector3(0, -0.27, 0.006));
+}
+window.__integration = [];
+async function compose(kind) {
+  const W = await mod_('worker'), g = new THREE.Group(), note = (s) => window.__integration.push(kind + ': ' + s);
+  if (kind === '@boxTruckDriver' || kind === '@tractorDriver') {
+    const T = await mod_(kind === '@boxTruckDriver' ? 'dsdBoxTruck' : 'dsdTractorTrailer'), truck = T.build(THREE, mats, {}); g.add(truck); truck.updateMatrixWorld(true);
+    const seat = seatOf(truck); if (!seat) throw new Error('no seatPoint/seat on truck');
+    const w = W.build(THREE, mats, {}); if (!W.seatedDrivePose) throw new Error('worker has no seatedDrivePose');
+    W.seatedDrivePose(w, seat); g.updateMatrixWorld(true); w.updateMatrixWorld(true);
+    const hw = new THREE.Vector3(); w.userData.pivots.hips.getWorldPosition(hw);
+    note('seat world ' + seat.getWorldPosition(new THREE.Vector3()).toArray().map(v => v.toFixed(3)).join(',') + ' hips world ' + hw.toArray().map(v => v.toFixed(3)).join(','));
+    const sq = seat.getWorldQuaternion(new THREE.Quaternion());
+    const sp = seat.getWorldPosition(new THREE.Vector3()), bb = new THREE.Box3().setFromObject(truck), ctr = bb.getCenter(new THREE.Vector3());
+    const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(sq), side = Math.sign(sp.x - ctr.x) || -1;
+    const look = sp.clone().add(new THREE.Vector3(0, 0.25, 0)), pos = look.clone().addScaledVector(fwd, 2.4).add(new THREE.Vector3(side * 4.6, 0.3, 0));
+    return { obj: g, cam: { pos, look, fov: 36 }, worker: w, truck };
+  }
+  // @jackPull: associate pulling a pallet jack loaded with a wrapped skid
+  const J = await mod_('palletJack'), S = await mod_('wrappedSkid');
+  const w = W.build(THREE, mats, {}); if (!W.jackPullPose) throw new Error('worker has no jackPullPose');
+  const lift = 0.11, GY0 = 0.47 + lift, HAND_Y = 1.1;
+  const GY = J.build(THREE, mats, { raised: true }).userData.gripPoint.local[1];
+  const ang = -Math.acos(Math.min(1, (HAND_Y - GY0) / GY));      // tilt handle back toward the puller so the grip sits at the pose's hand height
+  const jack = J.build(THREE, mats, { raised: true, handleAngle: ang }); g.add(jack);
+  const skid = S.build(THREE, mats, { seed: 3, palletColor: 'blue' }); skid.rotation.y = Math.PI / 2; skid.position.set(0, 0.035, 0.135); g.add(skid);
+  g.updateMatrixWorld(true);
+  const grip = jack.userData.gripPoint.object.getWorldPosition(new THREE.Vector3());
+  // worker walks toward -z (away from the forks), jack trails behind; pose default hand = local (-0.17,1.1,-0.5)
+  w.rotation.y = Math.PI; w.position.set(grip.x - 0.17, 0, grip.z - 0.5); g.add(w); g.updateMatrixWorld(true);
+  W.jackPullPose(w, grip.clone());
+  for (let i = 0; i < 6; i++) { // walk the worker toward the grip until the IK reaches it (IK clamps at full arm extension)
+    const h = W.handWorld(w).R, dx = grip.x - h.x, dz = grip.z - h.z; if (Math.hypot(dx, dz, grip.y - h.y) < 0.008) break;
+    w.position.x += dx; w.position.z += dz; g.updateMatrixWorld(true); W.jackPullPose(w, grip.clone());
+  }
+  note(`worker pos ${w.position.toArray().map(v => v.toFixed(3))} (offset from grip ${(w.position.x - grip.x).toFixed(3)}, ${(w.position.z - grip.z).toFixed(3)})`);
+  const hd = W.handWorld ? W.handWorld(w).R : handOf(w, 'R');
+  note(`handleAngle=${ang.toFixed(3)} grip=${grip.toArray().map(v => v.toFixed(3))} handR=${hd.toArray().map(v => v.toFixed(3))} miss=${hd.distanceTo(grip).toFixed(3)} m`);
+  return { obj: g };
+}
+const COLS = 4, TW = 450, TH = 420, grid = document.getElementById('grid');
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+R.setPixelRatio(1); R.setSize(COLS * TW, Math.ceil(LIST.length / COLS) * TH); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.0; R.setScissorTest(true); grid.appendChild(R.domElement);
+const env = new THREE.PMREMGenerator(R).fromScene(new RoomEnvironment(R), 0.04).texture;
+const mats = makeMats(THREE);
+function canvasT(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+const concreteTex = canvasT(512, 512, (x, w, h) => { x.fillStyle = '#cfccc6'; x.fillRect(0, 0, w, h); for (let i = 0; i < 4000; i++) { const v = 150 + Math.random() * 90; x.fillStyle = `rgba(${v},${v},${v - 4},0.25)`; x.fillRect(Math.random() * w, Math.random() * h, 2, 2); } for (let i = 0; i < 14; i++) { x.fillStyle = 'rgba(90,85,78,0.08)'; x.beginPath(); x.ellipse(Math.random() * w, Math.random() * h, 20 + Math.random() * 70, 10 + Math.random() * 40, Math.random() * 3, 0, 7); x.fill(); } });
+concreteTex.wrapS = concreteTex.wrapT = THREE.RepeatWrapping; concreteTex.repeat.set(60, 60);
+const contactM = new THREE.MeshBasicMaterial({ map: canvasT(128, 128, (x, w, h) => { const g = x.createRadialGradient(64, 64, 10, 64, 64, 64); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.35)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h); }), transparent: true, depthWrite: false, toneMapped: false });
+function scaleBar(len) {
+  const g = new THREE.Group(), n = 10;
+  for (let i = 0; i < n; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(len / n, 0.012 * len, 0.03 * len), new THREE.MeshStandardMaterial({ color: i % 2 ? 0xffffff : 0x111111, roughness: .7 })); m.position.set(-len / 2 + (i + .5) * len / n, 0.006 * len, 0); g.add(m); }
+  return g;
+}
+const tiles = [];
+for (let i = 0; i < LIST.length; i++) {
+  const [name, opts, view = {}] = LIST[i]; let mod;
+  const col = i % COLS, row = Math.floor(i / COLS);
+  const lab = document.createElement('div'); lab.className = 'lab'; lab.style.left = col * TW + 8 + 'px'; lab.style.top = row * TH + 8 + 'px'; grid.appendChild(lab);
+  if (!name.startsWith('@')) { try { mod = await import('../' + name + '.js'); } catch (e) { lab.innerHTML = `<b>${name}</b><br>missing`; continue; } }
+  try {
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe4e2dd); scene.environment = env;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8478, 0.45));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.6); scene.add(sun, sun.target);
+    let comp = null, obj; if (name.startsWith('@')) { comp = await compose(name); obj = comp.obj; } else obj = mod.build(THREE, mats, opts); scene.add(obj);
+    obj.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    const bb = new THREE.Box3().setFromObject(obj), size = bb.getSize(new THREE.Vector3()), ctr = bb.getCenter(new THREE.Vector3());
+    const rad = Math.max(size.x, size.y, size.z) * 0.5 + 0.0001;
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0x9d9a95, map: concreteTex, roughness: 0.95 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+    { const cs = new THREE.Mesh(new THREE.PlaneGeometry(size.x + 0.5 * Math.min(1, rad), size.z + 0.5 * Math.min(1, rad)), contactM); cs.rotation.x = -Math.PI / 2; cs.position.set(ctr.x, 0.002, ctr.z); cs.renderOrder = 1; scene.add(cs); }
+    const small = rad < 0.3, bl = small ? 0.1 : 1.0, bar = scaleBar(bl); bar.position.set(ctr.x, 0.001, bb.max.z + (small ? 0.03 : 0.25)); scene.add(bar);
+    if (small) { obj.position.y += 0.0; }
+    sun.position.set(ctr.x + rad * 3, rad * 6 + 1, ctr.z + rad * 4); sun.target.position.copy(ctr); sun.castShadow = true;
+    const sc = sun.shadow.camera; sc.left = sc.bottom = -rad * 2; sc.right = sc.top = rad * 2; sc.near = 0.01; sc.far = rad * 20 + 10; sun.shadow.mapSize.set(1024, 1024); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
+    const cam = new THREE.PerspectiveCamera(35, TW / TH, rad * 0.02, rad * 50);
+    const dir = new THREE.Vector3(...(view.dir || [1.0, 0.75, 1.35])).normalize(), dist = rad / Math.sin(THREE.MathUtils.degToRad(17)) * 1.25 * (view.zoom || 1);
+    cam.position.copy(ctr).addScaledVector(dir, dist); cam.lookAt(ctr.x, ctr.y - size.y * 0.04, ctr.z);
+    if (comp && comp.cam) { cam.fov = comp.cam.fov; cam.near = 0.05; cam.updateProjectionMatrix(); cam.position.copy(comp.cam.pos); cam.lookAt(comp.cam.look); }
+    let calls = 0; obj.traverse(o => { if (o.isMesh) calls++; });
+    const d = obj.userData.dims || {};
+    lab.innerHTML = `<b>${name}</b>${opts.seed ? ' seed ' + opts.seed : ''}<br>${d.w ?? '?'} × ${d.h ?? '?'} × ${d.d ?? '?'} m · meshes ${calls} (ud ${obj.userData.drawCalls ?? '?'})<br>bar = ${bl} m`;
+    tiles.push({ scene, cam, col, row });
+  } catch (e) { lab.innerHTML = `<b>${name}</b><br>ERROR ${e.message}`; window.__errors.push(name + ': ' + e.message); console.error(e); }
+}
+const H = Math.ceil(LIST.length / COLS) * TH; grid.style.height = H + 'px';
+for (const t of tiles) { const x = t.col * TW, y = H - (t.row + 1) * TH; R.setViewport(x, y, TW, TH); R.setScissor(x, y, TW, TH); R.render(t.scene, t.cam); }
+window.__ready = true;
+</script></body></html>

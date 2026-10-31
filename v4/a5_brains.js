@@ -24,7 +24,7 @@ const BRAINS = []; // [worker, generator]
 function brain(w, g) { BRAINS.push({ w, g }); }
 const ROLES = []; // html label targets {w, text}
 function role(w, text) { ROLES.push({ w, text }); return w; }
-let FLAGS = {}, NIGHTN = 0, PHSK = null;
+let FLAGS = {}, NIGHTN = 0, PHSK = null, BEVCUR = null, MILKCUR = null;
 
 function initSim() {
   W.length = 0; BX.length = 0; SK.length = 0; CT.length = 0; GA.length = 0; OT.length = 0; BRAINS.length = 0; ROLES.length = 0; FLAGS = {}; T = 0; DSK = {};
@@ -35,7 +35,7 @@ function initSim() {
   // ---- trailer B: floor-loaded cases (hand-unloaded onto the roller head) ----
   const COLS = []; for (let r = 0; r < 10; r++) for (let c = 0; c < 4; c++) { const col = { x: DOORS.B.x - 0.84 + c * 0.56, z: 16.4 + r * 0.6, r, stack: [] }; let y = 0; const nh = r === 0 ? 3 : 6; for (let k = 0; k < nh; k++) { const sz = { w: 0.5, h: 0.3 + rnd() * 0.08, d: 0.54 }; const b = mkBox(Object.assign(sz, { x: col.x + (rnd() - 0.5) * 0.03, z: col.z, y: y + sz.h / 2, ry: (rnd() - 0.5) * 0.05 })); y += sz.h; col.stack.push(b); } COLS.push(col); }
   // ---- trailer A: wrapped mixed skids (~1.9 m) ----
-  const wrapped = []; for (const [x, z] of [[-5.55, 13.5], [-4.45, 13.5], [-5.0, 15.0], [-5.55, 16.6], [-4.45, 16.6]]) { const s = mkSkid({ x, z, col: PCOL[(rnd() * 4) | 0], wrapped: true }); while (skidTopY(s) < 1.62) { const b = mkBox(caseM()); attachToSkid(b, s, 0.05); } s.wrapH = skidTopY(s) + 0.04; s.wrap0 = s.wrapH; { const wi = wrapped.length; s.inky = INKY_WR[wi] || (INKY_WR[wi] = buildWrapped(THREE, PM, { seed: 11 + wrapped.length * 7, height: 1.9, palletColor: s.col === COL.blue || s.col === COL.chep ? 'blue' : (s.col === COL.red ? 'red' : 'natural') })); if (!s.inky.parent) scene.add(s.inky); } wrapped.push(s); }
+  const wrapped = []; for (const [x, z] of [[-4.45, 13.5], [-4.45, 15.1], [-4.45, 16.7], [-4.45, 18.3], [-4.45, 19.9]]) { const s = mkSkid({ x, z, col: PCOL[(rnd() * 4) | 0], wrapped: true }); while (skidTopY(s) < 1.62) { const b = mkBox(caseM()); attachToSkid(b, s, 0.05); } s.wrapH = skidTopY(s) + 0.04; s.wrap0 = s.wrapH; { const wi = wrapped.length; s.inky = INKY_WR[wi] || (INKY_WR[wi] = buildWrapped(THREE, PM, { seed: 11 + wrapped.length * 7, height: 1.9, palletColor: s.col === COL.blue || s.col === COL.chep ? 'blue' : (s.col === COL.red ? 'red' : 'natural') })); if (!s.inky.parent) scene.add(s.inky); } wrapped.push(s); }
   // one skid already at breakdown spot 1 (wrap cut, being worked)
   const BD = [{ x: 4.6, z: 9.6 }, { x: 4.6, z: 11.0 }];
   const bd1 = mkSkid({ x: BD[0].x, z: BD[0].z, ry: Math.PI / 2, col: COL.blue }); fillSkid(bd1, 14, caseM);
@@ -94,15 +94,15 @@ function initSim() {
   const s2 = role(mkWorker({ x: 45, z: 8.0, yaw: 0, torso: COL.st3 }), ''); brain(s2, stockLoop(s2, S4, 8.75));
   // ===== 7. DSD: beverage vendor + receiver check-in =====
   const recv = role(mkWorker({ x: -18.7, z: 7.6, yaw: -Math.PI / 2, torso: COL.dsd, tool: true }), 'DSD associate · receiving');
-  const POPSK = POPS.map((g, i) => mkSkid({ x: DOORS.DSD.x, z: 13.2 + i * 1.45, y: 0.0, col: COL.red, grp: g, pop: true }));
+  const POPSK = POPS.map((g, i) => mkSkid({ x: DOORS.DSD.x, z: 13.0 + i * 1.3, y: 0.0, col: COL.blue, grp: g, pop: true }));
   const bev = role(mkWorker({ x: -16.5, z: 9.2, yaw: Math.PI, torso: COL.bev }), 'Beverage vendor');
   const checkQ = [];
   function* checkIn(w, sk, label) { const req = { sk, done: false, label }; checkQ.push(req); yield* until(w, () => req.done, 'idle'); }
   brain(bev, (function* () { yield* wait(bev, 1.5);
-    for (let i = 0; i < 2; i++) { const sk = POPSK[i]; yield* jackFetch(bev, jBev, sk, Math.PI, i ? [[DOORS.DSD.x, 10.8]] : []);
+    for (let i = 0; i < POPSK.length; i++) { const sk = POPSK[i]; yield* jackFetch(bev, jBev, sk, Math.PI, i ? [[DOORS.DSD.x, 10.8]] : []);
       yield* jackPull(bev, jBev, [[DOORS.DSD.x, 9.4], [-15.6, 6.2]]); yield* jackRelease(bev, jBev); yield* walkTo(bev, -14.2, 7.2); yield* face(bev, sk.x, sk.z);
       yield* checkIn(bev, sk, 'pop');
-      yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.5]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
+      yield* jackRegrab(bev, jBev, sk); yield* jackPull(bev, jBev, [[-14.8, 4.2], [-13.6, 3.2 - i * 1.4]]); yield* jackRelease(bev, jBev); yield* jackBackOut(bev, jBev, 1.4); }
     yield* walkTo(bev, -16.3, 9.0); for (;;) yield* wait(bev, 5, 'idle'); })());
   // ===== 8. SNACK vendor (reverses in, then pulls a skid) =====
   const SNK = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, grp: SNACKS[0] }); const SNC = mkSkid({ x: 0, z: 0, col: COL.nat, follow: SNACK.trailer, flz: -5.4, grp: SNACKS[1] });
@@ -114,14 +114,16 @@ function initSim() {
     // second stack rides a wire case cart: wheel it out of the trailer and onto the sales floor
     yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
   // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
-  const MSK = [[-5.55, 18.4], [-4.45, 18.4], [-5.55, 20.0], [-4.45, 20.0], [-5.55, 21.6], [-4.45, 21.6]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
+  const MSK = [[-5.55, 13.5], [-5.55, 15.1], [-5.55, 16.7], [-5.55, 18.3], [-5.55, 19.9], [-5.55, 21.5]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
   const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
   const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
-  const CPARK = [[-5.0, -13.3], [-3.8, -13.3], [-2.6, -13.3], [-5.0, -14.6], [-3.8, -14.6], [-2.6, -14.6]];
-  brain(mk, (function* () { yield* until(mk, () => wrapped.every((s) => s.z < 12.0), 'idle');
-    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i]; const [px, pz] = CPARK[i];
+  const CPARK = [-9.4, 2.2, -7.7, 0.5, -6.0, -1.2];
+  MILKCUR = MSK[0];
+  brain(mk, (function* () { yield* wait(mk, 4);
+    for (let i = 0; i < MSK.length; i++) { const sk = MSK[i], px = CPARK[i]; MILKCUR = sk;
       yield* jackFetch(mk, jMk, sk, Math.PI, [[sk.x, 9.0], [sk.x, 11.0]]);
-      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.0], [px, pz + 1.2], [px, pz]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 1.4); }
+      yield* jackPull(mk, jMk, [[sk.x, 11.6], [-3.6, 8.6], [-3.6, -11.2], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
+      yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -16.1); yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -13.0); yield* walkTo(mk, -3.6, -11.0); }
     yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
   NIGHTN = (NIGHTN | 0) + 1; for (const g of MCP) g.visible = false; const MG = MCP[NIGHTN % 2]; MG.visible = true; for (const m of MG.userData.wrap) { m.visible = true; m.scale.set(1, 1, 1); }
@@ -129,7 +131,8 @@ function initSim() {
   FLAGS.pharmSigned = true; PHSK = PH;
   brain(recv, (function* () {
     for (;;) { const q = checkQ.shift(); if (!q) { yield* walkTo(recv, -18.75, 7.6); yield* face(recv, -19.6, 7.6); yield* wait(recv, 0.5, 'idle'); continue; }
-      const s = q.sk; const p = approach(s, -18, s.z + 0.3, 1.0); yield* walkTo(recv, p[0], p[1]); yield* face(recv, s.x, s.z); recv.scanning = true; yield* wait(recv, 3.5, 'scan');
+      const s = q.sk; if (s.pop && s.grp && s.grp.userData.wrapped) { BEVCUR = s; const wm = s.grp.userData.wrap; const R = 1.05; let a = 0; yield* walkTo(recv, s.x + R, s.z); while (a < Math.PI * 2.1) { a += DT * 0.9; recv.x = s.x + Math.cos(a) * R; recv.z = s.z + Math.sin(a) * R; recv.yaw = yawTo(s.x - recv.x, s.z - recv.z); recv.pose = 'reach'; if (wm) wm.scale.y = Math.max(0.03, 1 - a / (Math.PI * 2.1)); yield; } if (wm) wm.scale.y = 1; bevSetWrapped(s.grp, false); FLAGS.bevUnwrapped = (FLAGS.bevUnwrapped | 0) + 1; }
+      const p = approach(s, -18, s.z + 0.3, 1.0); yield* walkTo(recv, p[0], p[1]); yield* face(recv, s.x, s.z); recv.scanning = true; yield* wait(recv, 3.5, 'scan');
       const p2 = approach(s, s.x + 1, s.z - 1, 1.0); yield* walkTo(recv, p2[0], p2[1]); yield* face(recv, s.x, s.z); yield* wait(recv, 2.5, 'scan'); recv.scanning = false;
       yield* walkTo(recv, -18.75, 7.6); yield* face(recv, -19.6, 7.6); yield* wait(recv, 3, 'reach'); q.done = true; } })());
   const run = role(mkWorker({ x: -15.6, z: 4.2, yaw: Math.PI, torso: COL.st2 }), 'Pharmacy pallet · jack to pharmacy');

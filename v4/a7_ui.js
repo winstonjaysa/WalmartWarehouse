@@ -4,18 +4,21 @@ const STEPS = [...document.querySelectorAll('.step')].map((el) => ({ el, id: el.
 const CAMS = {
   hero: [[24, 31, 45], [-3.5, -2, 4]],
   truck: [[7.2, 1.6, 8.6], [8.2, 1.25, 17.5]],
-  breakdown: [[0.4, 1.7, 6.4], [4.8, 1.0, 10.4]],
-  roller: [[6.0, 1.65, 11.4], [8.8, 1.0, -5]],
-  sort: [[13.6, 3.6, 7.4], [7.6, 0.4, 0.8]],
+  breakdown: [[-2.2, 2.3, 7.6], [-5.9, 1.0, 14.6]],
+  roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
+  sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
   floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [-3.5, 5.2, 3.5]],
   stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · Dept 46 skid (1 person)', [-3.0, 4.9, 2.8]],
   dsd: [[-10.4, 1.75, 3.6], [-16.2, 0.9, 9.6]],
+  bev: [[-13.0, 3.2, 10.4], [-16.3, 0.8, 7.0], '@bev', [2.6, 2.9, 2.4]],
+  milk: [[-3.6, 7.6, -6.4], [-3.6, 0.4, -14.2], '@milk', [1.8, 6.6, 4.2]],
   snack: [[3, 8.5, 37], [-11.5, 0, 22]],
   pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6]],
   baler: [[-13.0, 1.8, -5.4], [-19, 1.3, -1.6]],
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
+  upstairs: [[-29, 23, 23], [-34.5, 4.2, 0]],
   overview: [[-26, 30, 40], [6, -1, 2]],
 };
 const LBL = { // fixed points of interest per step
@@ -35,7 +38,7 @@ const LBL = { // fixed points of interest per step
   claims: [['Claims cage', -17.2, 2.6, -10.2]],
   overview: [],
 };
-const ROLE_STEPS = { hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
+const ROLE_STEPS = { bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
   floor: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · Dept 92 (big skid, 2 people)'], stock: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · overnight stocking'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
   pharm: ['DSD associate · receiving', 'Pharmacy pallet · jack to pharmacy'], baler: ['Baler & compactor pre-op'], omni: ['OMNI customer fulfillment'], fashion: ['Fashion · hanging apparel'], claims: ['Claims & returns'], overview: [] };
 const labelsEl = document.getElementById('labels');
@@ -65,7 +68,7 @@ function camLook() { // fov: narrow (iso-like) when high, wide at eye level; cut
   const cut = y > 4.6; if (cut !== cutaway) { cutaway = cut; UPPER.visible = !cut; LIGHTS_MESH.visible = !cut; } }
 addEventListener('resize', resize);
 const _lv = new THREE.Vector3();
-function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
+function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
   if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) items.push({ t: r.text, x: r.w.x, y: 2.05, z: r.w.z, k: 'who' });
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;

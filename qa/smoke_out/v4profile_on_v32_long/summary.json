@@ -1,0 +1,188 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "loader": false,
+      "programs": false,
+      "draws": false,
+      "longtask": false,
+      "console": true,
+      "nav": false
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 3895,
+      "simSecondsPerWallSecond": 0,
+      "ttffMs": 5647,
+      "shaders": 60,
+      "programsHook": 30,
+      "programsPage": 30,
+      "drawsPerFramePage": 5525,
+      "drawsPerFrameHook": 9291.1,
+      "avgFps": 0.47,
+      "longestTaskMs": 4719,
+      "top3LongTasks": [
+        "4719ms @5649ms",
+        "4080ms @35808ms",
+        "3880ms @42262ms"
+      ],
+      "longTaskCount": 90,
+      "loaderTimeline": [
+        [
+          118,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          2060,
+          "Loading 3D scene · environment…",
+          0,
+          0
+        ],
+        [
+          2915,
+          "Loading 3D scene · racks & conveyors…",
+          0,
+          0
+        ],
+        [
+          4705,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          4864,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          5011,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "loaderGoneMs": 5011,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": "__R.renderer",
+        "camera": "__R.camera",
+        "scene": "__R.scene"
+      },
+      "windowGlobals": [
+        "__glBoot",
+        "__gfFail",
+        "__THREE__",
+        "__gfMergeRigid",
+        "__ents",
+        "__step",
+        "__place",
+        "__render",
+        "__cam",
+        "__sim",
+        "__quality",
+        "__assert",
+        "__ready",
+        "__R",
+        "__dbg",
+        "__kpi"
+      ],
+      "quality": "low"
+    }
+  },
+  {
+    "viewport": "phone",
+    "pass": false,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "loader": false,
+      "programs": false,
+      "draws": false,
+      "longtask": false,
+      "console": true,
+      "nav": false
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 2989,
+      "simSecondsPerWallSecond": 0.015,
+      "ttffMs": 7580,
+      "shaders": 60,
+      "programsHook": 30,
+      "programsPage": 30,
+      "drawsPerFramePage": 3768,
+      "drawsPerFrameHook": 7629.4,
+      "avgFps": 0.58,
+      "longestTaskMs": 4521,
+      "top3LongTasks": [
+        "4521ms @13567ms",
+        "4349ms @3232ms",
+        "3997ms @21653ms"
+      ],
+      "longTaskCount": 110,
+      "loaderTimeline": [
+        [
+          115,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          1027,
+          "Loading 3D scene · racks & conveyors…",
+          0,
+          0
+        ],
+        [
+          2920,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          3098,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          3216,
+          "(gone)",
+          50,
+          25
+        ]
+      ],
+      "loaderGoneMs": 3216,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": "__R.renderer",
+        "camera": "__R.camera",
+        "scene": "__R.scene"
+      },
+      "windowGlobals": [
+        "__glBoot",
+        "__gfFail",
+        "__THREE__",
+        "__gfMergeRigid",
+        "__ents",
+        "__step",
+        "__place",
+        "__render",
+        "__cam",
+        "__sim",
+        "__quality",
+        "__assert",
+        "__ready",
+        "__R",
+        "__dbg",
+        "__kpi"
+      ],
+      "quality": "low"
+    }
+  }
+]

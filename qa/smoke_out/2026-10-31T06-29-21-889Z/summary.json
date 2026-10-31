@@ -1,0 +1,34 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": false,
+    "checks": {
+      "console": true,
+      "loader": false,
+      "frame": false,
+      "vehicles": false,
+      "buttons": false,
+      "programs": false
+    },
+    "metrics": {
+      "ttffMs": 4408.10009765625,
+      "ttffPolls": 2
+    }
+  },
+  {
+    "viewport": "phone",
+    "pass": false,
+    "checks": {
+      "console": true,
+      "loader": false,
+      "frame": false,
+      "vehicles": false,
+      "buttons": false,
+      "programs": false
+    },
+    "metrics": {
+      "ttffMs": 3910.10009765625,
+      "ttffPolls": 2
+    }
+  }
+]

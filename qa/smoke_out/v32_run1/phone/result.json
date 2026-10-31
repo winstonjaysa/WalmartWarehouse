@@ -1,0 +1,1170 @@
+{
+  "viewport": "phone",
+  "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 8023ms",
+      "found": []
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "zoomIn, zoomOut, explore: NOT FOUND in DOM (no matching button/aria-label/title/id)",
+      "found": {
+        "zoomIn": null,
+        "zoomOut": null,
+        "explore": null
+      }
+    },
+    "frame": {
+      "pass": true,
+      "detail": "stats {\"mean\":195.4,\"sd\":49.93,\"colours\":500,\"blank\":false} diff1s {\"changedFrac\":0.01023,\"meanAbs\":0.652}",
+      "ttffMs": 2380.800048828125
+    },
+    "vehicles": {
+      "pass": true,
+      "method": "world positions via __sim.VEH + window.__step(5) sim-time fallback",
+      "wall": {
+        "movedN": 0,
+        "of": 21,
+        "simT": [
+          0.833,
+          0.967
+        ],
+        "simSecondsPerWallSecond": 0.024,
+        "maxD": 0.036
+      },
+      "sample": [
+        {
+          "id": "TRL-48213",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50177",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-71540",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-53390",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-66102",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50311",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "FL-07",
+          "type": "Counterbalance forklift",
+          "d": 0.024
+        },
+        {
+          "id": "FL-03",
+          "type": "Counterbalance forklift",
+          "d": 0
+        }
+      ],
+      "states": [
+        {
+          "id": "TRL-48213",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50177",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-71540",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-53390",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-66102",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50311",
+          "state": "Arriving",
+          "task": "Gate check-in",
+          "ds": 0
+        },
+        {
+          "id": "FL-07",
+          "state": "Unloading",
+          "task": "Into trailer",
+          "ds": 0.006916666666666671
+        },
+        {
+          "id": "FL-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-09",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RP-01",
+          "state": "Moving",
+          "task": "To STG-DR002-1:1",
+          "ds": 0.006222222222222218
+        },
+        {
+          "id": "RP-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-04",
+          "state": "Putaway",
+          "task": "To PD-04",
+          "ds": 0.0053333333333333306
+        },
+        {
+          "id": "RT-05",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-06",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-11",
+          "state": "Loading",
+          "task": "Approach OB-DS103:4",
+          "ds": 0
+        },
+        {
+          "id": "FL-12",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-01",
+          "state": "Moving",
+          "task": "Pulling to BLD-01",
+          "ds": 0
+        },
+        {
+          "id": "HJ-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "WS-01",
+          "state": "Replenishment",
+          "task": "Approach WS-01-B",
+          "ds": 0.009500000000000005
+        },
+        {
+          "id": "WS-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        }
+      ],
+      "sim": {
+        "simT": [
+          1.033,
+          6.133
+        ],
+        "movedN": 12,
+        "of": 21,
+        "maxD": 6.67,
+        "sample": [
+          {
+            "id": "TRL-48213",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-50177",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-71540",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-53390",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-66102",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "TRL-50311",
+            "type": "Road tractor + 53' trailer",
+            "d": 0
+          },
+          {
+            "id": "FL-07",
+            "type": "Counterbalance forklift",
+            "d": 2.104
+          },
+          {
+            "id": "FL-03",
+            "type": "Counterbalance forklift",
+            "d": 2.161
+          }
+        ]
+      },
+      "detail": "wall 2s: 0/21 moved, sim clock 0.833->0.967 (0.024 sim-s/wall-s); after __step(5) sim 1.033->6.133: 12/21 moved, max 6.67m"
+    },
+    "programs": {
+      "pass": true,
+      "detail": "renderer.info.programs.length=30 (limit 60); compileShader=60 [from final dump]"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 2380.800048828125,
+    "ttffPolls": 3,
+    "loaderProbeAtMs": 27809.800048828125,
+    "simSecondsPerWallSecond": 0.024,
+    "ttffMs": 7939,
+    "loaderTimeline": [
+      [
+        466,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        1409,
+        "Loading 3D scene · racks & conveyors…",
+        0,
+        0
+      ],
+      [
+        3172,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        3342,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        8023,
+        "(gone)",
+        60,
+        30
+      ]
+    ],
+    "longTasks": [
+      [
+        368,
+        67
+      ],
+      [
+        877,
+        56
+      ],
+      [
+        936,
+        69
+      ],
+      [
+        1011,
+        318
+      ],
+      [
+        1415,
+        779
+      ],
+      [
+        2224,
+        933
+      ],
+      [
+        3177,
+        160
+      ],
+      [
+        3342,
+        96
+      ],
+      [
+        3449,
+        4491
+      ],
+      [
+        7940,
+        82
+      ],
+      [
+        8030,
+        1808
+      ],
+      [
+        9840,
+        2258
+      ],
+      [
+        12150,
+        2880
+      ],
+      [
+        15034,
+        2013
+      ],
+      [
+        17051,
+        89
+      ],
+      [
+        17142,
+        2512
+      ],
+      [
+        19656,
+        1719
+      ],
+      [
+        21377,
+        1275
+      ],
+      [
+        22652,
+        1725
+      ],
+      [
+        24379,
+        1729
+      ],
+      [
+        26110,
+        1861
+      ],
+      [
+        27976,
+        1031
+      ],
+      [
+        29008,
+        1486
+      ],
+      [
+        30500,
+        1474
+      ],
+      [
+        31975,
+        2102
+      ],
+      [
+        34078,
+        1107
+      ],
+      [
+        35192,
+        1518
+      ],
+      [
+        36711,
+        2079
+      ],
+      [
+        38795,
+        1034
+      ],
+      [
+        39829,
+        1548
+      ],
+      [
+        41378,
+        1492
+      ],
+      [
+        42873,
+        2026
+      ],
+      [
+        44901,
+        1028
+      ],
+      [
+        45931,
+        1500
+      ],
+      [
+        47432,
+        1960
+      ],
+      [
+        49394,
+        1049
+      ],
+      [
+        50445,
+        1523
+      ],
+      [
+        51969,
+        1748
+      ],
+      [
+        53718,
+        1293
+      ],
+      [
+        55012,
+        1985
+      ],
+      [
+        57256,
+        789
+      ]
+    ],
+    "longestTaskMs": 4491,
+    "loaderGoneMs": 8023,
+    "programsLinkedHook": 30,
+    "shadersCompiledHook": 60,
+    "programsRendererInfo": 30,
+    "quality": "low",
+    "drawCallsPerFrameHooked": 7771.6,
+    "avgFps": 0.66
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "githack interstitial detected; clicked \"Open the page\" (console/requests from the interstitial discarded: 0)",
+    "FATAL: viewport budget 60s exceeded before fps window"
+  ],
+  "failedRequests": [],
+  "state10": {
+    "hooks": {
+      "shaders": 60,
+      "programsLinked": 30,
+      "programsCreated": 30,
+      "draws": 62216,
+      "raf": 8,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 3686,
+      "lastLinkAt": 3686,
+      "firstDrawFrameAt": 7939,
+      "framesWithDraws": 8
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "low",
+    "renderer": {
+      "programs": 30,
+      "calls": 3975,
+      "triangles": 8101180,
+      "frame": 8,
+      "geometries": 1750,
+      "textures": 49,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "fatal": "viewport budget 60s exceeded before fps window",
+  "hangDump": {
+    "smoke": {
+      "t0": 360.79999999981374,
+      "shaders": 60,
+      "programsLinked": 30,
+      "programsCreated": 30,
+      "compileStatusPolls": 0,
+      "draws": 264236,
+      "raf": 34,
+      "longTasks": [
+        [
+          368,
+          67
+        ],
+        [
+          877,
+          56
+        ],
+        [
+          936,
+          69
+        ],
+        [
+          1011,
+          318
+        ],
+        [
+          1415,
+          779
+        ],
+        [
+          2224,
+          933
+        ],
+        [
+          3177,
+          160
+        ],
+        [
+          3342,
+          96
+        ],
+        [
+          3449,
+          4491
+        ],
+        [
+          7940,
+          82
+        ],
+        [
+          8030,
+          1808
+        ],
+        [
+          9840,
+          2258
+        ],
+        [
+          12150,
+          2880
+        ],
+        [
+          15034,
+          2013
+        ],
+        [
+          17051,
+          89
+        ],
+        [
+          17142,
+          2512
+        ],
+        [
+          19656,
+          1719
+        ],
+        [
+          21377,
+          1275
+        ],
+        [
+          22652,
+          1725
+        ],
+        [
+          24379,
+          1729
+        ],
+        [
+          26110,
+          1861
+        ],
+        [
+          27976,
+          1031
+        ],
+        [
+          29008,
+          1486
+        ],
+        [
+          30500,
+          1474
+        ],
+        [
+          31975,
+          2102
+        ],
+        [
+          34078,
+          1107
+        ],
+        [
+          35192,
+          1518
+        ],
+        [
+          36711,
+          2079
+        ],
+        [
+          38795,
+          1034
+        ],
+        [
+          39829,
+          1548
+        ],
+        [
+          41378,
+          1492
+        ],
+        [
+          42873,
+          2026
+        ],
+        [
+          44901,
+          1028
+        ],
+        [
+          45931,
+          1500
+        ],
+        [
+          47432,
+          1960
+        ],
+        [
+          49394,
+          1049
+        ],
+        [
+          50445,
+          1523
+        ],
+        [
+          51969,
+          1748
+        ],
+        [
+          53718,
+          1293
+        ],
+        [
+          55012,
+          1985
+        ],
+        [
+          57256,
+          789
+        ]
+      ],
+      "loader": [
+        [
+          466,
+          "Loading 3D scene…",
+          0,
+          0
+        ],
+        [
+          1409,
+          "Loading 3D scene · racks & conveyors…",
+          0,
+          0
+        ],
+        [
+          3172,
+          "Loading 3D scene · fleet & people…",
+          0,
+          0
+        ],
+        [
+          3342,
+          "Loading 3D scene · compiling shaders…",
+          0,
+          0
+        ],
+        [
+          8023,
+          "(gone)",
+          60,
+          30
+        ]
+      ],
+      "lastCompileAt": 3685.7000000001863,
+      "lastLinkAt": 3685.7000000001863,
+      "contexts": 0,
+      "parallelExt": false,
+      "linkFail": 0
+    },
+    "ready": true
+  },
+  "final": {
+    "shaders": 60,
+    "programsLinked": 30,
+    "draws": 264236,
+    "framesWithDraws": 34,
+    "firstDrawFrameAt": 7939,
+    "frames": [
+      [
+        7939,
+        7777
+      ],
+      [
+        8022,
+        7777
+      ],
+      [
+        9836,
+        7777
+      ],
+      [
+        12098,
+        7777
+      ],
+      [
+        12148,
+        7777
+      ],
+      [
+        15030,
+        7777
+      ],
+      [
+        17046,
+        7777
+      ],
+      [
+        17140,
+        7777
+      ],
+      [
+        19653,
+        7777
+      ],
+      [
+        21375,
+        7777
+      ],
+      [
+        22650,
+        7777
+      ],
+      [
+        24377,
+        7777
+      ],
+      [
+        26108,
+        7777
+      ],
+      [
+        27971,
+        7777
+      ],
+      [
+        29006,
+        7777
+      ],
+      [
+        30494,
+        7777
+      ],
+      [
+        31973,
+        7777
+      ],
+      [
+        34077,
+        7777
+      ],
+      [
+        35184,
+        7777
+      ],
+      [
+        36709,
+        7777
+      ],
+      [
+        38789,
+        7777
+      ],
+      [
+        39827,
+        7777
+      ],
+      [
+        41377,
+        7777
+      ],
+      [
+        42870,
+        7777
+      ],
+      [
+        44899,
+        7777
+      ],
+      [
+        45928,
+        7777
+      ],
+      [
+        47431,
+        7777
+      ],
+      [
+        49392,
+        7777
+      ],
+      [
+        50443,
+        7777
+      ],
+      [
+        51965,
+        7777
+      ],
+      [
+        53717,
+        7777
+      ],
+      [
+        55010,
+        7777
+      ],
+      [
+        56997,
+        7777
+      ],
+      [
+        58043,
+        7595
+      ]
+    ],
+    "loader": [
+      [
+        466,
+        "Loading 3D scene…",
+        0,
+        0
+      ],
+      [
+        1409,
+        "Loading 3D scene · racks & conveyors…",
+        0,
+        0
+      ],
+      [
+        3172,
+        "Loading 3D scene · fleet & people…",
+        0,
+        0
+      ],
+      [
+        3342,
+        "Loading 3D scene · compiling shaders…",
+        0,
+        0
+      ],
+      [
+        8023,
+        "(gone)",
+        60,
+        30
+      ]
+    ],
+    "longTasks": [
+      [
+        368,
+        67
+      ],
+      [
+        877,
+        56
+      ],
+      [
+        936,
+        69
+      ],
+      [
+        1011,
+        318
+      ],
+      [
+        1415,
+        779
+      ],
+      [
+        2224,
+        933
+      ],
+      [
+        3177,
+        160
+      ],
+      [
+        3342,
+        96
+      ],
+      [
+        3449,
+        4491
+      ],
+      [
+        7940,
+        82
+      ],
+      [
+        8030,
+        1808
+      ],
+      [
+        9840,
+        2258
+      ],
+      [
+        12150,
+        2880
+      ],
+      [
+        15034,
+        2013
+      ],
+      [
+        17051,
+        89
+      ],
+      [
+        17142,
+        2512
+      ],
+      [
+        19656,
+        1719
+      ],
+      [
+        21377,
+        1275
+      ],
+      [
+        22652,
+        1725
+      ],
+      [
+        24379,
+        1729
+      ],
+      [
+        26110,
+        1861
+      ],
+      [
+        27976,
+        1031
+      ],
+      [
+        29008,
+        1486
+      ],
+      [
+        30500,
+        1474
+      ],
+      [
+        31975,
+        2102
+      ],
+      [
+        34078,
+        1107
+      ],
+      [
+        35192,
+        1518
+      ],
+      [
+        36711,
+        2079
+      ],
+      [
+        38795,
+        1034
+      ],
+      [
+        39829,
+        1548
+      ],
+      [
+        41378,
+        1492
+      ],
+      [
+        42873,
+        2026
+      ],
+      [
+        44901,
+        1028
+      ],
+      [
+        45931,
+        1500
+      ],
+      [
+        47432,
+        1960
+      ],
+      [
+        49394,
+        1049
+      ],
+      [
+        50445,
+        1523
+      ],
+      [
+        51969,
+        1748
+      ],
+      [
+        53718,
+        1293
+      ],
+      [
+        55012,
+        1985
+      ],
+      [
+        57256,
+        789
+      ]
+    ],
+    "lastCompileAt": 3686,
+    "parallelExt": false,
+    "linkFail": 0,
+    "ready": true,
+    "programsInfo": 30,
+    "quality": "low",
+    "now": 58049
+  },
+  "infoLog": [
+    {
+      "t": 0.93,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver) -> quality low",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 1.14,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 2.82,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 3.18,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 3.4,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 3.5,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    },
+    {
+      "t": 3.51,
+      "type": "info",
+      "text": "[gf] v3.2 shader warm-up 106 ms, programs 25",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 57.15,
+      "type": "warn",
+      "text": "[ASSERT] path end FL-11: pos err 1.1 cm, heading err 1.5 deg",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 57.26,
+      "type": "warn",
+      "text": "[ASSERT] path end FL-12: pos err 1.1 cm, heading err 1.5 deg",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    },
+    {
+      "t": 57.28,
+      "type": "info",
+      "text": "[ASSERT] fork-to-slot ok pickup FL-07 @ TRL-48213/P01: seat err 0.01 cm, xz err 0.00 cm",
+      "url": "https://raw.githack.com/winstonjaysa/WalmartWarehouse/e9d306e0898c596c1b7a9e00fa46fb818c31bf3e/index.html"
+    }
+  ],
+  "pass": false
+}

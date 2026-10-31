@@ -28,7 +28,7 @@ function drawWorker(w, i) {
   } else {
     R.position.set(x, y, z); R.rotation.set(0, yaw, 0);
     const gw = (p === 'pull' || p === 'push') ? gripOf(w.jack) : null;
-    if (p === 'pull') { R.updateMatrixWorld(true); wPull(R, gw ? gw.clone() : undefined); if (moving) { const a = ph * Math.PI * 2; P.hip_L.rotation.x = -0.4 * Math.sin(a); P.hip_R.rotation.x = 0.4 * Math.sin(a); } }
+    if (p === 'pull') { if (gw) { const cy = Math.cos(yaw), sy = Math.sin(yaw); R.position.x = gw.x + 0.2 * cy + 0.36 * sy; R.position.z = gw.z - 0.2 * sy + 0.36 * cy; } R.updateMatrixWorld(true); wPull(R, gw ? gw.clone() : undefined); P.spine.rotation.x = 0.04; P.hips.rotation.x = 0; P.spine.rotation.y = 0.08; P.neck.rotation.x = 0; if (gw) { R.updateMatrixWorld(true); wHands(R, gw.clone(), 'R'); } if (moving) { const a = ph * Math.PI * 2; P.hip_L.rotation.x = -0.4 * Math.sin(a); P.hip_R.rotation.x = 0.4 * Math.sin(a); } }
     else { if (moving) wWalk(R, ph); else wRest(R);
       const arm = (l, r, el = -0.3) => { P.shoulder_L.rotation.x = l; P.shoulder_R.rotation.x = r; P.elbow_L.rotation.x = P.elbow_R.rotation.x = el; };
       if (p === 'carry') { arm(-0.75, -0.75, -0.75); P.shoulder_L.rotation.z = -0.12; P.shoulder_R.rotation.z = 0.12; }
@@ -71,7 +71,7 @@ function render3d() {
   for (const g of GA) { if (g.st === 'carry') { const [x, y, z] = _hp(g.carrier); GARM.put(TRS(x, y + 0.45, z, g.carrier.yaw + Math.PI / 2), g.col); } else GARM.put(TRS(g.x, g.y, g.z, 0), g.col); }
   // Zebra handhelds: one in the receiver's hand while scanning, one riding on top of the first pop skid
   { const r = W.find((w) => w.torso === COL.dsd && w.tool); if (r && r.pose === 'scan') { const [x, y, z] = _hp(r); ZEBRA.visible = true; ZEBRA.position.set(x, y + 0.1, z); ZEBRA.rotation.set(-0.9, r.yaw, 0, 'YXZ'); } else ZEBRA.visible = false;
-    const ps = SK.find((s) => s.pop); if (ps) { ZEBRA2.position.set(ps.x + 0.1, ps.y + 0.5, ps.z + 0.15); ZEBRA2.rotation.set(-Math.PI / 2, ps.ry + 0.4, 0, 'YXZ'); } }
+    ZEBRA2.visible = false; const ps = null; if (ps) { ZEBRA2.position.set(ps.x + 0.1, ps.y + 0.5, ps.z + 0.15); ZEBRA2.rotation.set(-Math.PI / 2, ps.ry + 0.4, 0, 'YXZ'); } }
   for (const p of [PAL, CART, WRAP, BLOB, TOTE, DEV, CARTS, GARM]) p.end();
 }
 window.__sim = { get t() { return T; }, get JK() { return JK; }, get W() { return W; }, VEH, renderer, camera, scene, get workers() { return W.filter((w) => !w.sit).map((w) => ({ id: 'worker', type: 'associate', obj: w.obj })); } };

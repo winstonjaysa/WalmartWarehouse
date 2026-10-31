@@ -1,0 +1,337 @@
+{
+  "viewport": "desktop",
+  "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high",
+  "checks": {
+    "loader": {
+      "pass": true,
+      "detail": "loader removed at 5014ms",
+      "found": []
+    },
+    "frame": {
+      "pass": false,
+      "detail": "no canvas",
+      "ttffMs": 3846
+    },
+    "vehicles": {
+      "pass": false,
+      "method": "world positions via __sim.VEH + window.__step(3) sim-time fallback",
+      "wall": {
+        "movedN": 0,
+        "of": 21,
+        "simT": [
+          0.283,
+          0.35
+        ],
+        "simSecondsPerWallSecond": 0.01,
+        "maxD": 0.005
+      },
+      "sample": [
+        {
+          "id": "TRL-48213",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50177",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-71540",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-53390",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-66102",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "TRL-50311",
+          "type": "Road tractor + 53' trailer",
+          "d": 0
+        },
+        {
+          "id": "FL-07",
+          "type": "Counterbalance forklift",
+          "d": 0
+        },
+        {
+          "id": "FL-03",
+          "type": "Counterbalance forklift",
+          "d": 0
+        }
+      ],
+      "states": [
+        {
+          "id": "TRL-48213",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50177",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-71540",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-53390",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-66102",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "TRL-50311",
+          "state": "Arriving",
+          "task": "Gate check-in",
+          "ds": 0
+        },
+        {
+          "id": "FL-07",
+          "state": "Unloading",
+          "task": "TRL-48213/P01 → STG-DR005-1:2",
+          "ds": 0
+        },
+        {
+          "id": "FL-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-09",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RP-01",
+          "state": "Moving",
+          "task": "To STG-DR002-1:1",
+          "ds": 0
+        },
+        {
+          "id": "RP-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-04",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-05",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "RT-06",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "FL-11",
+          "state": "Loading",
+          "task": "To OB-DS-103",
+          "ds": 0
+        },
+        {
+          "id": "FL-12",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-01",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "HJ-03",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        },
+        {
+          "id": "WS-01",
+          "state": "Replenishment",
+          "task": "Approach WS-01-B",
+          "ds": 0.0036666666666666675
+        },
+        {
+          "id": "WS-02",
+          "state": "Idle",
+          "task": "—",
+          "ds": 0
+        }
+      ],
+      "sim": {
+        "simT": [
+          0.45,
+          null
+        ],
+        "movedN": 0,
+        "of": 0,
+        "maxD": 0,
+        "sample": []
+      },
+      "detail": "wall 2s: 0/21 moved, sim clock 0.283->0.35 (0.01 sim-s/wall-s); after __step(3) sim 0.45->null: 0/0 moved, max 0m"
+    },
+    "console": {
+      "pass": true,
+      "detail": "0 console.error, 0 pageerror"
+    },
+    "buttons": {
+      "pass": false,
+      "detail": "not reached (viewport budget 60s exceeded before button check)"
+    },
+    "programs": {
+      "pass": false,
+      "detail": "not reached (viewport budget 60s exceeded before button check)"
+    }
+  },
+  "metrics": {
+    "ttffScreenshotNonBlankMs": 3846,
+    "ttffPolls": 2,
+    "simSecondsPerWallSecond": 0.01
+  },
+  "console": [],
+  "pageErrors": [],
+  "notes": [
+    "poll error: timeout: screenshot >8000ms",
+    "snap a: timeout: screenshot >8000ms",
+    "snap b: timeout: canvas probe >4000ms",
+    "__step: Execution context was destroyed",
+    "FATAL: viewport budget 60s exceeded before button check",
+    "final dump failed: Attempted to use detached Frame 'EF068A83B9E9B29C0C648FA7D7550B65'."
+  ],
+  "state10": {
+    "hooks": {
+      "shaders": 110,
+      "programsLinked": 55,
+      "programsCreated": 55,
+      "draws": 27825,
+      "raf": 3,
+      "compileStatusPolls": 0,
+      "parallelExt": false,
+      "linkFail": 0,
+      "lastCompileAt": 5990,
+      "lastLinkAt": 5990,
+      "firstDrawFrameAt": 6005,
+      "framesWithDraws": 3
+    },
+    "globals": [
+      "__R",
+      "__sim",
+      "__ents",
+      "__dbg",
+      "__ready",
+      "__quality",
+      "scene",
+      "UI"
+    ],
+    "ready": true,
+    "quality": "high",
+    "renderer": {
+      "programs": 55,
+      "calls": 1,
+      "triangles": 1,
+      "frame": 15,
+      "geometries": 1822,
+      "textures": 63,
+      "autoReset": true
+    },
+    "camera": {
+      "p": [
+        -20,
+        95,
+        150
+      ],
+      "q": [
+        -0.3135,
+        -0.0222,
+        -0.0073,
+        0.9493
+      ],
+      "zoom": 1,
+      "fov": 28
+    }
+  },
+  "fatal": "viewport budget 60s exceeded before button check",
+  "hangDump": "page unresponsive: Attempted to use detached Frame 'EF068A83B9E9B29C0C648FA7D7550B65'.",
+  "infoLog": [
+    {
+      "t": 1.71,
+      "type": "info",
+      "text": "[gateflow] GL: ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version) -> quality high (lite GPU: AO/outline off)",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    },
+    {
+      "t": 2.63,
+      "type": "info",
+      "text": "[gf] rack cartons 19692 slots occupied 1641 / 2112",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    },
+    {
+      "t": 4.24,
+      "type": "info",
+      "text": "[gf] population [object Object]",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    },
+    {
+      "t": 4.62,
+      "type": "info",
+      "text": "[gf] v3.1 merged vehicle/people meshes 1516",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    },
+    {
+      "t": 4.84,
+      "type": "info",
+      "text": "[gf] v3.1 small parts no longer cast shadows: 1584",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    },
+    {
+      "t": 4.94,
+      "type": "warn",
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "url": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    },
+    {
+      "t": 4.95,
+      "type": "info",
+      "text": "[gf] v3.2 shader warm-up 89 ms, programs 25",
+      "url": "file:///workspace/gateflow/builds/walmart-dc_v3_2.html?q=high"
+    }
+  ],
+  "pass": false
+}
