@@ -3889,7 +3889,8 @@ const GL_INFO = (() => { try { const c = document.createElement('canvas'), g = c
   const e = g.getExtension('WEBGL_debug_renderer_info'), name = e ? String(g.getParameter(e.UNMASKED_RENDERER_WEBGL)) : 'unknown', maxTex = g.getParameter(g.MAX_TEXTURE_SIZE);
   g.getExtension('WEBGL_lose_context')?.loseContext(); return { weak: /swiftshader|llvmpipe|softpipe|software|basic render|mali-4|adreno \(tm\) 3/i.test(name) || maxTex < 8192, name }; } catch (e) { return { weak: true, name: 'error' }; } })();
 const Q = QS.get('q') || (GL_INFO.weak ? 'low' : 'high'), LOW = Q === 'low';
-console.info(`[gateflow] GL: ${GL_INFO.name} -> quality ${Q}`);
+const LITE_GPU = /apple|intel|radeon.*(vega|graphics)|integrated/i.test(GL_INFO.name) && !QS.has('ao'); // v3.2: Apple / integrated GPUs -> no AO, no outline (?ao forces both on)
+console.info(`[gateflow] GL: ${GL_INFO.name} -> quality ${Q}${LITE_GPU ? ' (lite GPU: AO/outline off)' : ''}`);
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: !LOW, powerPreference: 'high-performance', preserveDrawingBuffer: QS.has('capture') });
 const DPR_MAX = LOW ? 1 : Math.min(devicePixelRatio || 1, +(QS.get('dpr') || 1.5)); // v3.1: cap DPR (Retina 2.0 -> 1.5)
 renderer.setPixelRatio(DPR_MAX);
@@ -4992,8 +4993,8 @@ function setupPost() {
   const w = innerWidth, h = innerHeight, pr = renderer.getPixelRatio();
   const rt = new THREE.WebGLRenderTarget(w * pr, h * pr, { type: THREE.HalfFloatType, samples: 4 });
   composer = new EffectComposer(renderer, rt); composer.addPass(new RenderPass(scene, camera));
-  if (GTAOPass && !QS.has('noao')) { const g = new GTAOPass(scene, camera, w, h); g.output = GTAOPass.OUTPUT.Default; g.blendIntensity = 0.75; g.updateGtaoMaterial({ radius: 1.6, distanceExponent: 1.4, thickness: 1.2, scale: 1.0, samples: 12 }); composer.addPass(g); }
-  outline = new OutlinePass(new THREE.Vector2(w, h), scene, camera); outline.edgeStrength = 4; outline.edgeThickness = 1.2; outline.visibleEdgeColor.set(0x0071ce); outline.hiddenEdgeColor.set(0x0071ce); composer.addPass(outline);
+  if (GTAOPass && !QS.has('noao') && !LITE_GPU) { const g = new GTAOPass(scene, camera, w, h); g.output = GTAOPass.OUTPUT.Default; g.blendIntensity = 0.75; g.updateGtaoMaterial({ radius: 1.6, distanceExponent: 1.4, thickness: 1.2, scale: 1.0, samples: 12 }); composer.addPass(g); }
+  if (!LITE_GPU && !QS.has('nooutline')) { outline = new OutlinePass(new THREE.Vector2(w, h), scene, camera); outline.edgeStrength = 4; outline.edgeThickness = 1.2; outline.visibleEdgeColor.set(0x0071ce); outline.hiddenEdgeColor.set(0x0071ce); composer.addPass(outline); }
   composer.addPass(new OutputPass());
   composer.addPass(new SMAAPass(w * pr, h * pr));
 }
@@ -5089,7 +5090,9 @@ try { const _sph = new THREE.Sphere(), _sv = new THREE.Vector3(); let nc = 0; sc
   console.info('[gf] v3.1 small parts no longer cast shadows:', nc); } catch (e) { console.warn('[gf] shadow pass', e && e.message); }
 const __hideLoad = () => { const el = document.getElementById('gfLoad'); if (el) el.remove(); };
 await __yield(90, 'compiling shaders');
-try { await renderer.compileAsync(scene, camera); } catch (e) { console.warn('compileAsync', e); }
+{ const t0 = performance.now(); let to = 0; // v3.2: never block the loader on shader compilation (hung on some Macs): hard 3 s cap
+  try { await Promise.race([renderer.compileAsync(scene, camera).catch((e) => console.warn('[gf] compileAsync', e && e.message)), new Promise((r) => setTimeout(() => { to = 1; r(); }, 3000))]); } catch (e) { console.warn('[gf] compileAsync', e && e.message); }
+  console.info('[gf] v3.2 shader warm-up', Math.round(performance.now() - t0) + ' ms' + (to ? ' (timed out, continuing)' : '') + ', programs ' + (renderer.info.programs ? renderer.info.programs.length : '?')); }
 __hideLoad();
 window.__sim = { VEH, PALS, SLOTS, LOC, COUNTS, ASSERT, get t() { return SIMT; } };
 window.__quality = Q; window.__assert = ASSERT; window.__ready = true; window.__R = { renderer, scene, camera, sun, get composer() { return composer; } };
