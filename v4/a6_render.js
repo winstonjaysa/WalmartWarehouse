@@ -22,7 +22,7 @@ function drawWorker(w, i) {
   const R = w.rig, P = R.userData.pivots, V = WVAR[w.vi];
   const moving = w.ph !== w._lph; w._lph = w.ph; const p = w.pose, ph = ((w.ph / (Math.PI * 2)) % 1 + 1) % 1;
   if (w.sit) {
-    if (w.seat && w.seat.obj) wSeat(R, w.seat.obj);
+    if (w.seat && w.seat.obj) { wSeat(R, w.seat.obj); w.seat.obj.updateWorldMatrix(true, false); }
     else { if (w.seatOf) { const o = w.seatOf; _P.set(w.seat[0], w.seat[1], w.seat[2]); o.localToWorld(_P); x = _P.x; y = _P.y; z = _P.z; yaw = o.rotation.y; }
       if (R.parent) R.parent.remove(R); wSeat(R); R.position.set(x, y - R.userData.hipHeight, z); R.rotation.set(0, yaw, 0); }
   } else {

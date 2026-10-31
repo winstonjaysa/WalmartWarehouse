@@ -13,22 +13,22 @@
       "console": true
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 1501,
-      "simSecondsPerWallSecond": 0.108,
-      "fpsWindowS": 2,
-      "avgFps": 2.49,
-      "drawsPerFrameHookWindow": 123,
-      "ttffMs": 3595,
+      "ttffScreenshotNonBlankMs": 1465,
+      "simSecondsPerWallSecond": 0.2,
+      "fpsWindowS": 8.8,
+      "avgFps": 5.09,
+      "drawsPerFrameHookWindow": 53.1,
+      "ttffMs": 3935,
       "shaders": 44,
       "programsHook": 22,
       "programsPage": 22,
-      "drawsPerFramePage": 133,
-      "drawsPerFrameHook": 135.4,
-      "longestTaskMs": 471,
+      "drawsPerFramePage": 48,
+      "drawsPerFrameHook": 104,
+      "longestTaskMs": 373,
       "top3LongTasks": [
-        "471ms @888ms",
-        "308ms @2888ms",
-        "262ms @1775ms"
+        "373ms @3191ms",
+        "294ms @2285ms",
+        "218ms @35325ms"
       ],
       "longTaskCount": 20,
       "loaderTimeline": [
@@ -39,13 +39,13 @@
           0
         ],
         [
-          1752,
+          1948,
           "(gone)",
           16,
           8
         ]
       ],
-      "loaderGoneMs": 1752,
+      "loaderGoneMs": 1948,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",

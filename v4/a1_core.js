@@ -23,6 +23,7 @@ import { build as buildTraining } from '../parts/v4/trainingRoom.js';
 import { build as buildLunch } from '../parts/v4/lunchRoom.js';
 import { build as buildSick } from '../parts/v4/sickRoom.js';
 import { build as buildCleaning } from '../parts/v4/cleaningRoom.js';
+import { build as buildBale } from '../parts/v4/cardboardBale.js';
 import { build as buildStairs } from '../parts/v4/stairs.js';
 import { build as buildBev, setWrapped as bevSetWrapped } from '../parts/v4/beverageSkid.js';
 

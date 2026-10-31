@@ -146,6 +146,8 @@ sign(textSign(['Receiving', 'Check-in · invoices · memos'], { w: 768, h: 192 }
 await __yield();
 // Baler + compactor (west wall) — Inky's models
 const BALER = buildBaler(THREE, PM, { doorOpen: 0, platenY: 1, fill: 0.35 }); BALER.rotation.y = Math.PI / 2; BALER.position.set(-19.4, 0, -3.2); scene.add(BALER);
+// finished OCC bales on pallets beside the baler (Inky cardboardBale.js)
+for (const [z, sd] of [[-5.4, 2], [-6.8, 5], [-8.2, 9]]) { const b = buildBale(THREE, PM, { seed: sd, pallet: true, straps: 5 }); b.position.set(-19.25, 0, z); b.rotation.y = Math.PI / 2 + (sd % 3 - 1) * 0.04; scene.add(b); }
 sign(textSign(['Cardboard baler'], { w: 512, h: 96, size: 0.46 }), 1.8, 0.34, -19.97, 3.6, -3.2, Math.PI / 2);
 const COMPACTOR = buildCompactor(THREE, PM, { wall: true }); COMPACTOR.rotation.y = Math.PI; COMPACTOR.position.set(-20 - COMPACTOR.userData.wallX, 0, 1.2); scene.add(COMPACTOR);
 S.box(4.2, -GROUND, 2.6, -22.3, GROUND / 2, 1.2, '#8e8f8c'); // exterior concrete pad under the compactor body

@@ -5,12 +5,12 @@ OUT /workspace/gateflow/qa/smoke_out/v4_phone_run2
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
 phone    | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[phone] TTFF=3797ms loaderGone=2263ms fps=6.68 draws/frame hook=82.7 page=64 programs page=22 hook=22 shaders=44 longest=420ms top3=[420ms @3136ms, 339ms @1923ms, 278ms @2269ms] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 2263 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":184.4,"sd":70.16,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.01951,"meanAbs":0.721}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 5/21 moved; sim 1.917->2.334 (0.208 sim-s/wall-s)
-  nav: PASS - next:ok caption changed, cam 24.006; prev:ok caption changed, cam 11.414; wheel:ok caption changed, cam 25.25; touch-swipe:ok caption changed, cam 19.859; scrollBy:ok caption changed, cam 1.171
+[phone] TTFF=3349ms loaderGone=1779ms fps=6.4 draws/frame hook=89.3 page=77 programs page=22 hook=22 shaders=44 longest=374ms top3=[374ms @2760ms, 264ms @1787ms, 208ms @1436ms] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 1779 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":184.3,"sd":70.23,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.02717,"meanAbs":1.293}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 6/21 moved; sim 2.167->2.583 (0.208 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 10.035; prev:ok caption changed, cam 17.152; wheel:ok caption changed, cam 33.706; touch-swipe:ok caption changed, cam 24.258; scrollBy:ok caption changed, cam 22.402
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 82.7/frame (window avg 61.6), page renderer.info.render.calls 64 (limit <300)
+  draws: PASS - GL hook 89.3/frame (window avg 66.5), page renderer.info.render.calls 77 (limit <300)
   programs: PASS - renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)
-  longtask: PASS - longest 420 ms (limit <500); top3 420ms @3136ms, 339ms @1923ms, 278ms @2269ms; 19 long tasks
+  longtask: PASS - longest 374 ms (limit <500); top3 374ms @2760ms, 264ms @1787ms, 208ms @1436ms; 15 long tasks

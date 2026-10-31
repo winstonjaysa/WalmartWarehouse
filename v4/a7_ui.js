@@ -3,21 +3,22 @@
 const STEPS = [...document.querySelectorAll('.step')].map((el) => ({ el, id: el.dataset.cam }));
 const CAMS = {
   hero: [[24, 31, 45], [-3.5, -2, 4]],
-  truck: [[7.2, 1.6, 8.6], [8.2, 1.25, 17.5]],
-  breakdown: [[-2.2, 2.3, 7.6], [-5.9, 1.0, 14.6]],
+  truck: [[7.2, 3.2, 8.0], [8.2, 1.25, 17.5]],
+  breakdown: [[-0.8, 3.3, 6.6], [4.0, 0.7, 10.4]],
   roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
   sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
-  floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [-3.5, 5.2, 3.5]],
+  floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [3.2, 1.7, 1.6]],
   stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · Dept 46 skid (1 person)', [-3.0, 4.9, 2.8]],
   dsd: [[-10.4, 1.75, 3.6], [-16.2, 0.9, 9.6]],
   bev: [[-13.0, 3.2, 10.4], [-16.3, 0.8, 7.0], '@bev', [2.6, 2.9, 2.4]],
-  milk: [[-3.6, 7.6, -6.4], [-3.6, 0.4, -14.2], '@milk', [1.8, 6.6, 4.2]],
-  snack: [[3, 8.5, 37], [-11.5, 0, 22]],
+  milk: [[3.0, 3.0, -12.3], [-4.2, 0.3, -16.3]],
+  snack: [[3, 8.5, 37], [-11.5, 0, 22], '@snackcab', [-4.6, 1.6, 1.6]],
   pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6]],
-  baler: [[-13.0, 1.8, -5.4], [-19, 1.3, -1.6]],
+  baler: [[-12.4, 2.6, -1.4], [-19, 1.0, -4.0]],
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
+  stairs: [[-13.5, 6.5, 16.5], [-21.2, 2.4, 8.6]],
   upstairs: [[-29, 23, 23], [-34.5, 4.2, 0]],
   overview: [[-26, 30, 40], [6, -1, 2]],
 };
@@ -68,9 +69,10 @@ function camLook() { // fov: narrow (iso-like) when high, wide at eye level; cut
   const cut = y > 4.6; if (cut !== cutaway) { cutaway = cut; UPPER.visible = !cut; LIGHTS_MESH.visible = !cut; } }
 addEventListener('resize', resize);
 const _lv = new THREE.Vector3();
-function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
+const _cabV = new THREE.Vector3();
+function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; if (c[2] === '@snackcab') { const sp = SNACK.tractor.userData.seatPoint; if (sp && sp.object) return sp.object.getWorldPosition(_cabV); return SNACK.tractor.localToWorld(_cabV.set(0.55, 1.95, 2.2)); } const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
-  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) items.push({ t: r.text, x: r.w.x, y: 2.05, z: r.w.z, k: 'who' });
+  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05, z: js ? js.z : r.w.z, k: 'who' }); }
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;
   for (const it of items) { if (n >= LPOOL.length) break; _lv.set(it.x, it.y, it.z).project(camera); if (_lv.z > 1 || Math.abs(_lv.x) > 1.05 || Math.abs(_lv.y) > 1.05) continue; const sx = (_lv.x + 1) / 2 * W_, sy = (1 - _lv.y) / 2 * H_; if (cardR && sx > cardR.left - 80 && sx < cardR.right + 80 && sy > cardR.top - 10 && sy < cardR.bottom + 40) continue; const d = LPOOL[n++]; d.textContent = it.t; d.className = 'lbl ' + it.k; d.style.transform = `translate(${((_lv.x + 1) / 2 * W_).toFixed(0)}px,${((1 - _lv.y) / 2 * H_).toFixed(0)}px) translate(-50%,-100%)`; d.style.display = 'block'; }
   for (; n < LPOOL.length; n++) LPOOL[n].style.display = 'none'; }
