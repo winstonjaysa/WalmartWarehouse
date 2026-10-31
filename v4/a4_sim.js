@@ -132,7 +132,12 @@ const snackTrailerV = { id: 'snack-vendor-trailer', type: 'trailer', obj: SNACK.
 // Red beverage-vendor box truck parked at the DSD door (rear door rolled up), driver in the cab.
 const BOXT = buildBoxTruck(THREE, PM, {}); BOXT.position.set(DOORS.DSD.x, GROUND, 12.3 + 4.3); setRearDoor(BOXT, 1); scene.add(BOXT);
 // pop skids (Inky) and pharmacy totes (Inky), handheld scanner (Inky)
-const POPS = [['mixed', 3], ['mixed', 8], ['uniform', 5]].map(([mix, seed]) => { const g = buildBev(THREE, PM, { seed, mix, wrapped: true, palletColor: 'blue', detail: 'low' }); scene.add(g); return g; }); // beverage DSD skids (no logos)
+// beverage cases: tint the procedural rainbow down to realistic muted case colours (dark red, navy, silver, green, charcoal); clear bottles untouched
+function mutePop(g) { const PAL = [0x7a2226, 0x1f3357, 0x8d9399, 0x2e5236, 0x2b2c30, 0x5b1d2a].map((h) => new THREE.Color(h)); const hsl = {};
+  g.traverse((o) => { if (!o.isMesh || o.name === 'pallet' || o === g.userData.wrap || (o.material && o.material.transparent)) return; const c = o.geometry.attributes.color; if (!c) return; const C = new THREE.Color();
+    for (let i = 0; i < c.count; i++) { C.setRGB(c.getX(i), c.getY(i), c.getZ(i)); C.getHSL(hsl); if (hsl.s < 0.18) continue; const k = PAL[Math.floor(((hsl.h * 6) + 0.5) % 6)]; const f = 0.75 + hsl.l * 0.5; c.setXYZ(i, Math.min(1, k.r * f), Math.min(1, k.g * f), Math.min(1, k.b * f)); }
+    c.needsUpdate = true; }); }
+const POPS = [['mixed', 3], ['mixed', 8], ['uniform', 5]].map(([mix, seed]) => { const g = buildBev(THREE, PM, { seed, mix, wrapped: true, palletColor: 'blue', detail: 'low' }); mutePop(g); scene.add(g); return g; }); // beverage DSD skids (no logos)
 // McKesson pharmacy pallet: 3 sealed totes per layer (2 or 3 layers by seed), 2-4 cartons on top, whole stack stretch-wrapped, delivery memo on top of the film
 const MEMO_CELL = textSign(['DELIVERY MEMO', 'count totes · sign'], { w: 384, h: 256, bg: '#fbfbf7', fg: '#222', sub: '#555', border: '#9aa', size: 0.42 }); atlasTex.needsUpdate = true;
 function mkMcPallet(layers, seedN) { const G = new THREE.Group(); const r = (() => { let q = seedN * 7919 + 13; return () => ((q = (q * 9301 + 49297) % 233280) / 233280); })();

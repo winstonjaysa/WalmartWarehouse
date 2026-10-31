@@ -5,12 +5,12 @@ OUT /workspace/gateflow/qa/smoke_out/v4_desktop_run1
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
 desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[desktop] TTFF=3759ms loaderGone=2059ms fps=4.74 draws/frame hook=117.7 page=48 programs page=22 hook=22 shaders=44 longest=474ms top3=[474ms @852ms, 419ms @1636ms, 415ms @2964ms] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 2059 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":168.1,"sd":60.35,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.06004,"meanAbs":2.493}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 4/21 moved; sim 1.85->2.267 (0.208 sim-s/wall-s)
-  nav: PASS - next:ok caption changed, cam 3.928; prev:ok caption changed, cam 14.934; dot:ok caption changed, cam 2.246; wheel:ok caption changed, cam 41.802
+[desktop] TTFF=3646ms loaderGone=1736ms fps=3.75 draws/frame hook=121.7 page=95 programs page=22 hook=22 shaders=44 longest=457ms top3=[457ms @871ms, 265ms @3039ms, 262ms @1748ms] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 1736 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":168,"sd":60.46,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.05999,"meanAbs":2.492}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 3/21 moved; sim 2.1->2.333 (0.116 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 9.811; prev:ok caption changed, cam 5.267; dot:ok caption changed, cam 1.675; wheel:ok caption changed, cam 33.085
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 117.7/frame (window avg 57.2), page renderer.info.render.calls 48 (limit <300)
+  draws: PASS - GL hook 121.7/frame (window avg 98.1), page renderer.info.render.calls 95 (limit <300)
   programs: PASS - renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)
-  longtask: PASS - longest 474 ms (limit <500); top3 474ms @852ms, 419ms @1636ms, 415ms @2964ms; 21 long tasks
+  longtask: PASS - longest 457 ms (limit <500); top3 457ms @871ms, 265ms @3039ms, 262ms @1748ms; 21 long tasks

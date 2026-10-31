@@ -36,8 +36,9 @@ function drawWorker(w, i) {
       else if (p === 'pump') { P.spine.rotation.x = 0.18; if (gw) { R.updateMatrixWorld(true); wHands(R, gw.clone(), 'R'); } else arm(0.1, -0.9 + Math.sin(T * 10) * 0.45); }
       else if (p === 'bend') { P.spine.rotation.x = 0.7; P.hips.rotation.x = 0.2; P.hip_L.rotation.x = P.hip_R.rotation.x = -0.35; P.knee_L.rotation.x = P.knee_R.rotation.x = 0.55; P.hips.position.y = 0.86; arm(-1.25, -1.25, -0.4); }
       else if (p === 'reach') arm(-1.35, -1.35, -0.25);
+      else if (p === 'cut') { P.spine.rotation.x = 0.12; P.shoulder_R.rotation.x = -1.25 + Math.sin(T * 5) * 0.25; P.shoulder_R.rotation.z = -0.2; P.elbow_R.rotation.x = -0.45; P.shoulder_L.rotation.x = -0.95; P.elbow_L.rotation.x = -0.6; }
       else if (p === 'reachHi') arm(-2.6, -2.6, -0.15);
-      else if (p === 'scan') { P.shoulder_R.rotation.x = -1.0; P.elbow_R.rotation.x = -0.9; P.shoulder_L.rotation.x = -0.7; P.elbow_L.rotation.x = -0.9; } }
+      else if (p === 'scan') { P.shoulder_R.rotation.x = -1.45; P.elbow_R.rotation.x = -0.75; P.shoulder_L.rotation.x = -0.7; P.elbow_L.rotation.x = -0.9; } }
   }
   R.updateMatrixWorld(true);
   for (let k = 0; k < V.parts.length; k++) { const pool = V.pools[k]; if (pool.count >= 48) continue; _M1.multiplyMatrices(w.rp[k].matrixWorld, V.parts[k].m); pool.setMatrixAt(pool.count++, _M1); }

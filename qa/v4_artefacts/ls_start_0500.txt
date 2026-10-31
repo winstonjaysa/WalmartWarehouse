@@ -1,0 +1,36 @@
+-rw-r--r-- 1 box box 210712 2026-10-31 05:00:16.627071240 -0400 preview/v4_01_truck.png
+-rw-r--r-- 1 box box 411122 2026-10-31 05:00:16.627071240 -0400 preview/v4_02_breakdown.png
+-rw-r--r-- 1 box box 480780 2026-10-31 05:00:16.631071236 -0400 preview/v4_03_roller.png
+-rw-r--r-- 1 box box 797550 2026-10-31 05:00:16.631071236 -0400 preview/v4_04_sort.png
+-rw-r--r-- 1 box box 222227 2026-10-31 05:00:16.631071236 -0400 preview/v4_05_floor.png
+-rw-r--r-- 1 box box 301319 2026-10-31 05:00:16.635071232 -0400 preview/v4_06_stock.png
+-rw-r--r-- 1 box box 380226 2026-10-31 05:00:16.635071232 -0400 preview/v4_07_milk.png
+-rw-r--r-- 1 box box 339375 2026-10-31 05:00:16.639071228 -0400 preview/v4_08_dsd.png
+-rw-r--r-- 1 box box 374532 2026-10-31 05:00:16.639071228 -0400 preview/v4_09_bev.png
+-rw-r--r-- 1 box box 178099 2026-10-31 05:00:16.639071228 -0400 preview/v4_10_snack.png
+-rw-r--r-- 1 box box 284829 2026-10-31 05:00:16.639071228 -0400 preview/v4_11_pharm.png
+-rw-r--r-- 1 box box 391186 2026-10-31 05:00:16.643071225 -0400 preview/v4_12_baler.png
+-rw-r--r-- 1 box box 268260 2026-10-31 05:00:16.643071225 -0400 preview/v4_13_omni.png
+-rw-r--r-- 1 box box 277579 2026-10-31 05:00:16.643071225 -0400 preview/v4_14_fashion.png
+-rw-r--r-- 1 box box 306070 2026-10-31 05:00:16.647071220 -0400 preview/v4_15_claims.png
+-rw-r--r-- 1 box box 291937 2026-10-31 05:00:16.647071220 -0400 preview/v4_16_stairs.png
+-rw-r--r-- 1 box box 171737 2026-10-31 05:00:16.651071216 -0400 preview/v4_17_upstairs.png
+-rw-r--r-- 1 box box 571399 2026-10-31 05:00:16.651071216 -0400 preview/v4_18_overview.png
+-rw-r--r-- 1 box box 540312 2026-10-31 05:00:16.651071216 -0400 preview/v4_desktop.png
+-rw-r--r-- 1 box box 157064 2026-10-31 05:00:16.655071212 -0400 preview/v4_phone.png
+
+parts/v4/preview:
+total 12444
+drwxr-xr-x 2 box box    4096 2026-10-31 04:24:54.121188619 -0400 .
+drwxr-xr-x 3 box box    4096 2026-10-31 04:23:47.905192777 -0400 ..
+-rw-r--r-- 1 box box  181649 2026-10-31 04:24:17.997193349 -0400 cardboardBale.png
+-rw-r--r-- 1 box box  530536 2026-10-31 04:24:54.213188599 -0400 cardboardBale_crop.png
+-rw-r--r-- 1 box box   12104 2026-10-31 04:23:47.905192777 -0400 contact.html
+-rw-r--r-- 1 box box   10968 2026-10-31 04:17:31.720716245 -0400 floor1_test.html
+-rw-r--r-- 1 box box 1367722 2026-10-31 04:18:02.996798021 -0400 floor1_test.png
+-rw-r--r-- 1 box box    3708 2026-10-31 03:29:23.369940454 -0400 trucks_test.html
+-rw-r--r-- 1 box box  261755 2026-10-31 03:29:27.141933867 -0400 trucks_test.png
+-rw-r--r-- 1 box box 5029936 2026-10-31 04:24:30.361192377 -0400 v4_models.png
+-rw-r--r-- 1 box box 5029936 2026-10-31 04:24:32.981192083 -0400 v4_models_final.png
+-rw-r--r-- 1 box box    2716 2026-10-31 03:27:22.258065174 -0400 worker_test.html
+-rw-r--r-- 1 box box  286503 2026-10-31 03:29:28.501931454 -0400 worker_test.png

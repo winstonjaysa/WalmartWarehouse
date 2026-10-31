@@ -5,12 +5,12 @@ OUT /workspace/gateflow/qa/smoke_out/v4_mac_run1
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
 desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[desktop] TTFF=3935ms loaderGone=1948ms fps=5.09 draws/frame hook=104 page=48 programs page=22 hook=22 shaders=44 longest=373ms top3=[373ms @3191ms, 294ms @2285ms, 218ms @35325ms] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 1948 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":168.1,"sd":60.35,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.02,"meanAbs":0.846}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 5/21 moved; sim 1.283->1.683 (0.2 sim-s/wall-s)
-  nav: PASS - next:ok caption changed, cam 6.809; prev:ok caption changed, cam 3.844; dot:ok caption changed, cam 7.764; wheel:ok caption changed, cam 34.439
+[desktop] TTFF=4063ms loaderGone=2279ms fps=3.78 draws/frame hook=116.5 page=94 programs page=22 hook=22 shaders=44 longest=388ms top3=[388ms @1889ms, 375ms @3234ms, 296ms @2288ms] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 2279 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":168,"sd":60.46,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.0127,"meanAbs":0.558}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 4/21 moved; sim 0.966->1.366 (0.199 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 6.812; prev:ok caption changed, cam 1.662; dot:ok caption changed, cam 3.437; wheel:ok caption changed, cam 40.763
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 104/frame (window avg 53.1), page renderer.info.render.calls 48 (limit <300)
+  draws: PASS - GL hook 116.5/frame (window avg 97.6), page renderer.info.render.calls 94 (limit <300)
   programs: PASS - renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)
-  longtask: PASS - longest 373 ms (limit <500); top3 373ms @3191ms, 294ms @2285ms, 218ms @35325ms; 20 long tasks
+  longtask: PASS - longest 388 ms (limit <500); top3 388ms @1889ms, 375ms @3234ms, 296ms @2288ms; 22 long tasks

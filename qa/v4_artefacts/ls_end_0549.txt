@@ -1,0 +1,56 @@
+listing at 2026-10-31 05:59:40 EDT
+-rw-r--r-- 1 box box 240490 2026-10-31 05:49:39.940685355 -0400 preview/v4_01_truck.png
+-rw-r--r-- 1 box box 423351 2026-10-31 05:49:39.940685355 -0400 preview/v4_02_breakdown.png
+-rw-r--r-- 1 box box 482388 2026-10-31 05:49:39.940685355 -0400 preview/v4_03_roller.png
+-rw-r--r-- 1 box box 797397 2026-10-31 05:49:39.944685522 -0400 preview/v4_04_sort.png
+-rw-r--r-- 1 box box 202368 2026-10-31 05:49:39.944685522 -0400 preview/v4_05_floor.png
+-rw-r--r-- 1 box box 308870 2026-10-31 05:49:39.944685522 -0400 preview/v4_06_stock.png
+-rw-r--r-- 1 box box 385260 2026-10-31 05:49:39.948685689 -0400 preview/v4_07_milk.png
+-rw-r--r-- 1 box box 416967 2026-10-31 05:49:39.948685689 -0400 preview/v4_08_dsd.png
+-rw-r--r-- 1 box box 371218 2026-10-31 05:49:39.948685689 -0400 preview/v4_09_bev.png
+-rw-r--r-- 1 box box 185030 2026-10-31 05:49:39.952685856 -0400 preview/v4_10_snack.png
+-rw-r--r-- 1 box box 289091 2026-10-31 05:49:39.952685856 -0400 preview/v4_11_pharm.png
+-rw-r--r-- 1 box box 391229 2026-10-31 05:49:39.952685856 -0400 preview/v4_12_baler.png
+-rw-r--r-- 1 box box 268130 2026-10-31 05:49:39.956686023 -0400 preview/v4_13_omni.png
+-rw-r--r-- 1 box box 278390 2026-10-31 05:49:39.956686023 -0400 preview/v4_14_fashion.png
+-rw-r--r-- 1 box box 306752 2026-10-31 05:49:39.956686023 -0400 preview/v4_15_claims.png
+-rw-r--r-- 1 box box 316832 2026-10-31 05:49:39.960686190 -0400 preview/v4_16_stairs.png
+-rw-r--r-- 1 box box 171830 2026-10-31 05:49:39.960686190 -0400 preview/v4_17_upstairs.png
+-rw-r--r-- 1 box box 572331 2026-10-31 05:49:39.960686190 -0400 preview/v4_18_overview.png
+-rw-r--r-- 1 box box 541960 2026-10-31 05:49:39.964686357 -0400 preview/v4_desktop.png
+-rw-r--r-- 1 box box 161240 2026-10-31 05:49:39.964686357 -0400 preview/v4_phone.png
+
+parts/v4/preview/:
+total 12444
+drwxr-xr-x 2 box box    4096 2026-10-31 04:24:54.121188619 -0400 .
+drwxr-xr-x 3 box box    4096 2026-10-31 04:23:47.905192777 -0400 ..
+-rw-r--r-- 1 box box  181649 2026-10-31 04:24:17.997193349 -0400 cardboardBale.png
+-rw-r--r-- 1 box box  530536 2026-10-31 04:24:54.213188599 -0400 cardboardBale_crop.png
+-rw-r--r-- 1 box box   12104 2026-10-31 04:23:47.905192777 -0400 contact.html
+-rw-r--r-- 1 box box   10968 2026-10-31 04:17:31.720716245 -0400 floor1_test.html
+-rw-r--r-- 1 box box 1367722 2026-10-31 04:18:02.996798021 -0400 floor1_test.png
+-rw-r--r-- 1 box box    3708 2026-10-31 03:29:23.369940454 -0400 trucks_test.html
+-rw-r--r-- 1 box box  261755 2026-10-31 03:29:27.141933867 -0400 trucks_test.png
+-rw-r--r-- 1 box box 5029936 2026-10-31 04:24:30.361192377 -0400 v4_models.png
+-rw-r--r-- 1 box box 5029936 2026-10-31 04:24:32.981192083 -0400 v4_models_final.png
+-rw-r--r-- 1 box box    2716 2026-10-31 03:27:22.258065174 -0400 worker_test.html
+-rw-r--r-- 1 box box  286503 2026-10-31 03:29:28.501931454 -0400 worker_test.png
+total 548
+drwxr-xr-x  3 box box   4096 2026-10-31 05:48:40.064545599 -0400 .
+drwxr-xr-x 18 box box   4096 2026-10-31 04:38:12.052168347 -0400 ..
+-rw-r--r--  1 box box  16490 2026-10-31 04:45:26.767268983 -0400 a1_core.js
+-rw-r--r--  1 box box  25231 2026-10-31 04:33:09.376699419 -0400 a2_static.js
+-rw-r--r--  1 box box   5315 2026-10-31 03:18:36.903514125 -0400 a3_inst.js
+-rw-r--r--  1 box box  22449 2026-10-31 05:25:13.076510263 -0400 a4_sim.js
+-rw-r--r--  1 box box  28804 2026-10-31 05:36:38.266459610 -0400 a5_brains.js
+-rw-r--r--  1 box box   9612 2026-10-31 05:26:47.436202957 -0400 a6_render.js
+-rw-r--r--  1 box box  13447 2026-10-31 05:48:40.064545599 -0400 a7_ui.js
+-rw-r--r--  1 box box   9022 2026-10-31 04:33:09.376699419 -0400 body.html
+-rw-r--r--  1 box box   2643 2026-10-31 03:30:24.177816585 -0400 build_v4.py
+-rw-r--r--  1 box box 121578 2026-10-31 05:48:40.104544253 -0400 main.js
+-rw-r--r--  1 box box   1991 2026-10-31 05:48:40.740522843 -0400 news.json
+drwxr-xr-x  5 box box   4096 2026-10-31 03:06:53.219470283 -0400 node_modules
+-rw-r--r--  1 box box 232242 2026-10-31 05:48:40.128543445 -0400 out.js
+-rw-r--r--  1 box box  12907 2026-10-31 03:06:53.219470283 -0400 package-lock.json
+-rw-r--r--  1 box box    290 2026-10-31 03:06:53.215470007 -0400 package.json
+-rw-r--r--  1 box box   6063 2026-10-31 04:11:12.668234668 -0400 style.css

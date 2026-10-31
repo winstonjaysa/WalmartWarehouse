@@ -5,7 +5,7 @@
   "checks": {
     "frame": {
       "pass": true,
-      "detail": "stats {\"mean\":168.1,\"sd\":60.35,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.06004,\"meanAbs\":2.493}"
+      "detail": "stats {\"mean\":168,\"sd\":60.46,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.05999,\"meanAbs\":2.492}"
     },
     "movers": {
       "pass": true,
@@ -15,13 +15,13 @@
       ],
       "wall": {
         "vehicles": "0/3",
-        "workers": "4/21",
+        "workers": "3/21",
         "any": true,
         "simT": [
-          1.85,
-          2.267
+          2.1,
+          2.333
         ],
-        "rate": 0.208
+        "rate": 0.116
       },
       "sample": [
         {
@@ -42,17 +42,17 @@
         {
           "id": "workers[0]:worker",
           "kind": "worker",
-          "d": 0.031
+          "d": 0.198
         },
         {
           "id": "workers[1]:worker",
           "kind": "worker",
-          "d": 0.521
+          "d": 0
         },
         {
           "id": "workers[2]:worker",
           "kind": "worker",
-          "d": 0
+          "d": 0.042
         },
         {
           "id": "workers[3]:worker",
@@ -75,7 +75,7 @@
           "d": 0
         }
       ],
-      "detail": "2 s wall: vehicles 0/3, workers 4/21 moved; sim 1.85->2.267 (0.208 sim-s/wall-s)"
+      "detail": "2 s wall: vehicles 0/3, workers 3/21 moved; sim 2.1->2.333 (0.116 sim-s/wall-s)"
     },
     "nav": {
       "pass": true,
@@ -110,13 +110,13 @@
           "ok": true,
           "captionChanged": true,
           "cameraMoved": true,
-          "camDelta": 3.928,
-          "imgDiff": 0.98268,
+          "camDelta": 9.811,
+          "imgDiff": 0.98284,
           "captionBefore": "What happens in the backroom while the store sleeps",
           "captionAfter": "Unloading the trailer",
           "scrollY": [
             0,
-            880
+            900
           ],
           "err": null
         },
@@ -125,13 +125,13 @@
           "ok": true,
           "captionChanged": true,
           "cameraMoved": true,
-          "camDelta": 14.934,
-          "imgDiff": 0.98768,
+          "camDelta": 5.267,
+          "imgDiff": 0.98765,
           "captionBefore": "Unloading the trailer",
           "captionAfter": "What happens in the backroom while the store sleeps",
           "scrollY": [
             900,
-            179
+            259
           ],
           "err": null
         },
@@ -140,8 +140,8 @@
           "ok": true,
           "captionChanged": true,
           "cameraMoved": true,
-          "camDelta": 2.246,
-          "imgDiff": 0.9821,
+          "camDelta": 1.675,
+          "imgDiff": 0.98247,
           "captionBefore": "What happens in the backroom while the store sleeps",
           "captionAfter": "Unloading the trailer",
           "scrollY": [
@@ -155,7 +155,7 @@
           "ok": true,
           "captionChanged": true,
           "cameraMoved": true,
-          "camDelta": 41.802,
+          "camDelta": 33.085,
           "imgDiff": 0,
           "captionBefore": "Unloading the trailer",
           "captionAfter": "Mixed skids, stretch-wrapped",
@@ -167,11 +167,11 @@
           "method": "wheel"
         }
       ],
-      "detail": "next:ok caption changed, cam 3.928; prev:ok caption changed, cam 14.934; dot:ok caption changed, cam 2.246; wheel:ok caption changed, cam 41.802"
+      "detail": "next:ok caption changed, cam 9.811; prev:ok caption changed, cam 5.267; dot:ok caption changed, cam 1.675; wheel:ok caption changed, cam 33.085"
     },
     "loader": {
       "pass": true,
-      "detail": "loader gone at 2059 ms (limit 3000); last text \"Loading the backroom…\""
+      "detail": "loader gone at 1736 ms (limit 3000); last text \"Loading the backroom…\""
     },
     "programs": {
       "pass": true,
@@ -179,11 +179,11 @@
     },
     "draws": {
       "pass": true,
-      "detail": "GL hook 117.7/frame (window avg 57.2), page renderer.info.render.calls 48 (limit <300)"
+      "detail": "GL hook 121.7/frame (window avg 98.1), page renderer.info.render.calls 95 (limit <300)"
     },
     "longtask": {
       "pass": true,
-      "detail": "longest 474 ms (limit <500); top3 474ms @852ms, 419ms @1636ms, 415ms @2964ms; 21 long tasks"
+      "detail": "longest 457 ms (limit <500); top3 457ms @871ms, 265ms @3039ms, 262ms @1748ms; 21 long tasks"
     },
     "console": {
       "pass": true,
@@ -191,39 +191,39 @@
     }
   },
   "metrics": {
-    "ttffScreenshotNonBlankMs": 1478,
-    "simSecondsPerWallSecond": 0.208,
-    "fpsWindowS": 4.9,
-    "avgFps": 4.74,
-    "drawsPerFrameHookWindow": 57.2,
-    "ttffMs": 3759,
+    "ttffScreenshotNonBlankMs": 1421,
+    "simSecondsPerWallSecond": 0.116,
+    "fpsWindowS": 5.1,
+    "avgFps": 3.75,
+    "drawsPerFrameHookWindow": 98.1,
+    "ttffMs": 3646,
     "shaders": 44,
     "programsHook": 22,
     "programsPage": 22,
-    "drawsPerFramePage": 48,
-    "drawsPerFrameHook": 117.7,
-    "longestTaskMs": 474,
+    "drawsPerFramePage": 95,
+    "drawsPerFrameHook": 121.7,
+    "longestTaskMs": 457,
     "top3LongTasks": [
-      "474ms @852ms",
-      "419ms @1636ms",
-      "415ms @2964ms"
+      "457ms @871ms",
+      "265ms @3039ms",
+      "262ms @1748ms"
     ],
     "longTaskCount": 21,
     "loaderTimeline": [
       [
-        173,
+        193,
         "Loading the backroom…",
         0,
         0
       ],
       [
-        2059,
+        1736,
         "(gone)",
         16,
         8
       ]
     ],
-    "loaderGoneMs": 2059,
+    "loaderGoneMs": 1736,
     "loaderSeen": true,
     "globals": {
       "renderer": "__R.renderer",
@@ -255,9 +255,9 @@
     "hooks": {
       "shaders": 44,
       "programsLinked": 22,
-      "draws": 438,
-      "framesWithDraws": 2,
-      "firstDrawFrameAt": 3759
+      "draws": 794,
+      "framesWithDraws": 4,
+      "firstDrawFrameAt": 3646
     },
     "windowGlobals": [
       "__THREE__",
@@ -276,19 +276,19 @@
       "programs": 22,
       "calls": 178,
       "triangles": 987780,
-      "frame": 41,
+      "frame": 43,
       "geometries": 181,
       "textures": 16
     },
     "camera": {
       "p": [
-        24.097,
+        24.108,
         31,
         45
       ],
       "q": [
         -0.2775,
-        0.2793,
+        0.2794,
         0.0847,
         0.9153
       ],
@@ -325,9 +325,9 @@
     "hooks": {
       "shaders": 44,
       "programsLinked": 22,
-      "draws": 17798,
-      "framesWithDraws": 150,
-      "firstDrawFrameAt": 3759
+      "draws": 18145,
+      "framesWithDraws": 148,
+      "firstDrawFrameAt": 3646
     },
     "windowGlobals": [
       "__THREE__",
@@ -344,26 +344,26 @@
     "quality": "low",
     "renderer": {
       "programs": 22,
-      "calls": 48,
-      "triangles": 537326,
-      "frame": 189,
+      "calls": 95,
+      "triangles": 692206,
+      "frame": 187,
       "geometries": 194,
       "textures": 16
     },
     "camera": {
       "p": [
-        -0.837,
-        3.3,
-        6.6
+        2.58,
+        4.4,
+        2.6
       ],
       "q": [
-        0.0868,
-        0.8815,
-        0.1786,
-        -0.4285
+        0.0144,
+        0.9774,
+        0.1987,
+        -0.0706
       ],
       "zoom": 1,
-      "fov": 49.55549777187501
+      "fov": 47.9314721
     }
   },
   "pass": true

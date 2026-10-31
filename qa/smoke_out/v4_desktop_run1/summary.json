@@ -13,39 +13,39 @@
       "console": true
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 1478,
-      "simSecondsPerWallSecond": 0.208,
-      "fpsWindowS": 4.9,
-      "avgFps": 4.74,
-      "drawsPerFrameHookWindow": 57.2,
-      "ttffMs": 3759,
+      "ttffScreenshotNonBlankMs": 1421,
+      "simSecondsPerWallSecond": 0.116,
+      "fpsWindowS": 5.1,
+      "avgFps": 3.75,
+      "drawsPerFrameHookWindow": 98.1,
+      "ttffMs": 3646,
       "shaders": 44,
       "programsHook": 22,
       "programsPage": 22,
-      "drawsPerFramePage": 48,
-      "drawsPerFrameHook": 117.7,
-      "longestTaskMs": 474,
+      "drawsPerFramePage": 95,
+      "drawsPerFrameHook": 121.7,
+      "longestTaskMs": 457,
       "top3LongTasks": [
-        "474ms @852ms",
-        "419ms @1636ms",
-        "415ms @2964ms"
+        "457ms @871ms",
+        "265ms @3039ms",
+        "262ms @1748ms"
       ],
       "longTaskCount": 21,
       "loaderTimeline": [
         [
-          173,
+          193,
           "Loading the backroom…",
           0,
           0
         ],
         [
-          2059,
+          1736,
           "(gone)",
           16,
           8
         ]
       ],
-      "loaderGoneMs": 2059,
+      "loaderGoneMs": 1736,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",

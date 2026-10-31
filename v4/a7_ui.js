@@ -1,18 +1,19 @@
 // ======================= STORY / CAMERA / LABELS / LOOP =======================
 // seat & grip points from Inky's parts when available
 const STEPS = [...document.querySelectorAll('.step')].map((el) => ({ el, id: el.dataset.cam }));
+const _tg = new THREE.Vector3(); function tgtOf(fw, c) { const b = c[4] || 0; return _tg.set(fw.x + (c[1][0] - fw.x) * b, 0.95 + (c[1][1] - 0.95) * b, fw.z + (c[1][2] - fw.z) * b); }
 const CAMS = {
   hero: [[24, 31, 45], [-3.5, -2, 4]],
   truck: [[7.2, 3.2, 8.0], [8.2, 1.25, 17.5]],
-  breakdown: [[-0.8, 3.3, 6.6], [4.0, 0.7, 10.4]],
+  breakdown: [[2.6, 4.4, 2.6], [3.8, 0.8, 11.0]],
   roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
   sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
   floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [3.2, 1.7, 1.6]],
-  stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · Dept 46 skid (1 person)', [-3.0, 4.9, 2.8]],
-  dsd: [[-10.4, 1.75, 3.6], [-16.2, 0.9, 9.6]],
-  bev: [[-13.0, 3.2, 10.4], [-16.3, 0.8, 7.0], '@bev', [2.6, 2.9, 2.4]],
+  stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · overnight stocking', [-4.4, 3.1, 0.5]],
+  dsd: [[-19.8, 4.4, 1.6], [-15.4, 0.9, 8.6]],
+  bev: [[-11.2, 3.0, 3.4], [-17.4, 0.9, 7.8]],
   milk: [[3.0, 3.0, -12.3], [-4.2, 0.3, -16.3]],
-  snack: [[3, 8.5, 37], [-11.5, 0, 22], '@snackcab', [-4.6, 1.6, 1.6]],
+  snack: [[-22, 4.6, 42], [-15.8, 1.8, 27.3]],
   pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6]],
   baler: [[-12.4, 2.6, -1.4], [-19, 1.0, -4.0]],
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
@@ -30,8 +31,8 @@ const LBL = { // fixed points of interest per step
   sort: [['Dept 46 · Cosmetics', 5.6, 1.6, 7.5], ['Dept 92 · Dry Grocery', 10.4, 1.6, 7.5], ['Dept 2 · Health & Beauty', 5.6, 1.6, 5]],
   floor: [['To the sales floor', 24, 1.9, 0]],
   stock: [['Empty slots get filled', 30, 1.8, 3.6]],
-  dsd: [['Beverage Vendor truck', -16.5, 3.0, 15], ['Receiving desk', -19.3, 1.4, 7.6]],
-  snack: [['Snack Vendor reversing to door', -11.5, 4.6, 24]],
+  dsd: [['Beverage vendor truck', -16.5, 3.0, 15], ['Receiving desk', -19.3, 1.4, 7.6]],
+  snack: [['Snack vendor truck', -11.5, 4.6, 24]],
   pharm: [['McKesson totes · wrapped pallet', -17.6, 1.6, 5.6]],
   baler: [['Baler', -19.4, 3.4, -3.2], ['Compactor', -19.6, 2.6, 1.2], ['Cardboard', -16.9, 1.4, -1.4]],
   omni: [['OGP staging shelves', 15.5, 2.0, 11.4], ['Chill / frozen', 13, 2.0, 6.4]],
@@ -49,7 +50,7 @@ const camPos = new THREE.Vector3().fromArray(CAMS.hero[0]), camTgt = new THREE.V
 const controls = new OrbitControls(camera, canvas); controls.enabled = false; controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 1.5; controls.maxDistance = 90;
 function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : 1.12; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; } return [p, t]; }
 function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
-  camFrom = [camera.position.clone(), camTgt.clone()]; camT = instant ? 1 : 0; const c = CAMS[STEPS[i].id] || CAMS.hero; const cf = camFor(c); camPos.copy(cf[0]); { const fw = followRole(c); if (fw) { camPos.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]); } } if (instant) { camera.position.copy(camPos); camTgt.copy(cf[1]); const fw = followRole(c); if (fw) camTgt.set(fw.x, 0.95, fw.z); } { const fw = followRole(c); camFrom.push(fw ? new THREE.Vector3(fw.x, 0.95, fw.z) : cf[1].clone()); } if (explore) setExplore(false); }
+  camFrom = [camera.position.clone(), camTgt.clone()]; camT = instant ? 1 : 0; const c = CAMS[STEPS[i].id] || CAMS.hero; const cf = camFor(c); camPos.copy(cf[0]); { const fw = followRole(c); if (fw) { camPos.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]); } } if (instant) { camera.position.copy(camPos); camTgt.copy(cf[1]); const fw = followRole(c); if (fw) camTgt.copy(tgtOf(fw, c)); } { const fw = followRole(c); camFrom.push(fw ? tgtOf(fw, c).clone() : cf[1].clone()); } if (explore) setExplore(false); }
 window.__goStep = goStep;
 function stepFromScroll() { const mid = innerHeight * 0.5; let best = 0, bd = 1e9; STEPS.forEach((s, k) => { const r = s.el.getBoundingClientRect(); const d = Math.abs((r.top + r.bottom) / 2 - mid); if (d < bd) { bd = d; best = k; } }); return best; }
 addEventListener('scroll', () => { const k = stepFromScroll(); if (k !== cur) goStep(k); }, { passive: true });
@@ -74,7 +75,7 @@ function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return P
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
   if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05, z: js ? js.z : r.w.z, k: 'who' }); }
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;
-  for (const it of items) { if (n >= LPOOL.length) break; _lv.set(it.x, it.y, it.z).project(camera); if (_lv.z > 1 || Math.abs(_lv.x) > 1.05 || Math.abs(_lv.y) > 1.05) continue; const sx = (_lv.x + 1) / 2 * W_, sy = (1 - _lv.y) / 2 * H_; if (cardR && sx > cardR.left - 80 && sx < cardR.right + 80 && sy > cardR.top - 10 && sy < cardR.bottom + 40) continue; const d = LPOOL[n++]; d.textContent = it.t; d.className = 'lbl ' + it.k; d.style.transform = `translate(${((_lv.x + 1) / 2 * W_).toFixed(0)}px,${((1 - _lv.y) / 2 * H_).toFixed(0)}px) translate(-50%,-100%)`; d.style.display = 'block'; }
+  const placed = []; for (const it of items) { if (n >= LPOOL.length) break; _lv.set(it.x, it.y, it.z).project(camera); if (_lv.z > 1 || Math.abs(_lv.x) > 1.05 || Math.abs(_lv.y) > 1.05) continue; const sx = (_lv.x + 1) / 2 * W_, sy = (1 - _lv.y) / 2 * H_; if (cardR && sx > cardR.left - 80 && sx < cardR.right + 80 && sy > cardR.top - 10 && sy < cardR.bottom + 40) continue; const lw = it.t.length * 7.4 + 18, lh = 24; let px = Math.min(W_ - lw / 2 - 8, Math.max(lw / 2 + 8, sx)), py = Math.min(H_ - 40, Math.max(lh + 50, sy)); for (let g = 0; g < 6; g++) { const hit = placed.find((q) => Math.abs(q[0] - px) < (q[2] + lw) / 2 + 4 && Math.abs(q[1] - py) < lh + 2); if (!hit) break; py = hit[1] - lh - 4; if (py < lh + 50) { py = hit[1] + lh + 4; } } placed.push([px, py, lw]); const d = LPOOL[n++]; d.textContent = it.t; d.className = 'lbl ' + it.k; d.style.transform = `translate(${px.toFixed(0)}px,${py.toFixed(0)}px) translate(-50%,-100%)`; d.style.display = 'block'; }
   for (; n < LPOOL.length; n++) LPOOL[n].style.display = 'none'; }
 // ---------- loop: real elapsed time, clamped dt ----------
 let last = performance.now(), fadeT = -1, frames = 0;
@@ -83,7 +84,7 @@ function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
 function frame(now) { requestAnimationFrame(frame); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt));
   if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
-  if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].set(fw.x, 0.95, fw.z); else camTgt.lerp(_lv.set(fw.x, 0.95, fw.z), k); } }
+  if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
   camLook(); render3d(); renderer.render(scene, camera); updLabels(); frames++;
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
