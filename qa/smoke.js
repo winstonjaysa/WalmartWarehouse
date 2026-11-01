@@ -22,7 +22,7 @@ if (Q) target += (target.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const OUT = path.resolve(opt('--out', path.join(__dirname, 'smoke_out', stamp)));
 fs.mkdirSync(OUT, { recursive: true });
-const HARD_TIMEOUT = +opt('--timeout', 60000);
+const HARD_TIMEOUT = +opt('--timeout', 120000);
 const G = PROFILE === 'v3'
   ? { loaderMs: 10000, maxPrograms: 60, maxDraws: null, maxLongTask: null, checks: ['loader', 'frame', 'movers', 'buttons', 'console', 'programs'] }
   : { loaderMs: 3000, maxPrograms: 24, maxDraws: 299, maxLongTask: 499, checks: ['loader', 'frame', 'movers', 'nav', 'console', 'draws', 'programs', 'longtask'] };

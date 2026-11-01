@@ -1084,13 +1084,13 @@ const CAMS = {
   breakdown: [[2.6, 4.4, 2.6], [3.8, 0.8, 11.0]],
   roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
   sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
-  floor: [[-14.2, 3.0, 8.4], [-21.5, 0.9, 3.8], 'Stocking 3 · skid to the sales floor', [4.2, 2.6, 3.2]],
+  floor: [[-14.2, 3.0, 8.4], [-21.5, 0.9, 3.8], 'Stocking 3 · skid to the sales floor', [4.2, 2.6, 3.2], 0, [[-16.0, 3.8, 10.8], [-20.2, -1.6, 2.6]]], // [5] = fixed phone view (doors + skid + jack above the caption card)
   stock: [[-31.4, 2.3, -2.6], [-38.0, 1.0, -5.8], 'Stocking 3 · overnight stocking', [4.4, 2.4, 2.4]],
   dsd: [[-19.8, 4.4, 1.6], [-15.4, 0.9, 8.6]],
   bev: [[-11.2, 3.0, 3.4], [-17.4, 0.9, 7.8]],
   milk: [[3.0, 3.0, -12.3], [-4.2, 0.3, -16.3]],
   snack: [[-22, 4.6, 42], [-15.8, 1.8, 27.3]],
-  pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6]],
+  pharm: [[-14.6, 2.4, 8.6], [-18.2, 0.7, 5.2], '@pharm', [-2.6, 3.4, 2.6], 0, [[-24.0, 6.5, 2.0], [-31.0, -2.0, 12.5]]],
   baler: [[-12.4, 2.6, -1.4], [-19, 1.0, -4.0]],
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
@@ -1139,7 +1139,7 @@ const LPOOL = []; for (let i = 0; i < 8; i++) { const d = document.createElement
 let cur = 0, camFrom = null, camT = 1, explore = false;
 const camPos = new THREE.Vector3().fromArray(CAMS.hero[0]), camTgt = new THREE.Vector3().fromArray(CAMS.hero[1]);
 const controls = new OrbitControls(camera, canvas); controls.enabled = false; controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 1.5; controls.maxDistance = 90;
-function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : (c[0][2] < -12 && Math.abs(c[0][0]) < 20 ? 1.0 : 1.12); const inBR = Math.abs(c[0][0]) < 20 && Math.abs(c[0][2]) < 12 && c[0][1] < 7.2; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; if (inBR) { p.x = Math.max(-19.4, Math.min(19.4, p.x)); p.z = Math.max(-11.4, Math.min(11.4, p.z)); } } return [p, t]; }
+function camFor(c) { if (c[5] && innerWidth / innerHeight < 0.8) return [new THREE.Vector3().fromArray(c[5][0]), new THREE.Vector3().fromArray(c[5][1])]; const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : (c[0][2] < -12 && Math.abs(c[0][0]) < 20 ? 1.0 : 1.12); const inBR = Math.abs(c[0][0]) < 20 && Math.abs(c[0][2]) < 12 && c[0][1] < 7.2; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; if (inBR) { p.x = Math.max(-19.4, Math.min(19.4, p.x)); p.z = Math.max(-11.4, Math.min(11.4, p.z)); } } return [p, t]; }
 function floorsFor(id) { const f1 = ['stairs', 'upstairs', 'floor2', 'overview'].includes(id), f2 = ['floor2', 'overview'].includes(id); F1G.visible = f1; F2G.visible = f2;
   const ex = id === 'overview' || id === 'floor2'; F1G.position.y = id === 'overview' ? 3.0 : 0; F2G.position.y = ex ? (id === 'overview' ? 7.5 : 4.5) : 0; }
 function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; floorsFor(STEPS[i].id); STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
@@ -1168,7 +1168,7 @@ function camLook() { // fov: narrow (iso-like) when high, wide at eye level; cut
 addEventListener('resize', resize);
 const _lv = new THREE.Vector3();
 const _cabV = new THREE.Vector3();
-function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; if (c[2] === '@snackcab') { const sp = SNACK.tractor.userData.seatPoint; if (sp && sp.object) return sp.object.getWorldPosition(_cabV); return SNACK.tractor.localToWorld(_cabV.set(0.55, 1.95, 2.2)); } const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
+function followRole(c) { if (!c[2] || (c[5] && innerWidth / innerHeight < 0.8)) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; if (c[2] === '@snackcab') { const sp = SNACK.tractor.userData.seatPoint; if (sp && sp.object) return sp.object.getWorldPosition(_cabV); return SNACK.tractor.localToWorld(_cabV.set(0.55, 1.95, 2.2)); } const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
   if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05 + (r.w.y || 0), z: js ? js.z : r.w.z, k: 'who' }); }
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;
@@ -1182,21 +1182,12 @@ const fadeEl = document.getElementById('fade');
 function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT < 0) { fadeT = 0; fadeEl.classList.add('on'); } }
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
 const __FS = window.__frameSpikes = []; let __fsInfo = [0, 0, 0];
-// first-draw warm-up: every drawable (incl. hidden ones: upper walls/roof, lights, late pallets) gets its geometry/textures
-// uploaded in small per-frame slices at a 1x1 scissored viewport, right before the real frame render (no flicker, no long task).
-// (UPPER/LIGHTS_MESH are queued last so they upload before the camera first drops below the cutaway line.)
-const __warmQ = []; scene.traverse((o) => { if (o.isMesh || o.isPoints || o.isLine || o.isSprite) __warmQ.push(o); }); __warmQ.push(LIGHTS_MESH, UPPER); const __vp = new THREE.Vector4();
-function __warmSlice(ms) { if (!__warmQ.length) return; const t0 = performance.now(), vis = []; scene.traverse((o) => { if (o !== scene && !o.isLight) { vis.push(o, o.visible); o.visible = false; } });
-  renderer.getViewport(__vp); renderer.setScissorTest(true); renderer.setScissor(0, 0, 1, 1); renderer.setViewport(0, 0, 1, 1);
-  while (__warmQ.length && performance.now() - t0 < ms) { const o = __warmQ.pop(); const chain = []; for (let q = o; q && q !== scene; q = q.parent) { chain.push(q); q.visible = true; } const fc = o.frustumCulled; o.frustumCulled = false;
-    try { renderer.render(scene, camera); } catch (e) {} o.frustumCulled = fc; for (const q of chain) q.visible = false; }
-  renderer.setScissorTest(false); renderer.setViewport(__vp); for (let i = 0; i < vis.length; i += 2) vis[i].visible = vis[i + 1]; window.__warmLeft = __warmQ.length; }
 function frame(now) { requestAnimationFrame(frame); const _f0 = performance.now(); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt)); const _f1 = performance.now();
   if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); initMachines(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
   if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
   if (window.__camOverride) { const v = window.__camOverride; camera.position.fromArray(v[0]); camera.up.set(0, v[4] ? 1 : 0, v[4] ? 0 : -1); camera.lookAt(v[1][0], v[1][1], v[1][2]); camera.fov = v[2]; camera.updateProjectionMatrix(); }
-  camLook(); const _f2 = performance.now(); render3d(); if (frames > 2) __warmSlice(30); const r0 = performance.now(); renderer.render(scene, camera); const r1 = performance.now();  updLabels(); frames++; const _f3 = performance.now();
+  camLook(); const _f2 = performance.now(); render3d(); const r0 = performance.now(); renderer.render(scene, camera); const r1 = performance.now();  updLabels(); frames++; const _f3 = performance.now();
   { const I = renderer.info, inf = [I.memory.geometries, I.memory.textures, I.programs ? I.programs.length : 0]; if (_f3 - _f0 > 200 && __FS.length < 40) __FS.push({ at: Math.round(_f0), step: STEPS[cur].id, camT: +camT.toFixed(2), sim: +T.toFixed(1), adv: Math.round(_f1 - _f0), pre: Math.round(r0 - _f1), render: Math.round(r1 - r0), lbl: Math.round(_f3 - r1), geoNew: inf[0] - __fsInfo[0], texNew: inf[1] - __fsInfo[1], progNew: inf[2] - __fsInfo[2], calls: I.render.calls }); __fsInfo = inf; }
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
 initSim(); initMachines(); __doResize(); goStep(0, true); camera.lookAt(camTgt);
