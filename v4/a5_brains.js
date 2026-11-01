@@ -81,18 +81,22 @@ function initSim() {
   const R46 = mkSkid({ x: 13, z: -6.5, col: COL.blue, dept: 46 }); fillSkid(R46, 9, caseS);
   const R92 = mkSkid({ x: 15, z: -6.5, col: COL.chep, dept: 92 }); fillSkid(R92, 22, caseM);
   const R13 = mkSkid({ x: 17, z: -6.5, col: COL.red, dept: 13 }); fillSkid(R13, 12, caseM);
-  const f1 = role(mkWorker({ x: 13, z: -1.6, yaw: Math.PI, torso: COL.st3 }), 'Stocking 3 · Dept 46 skid (1 person)');
+  const f1 = role(mkWorker({ x: 13, z: -1.6, yaw: Math.PI, torso: COL.st3 }), 'Stocking 3 · Dept 46 overstock (1 person)');
   brain(f1, (function* () { yield* wait(f1, 48); yield* jackFetch(f1, jF1, R46, 0); yield* jackPull(f1, jF1, [[13, -1.0], [16.5, 0], [21.5, 0], [24.2, -5.25], [32.0, -5.25]]); yield* jackRelease(f1, jF1); yield* jackBackOut(f1, jF1, 1.6); yield* jackStow(f1, jF1, [[25.0, -5.25], [21.5, 0], [19.2, 6.4]]);
-    yield* stockLoop(f1, R46, -5.25); })());
-  const f2 = role(mkWorker({ x: 15, z: -1.6, yaw: Math.PI, torso: COL.st3 }), 'Stocking 3 · Dept 92 (big skid, 2 people)');
+    yield* walkTo(f1, 19.0, 0.6); yield* walkTo(f1, 21.5, 0); yield* walkTo(f1, 24.0, -4.7); yield* walkTo(f1, R46.x - 1.5, -4.7); yield* face(f1, R46.x, R46.z); for (;;) yield* wait(f1, 5, 'scan'); })());
+  const f2 = role(mkWorker({ x: 15, z: -1.6, yaw: Math.PI, torso: COL.st3 }), 'Stocking 3 · Dept 92 overstock (2 people)');
   const f2h = role(mkWorker({ x: 16.2, z: -1.4, yaw: Math.PI, torso: COL.st3 }), '');
-  brain(f2h, (function* () { yield* until(f2h, () => R92.jack); while (!FLAGS.r92done) { const [fx, fz] = fwd(R92.ry + Math.PI / 2); const tx = R92.x + fx * 0.95, tz = R92.z + fz * 0.95; const d = Math.hypot(tx - f2h.x, tz - f2h.z); if (d > 0.05) { const st = Math.min(d, 1.4 * DT); f2h.x += (tx - f2h.x) / d * st; f2h.z += (tz - f2h.z) / d * st; f2h.ph += st * 4.2; f2h.pose = 'push'; f2h.yaw = R92.ry + Math.PI; } else f2h.pose = 'push'; yield; } yield* stockLoop(f2h, R92, -5.25, 1); })());
-  brain(f2, (function* () { yield* wait(f2, 9); yield* jackFetch(f2, jF2, R92, 0); yield* jackPull(f2, jF2, [[15, -1.0], [18.5, 0], [38.6, 0], [39.6, -5.25], [48.3, -5.25]], 0.8); FLAGS.r92done = true; yield* jackRelease(f2, jF2); yield* jackBackOut(f2, jF2, 1.6); yield* jackStow(f2, jF2, [[38.8, -3.0], [38.6, 0], [21.5, 0], [19.2, 7.9]]); yield* stockLoop(f2, R92, -5.25); })());
+  brain(f2h, (function* () { yield* until(f2h, () => R92.jack); while (!FLAGS.r92done) { const [fx, fz] = fwd(R92.ry + Math.PI / 2); const tx = R92.x + fx * 0.95, tz = R92.z + fz * 0.95; const d = Math.hypot(tx - f2h.x, tz - f2h.z); if (d > 0.05) { const st = Math.min(d, 1.4 * DT); f2h.x += (tx - f2h.x) / d * st; f2h.z += (tz - f2h.z) / d * st; f2h.ph += st * 4.2; f2h.pose = 'push'; f2h.yaw = R92.ry + Math.PI; } else f2h.pose = 'push'; yield; } yield* walkTo(f2h, R92.x + 1.6, -5.25); for (;;) yield* wait(f2h, 5, 'scan'); })());
+  brain(f2, (function* () { yield* wait(f2, 9); yield* jackFetch(f2, jF2, R92, 0); yield* jackPull(f2, jF2, [[15, -1.0], [18.5, 0], [38.6, 0], [39.6, -5.25], [48.3, -5.25]], 0.8); FLAGS.r92done = true; yield* jackRelease(f2, jF2); yield* jackBackOut(f2, jF2, 1.6); yield* jackStow(f2, jF2, [[38.8, -3.0], [38.6, 0], [21.5, 0], [19.2, 7.9]]); yield* walkTo(f2, 19.0, 1.4); yield* walkTo(f2, 21.5, 0.4); yield* walkTo(f2, 38.6, 0.4); yield* walkTo(f2, 39.0, -4.7); yield* walkTo(f2, R92.x - 1.6, -4.7); yield* face(f2, R92.x, R92.z); for (;;) yield* wait(f2, 5, 'scan'); })());
   // ===== 6. OVERNIGHT STOCKING (Stocking 3) — fill the holes on the shelves =====
-  const S2 = mkSkid({ x: 30.0, z: 5.25, ry: Math.PI / 2, col: COL.blue, dept: 2 }); fillSkid(S2, 14, caseS);
-  const S4 = mkSkid({ x: 46.0, z: 8.75, ry: Math.PI / 2, col: COL.red, dept: 4 }); fillSkid(S4, 14, caseS);
-  const s1 = role(mkWorker({ x: 29, z: 4.6, yaw: 0, torso: COL.st3 }), 'Stocking 3 · overnight stocking'); brain(s1, (function* () { yield* wait(s1, 40); yield* stockLoop(s1, S2, 5.25); })());
-  const s2 = role(mkWorker({ x: 45, z: 8.0, yaw: 0, torso: COL.st3 }), ''); brain(s2, stockLoop(s2, S4, 8.75));
+  // skids staged by the west double doors are pulled out onto the MAIN sales floor; the holes are on the gondolas there
+  const S2 = mkSkid({ x: -17.6, z: 1.8, ry: Math.PI / 2, col: COL.blue, dept: 2 }); fillSkid(S2, 14, caseS);
+  const S4 = mkSkid({ x: -35.9, z: -4.6, ry: Math.PI / 2, col: COL.red, dept: 4 }); fillSkid(S4, 14, caseS);
+  const jS = mkJack({ x: -15.4, z: 0.4, yaw: -Math.PI / 2 });
+  const s1 = role(mkWorker({ x: -15.8, z: 1.4, yaw: -Math.PI / 2, torso: COL.st3 }), 'Stocking 3 · skid to the sales floor');
+  brain(s1, (function* () { yield* wait(s1, 34); yield* jackFetch(s1, jS, S2, -Math.PI / 2); yield* jackPull(s1, jS, [[-19.4, 2.6], [-20.8, 4.3], [-26.4, 4.3], [-33.4, 3.0], [-33.4, -5.6], [-36.0, -7.4]], 0.9);
+    yield* jackRelease(s1, jS); yield* jackBackOut(s1, jS, 1.4); yield* jackStow(s1, jS, [[-33.2, -6.6], [-32.6, -2.0]]); yield* stockLoop(s1, S2, -7.4, 0, 0.42); })());
+  const s2 = role(mkWorker({ x: -35.0, z: -3.8, yaw: -Math.PI / 2, torso: COL.st3 }), 'Stocking 3 · overnight stocking'); brain(s2, (function* () { yield* wait(s2, 2); yield* stockLoop(s2, S4, -4.6, 0, 0.42); })());
   // ===== 7. DSD: beverage vendor + receiver check-in =====
   const recv = role(mkWorker({ x: -18.7, z: 7.6, yaw: -Math.PI / 2, torso: COL.dsd, tool: true }), 'DSD associate · receiving');
   const POPSK = POPS.map((g, i) => mkSkid({ x: DOORS.DSD.x, z: 13.0 + i * 1.3, y: 0.0, col: COL.blue, grp: g, pop: true }));
@@ -122,8 +126,8 @@ function initSim() {
   MILKCUR = MSK[3]; // earlier in the night: 3 milk skids + the egg pallet already parked in the cooler; the last 2 milk skids wait on the dock floor
   brain(mk, (function* () { yield* wait(mk, 40);
     for (const i of [3, 4]) { const sk = MSK[i], px = CPARK[i]; MILKCUR = sk;
-      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-4.4, 8.0], [-4.4, 3.6]] : [[-3.6, -11.0], [-4.9, -9.0], [-4.9, 3.6]]);
-      yield* jackPull(mk, jMk, [[sk.x, sk.z - 0.4], [-4.9, sk.z - 0.4], [-4.9, -10.6], [-3.6, -11.6], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
+      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-3.7, 8.0], [-3.7, 3.6]] : [[-3.6, -11.0], [-3.7, -9.0], [-3.7, 3.6]]);
+      yield* jackPull(mk, jMk, [[sk.x, sk.z - 0.4], [-3.7, sk.z - 0.4], [-3.7, -10.6], [-3.6, -11.6], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
       yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -16.1); yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -13.0); yield* walkTo(mk, -3.6, -11.0); }
     yield* jackGrab(mk, jMk); yield* jackStow(mk, jMk, [[-3.6, -12.2], [-3.6, -10.4], [-12.8, -10.6]]); yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
@@ -139,7 +143,7 @@ function initSim() {
   const run = role(mkWorker({ x: -15.6, z: 4.2, yaw: Math.PI, torso: COL.st2 }), 'Pharmacy pallet · jack to pharmacy');
   const jPh = mkJack({ x: -15.2, z: 3.0, yaw: Math.PI / 2 });
   brain(run, (function* () { yield* wait(run, 3);
-    yield* jackFetch(run, jPh, PH, Math.PI / 2); yield* jackPull(run, jPh, [[-17.0, -6.6], [-12, -7.9], [18.6, -7.9], [18.6, -1.2], [21.5, 0], [56, 0], [58.6, -10.4]], 0.9); yield* jackRelease(run, jPh); yield* jackBackOut(run, jPh, 1.4); yield* jackStow(run, jPh, [[57.4, -4.0], [56.0, 0.6], [53.8, 0.9]]);
+    yield* jackFetch(run, jPh, PH, -Math.PI / 2); yield* jackPull(run, jPh, [[-19.2, 4.4], [-20.8, 4.3], [-26.4, 4.3], [-29.6, 7.6], [-31.2, 10.6]], 0.9); yield* jackRelease(run, jPh); yield* jackBackOut(run, jPh, 1.4); yield* jackStow(run, jPh, [[-29.0, 8.6], [-27.6, 9.6]]);
     // cut the wrap first (walk round with the safety cutter), then count totes against the memo and sign
     const R = 1.05; let a = 0; yield* walkTo(run, PH.x + R, PH.z); while (a < Math.PI * 2.1) { a += DT * 0.9; run.x = PH.x + Math.cos(a) * R; run.z = PH.z + Math.sin(a) * R; run.yaw = yawTo(PH.x - run.x, PH.z - run.z); run.pose = 'reach'; const f = Math.max(0.02, 1 - a / (Math.PI * 2.1)); for (const m of MG.userData.wrap) m.scale.set(1, f, 1); yield; }
     for (const m of MG.userData.wrap) m.visible = false;
@@ -187,11 +191,11 @@ function initSim() {
   snackV.phase = 'approach'; snackV.s = 0; snackV.doors = 0; snackV.t0 = 4;
 }
 function seatOf(o, d) { const sp = o.userData && o.userData.seatPoint; if (sp && sp.object) return { obj: sp.object }; if (sp && sp.position) return [sp.position.x, sp.position.y, sp.position.z]; return Array.isArray(sp) ? sp : d; }
-function* stockLoop(w, sk, az, side = 0) { // pick a case off the skid, fill the nearest empty slot facing this aisle
+function* stockLoop(w, sk, az, side = 0, off = 0.95) { // pick a case off the skid, fill the nearest empty slot facing this aisle
   for (;;) { if (!sk.boxes.length) { yield* wait(w, 3, 'idle'); continue; }
     const hs = HOLES.filter((h) => !h.used && Math.abs(h.z - az) < 1.6 && Math.abs(h.x - sk.x) < 6).sort((a, b) => Math.abs(a.x - sk.x) - Math.abs(b.x - sk.x)); const h = hs[side % Math.max(1, hs.length)] || hs[0]; if (!h) { yield* wait(w, 3, 'idle'); continue; }
     h.used = true; const p = approach(sk, sk.x + (side ? 1 : -1) * 0.2, az + (h.z > az ? 0.6 : -0.6), 0.92); yield* walkTo(w, p[0], p[1]); const top = sk.boxes.reduce((m, b) => b.ly > m.ly ? b : m, sk.boxes[0]); yield* pick(w, top, () => detachTop(sk));
-    const sz = az + (h.z > az ? 1 : -1) * 0.95; yield* walkTo(w, h.x, sz); yield* face(w, h.x, h.z); yield* placeAt(w, top, () => { top.st = 'free'; top.x = h.x + 0.05; top.y = h.y + top.h / 2 + 0.02; top.z = h.z; top.ry = 0; }, h.y); }
+    const sz = az + (h.z > az ? 1 : -1) * off; yield* walkTo(w, h.x, sz); yield* face(w, h.x, h.z); yield* placeAt(w, top, () => { top.st = 'free'; top.x = h.x + 0.05; top.y = h.y + top.h / 2 + 0.02; top.z = h.z; top.ry = 0; }, h.y); }
 }
 function* cartPush(w, c, p, sp = 1.0) { for (;;) { const dx = p[0] - c.x, dz = p[1] - c.z, d = Math.hypot(dx, dz); if (d < 0.04) break; const ty = yawTo(dx, dz), da = angDiff(c.yaw, ty); c.yaw += clamp(da, -1.8 * DT, 1.8 * DT); const step = Math.min(d, sp * DT * (Math.abs(da) > 0.5 ? 0.3 : 1)); const [fx, fz] = fwd(c.yaw); c.x += fx * step; c.z += fz * step; w.x = c.x - fx * 0.85; w.z = c.z - fz * 0.85; w.yaw = c.yaw; w.ph += step * 4.2; w.pose = 'push'; yield; } }
 
@@ -221,16 +225,16 @@ function mNear(g) { for (const o of W) { if (o.sit || o.hide || o === pkOp || o 
 const mEase = (k) => k * k * (3 - 2 * k);
 // rack bay for the stacker (green uprights, empty top level at 2.85 m)
 const MRACK = [];
-{ const G = '#22402e', x = -2.9, z = -4.4; for (const sx of [-1.22, 1.22]) for (const sz of [-0.46, 0.46]) S0box(0.09, 3.6, 0.09, x + sx, 1.8, z + sz, G);
+{ const G = '#22402e', x = -0.6, z = -4.4; for (const sx of [-1.22, 1.22]) for (const sz of [-0.46, 0.46]) S0box(0.09, 3.6, 0.09, x + sx, 1.8, z + sz, G);
   for (const y of [1.35, 2.8]) for (const sz of [-0.46, 0.46]) S0box(2.44, 0.1, 0.06, x, y, z + sz, '#e07b1f'); scene.add(bake(MRACK, 'machineRack')); }
 function S0box(w, h, d, x, y, z, c) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), MAT.v); paint(m.geometry, c); m.position.set(x, y, z); MRACK.push(m); }
 // 1) STOCK PICKER — operator rides the platform up to the top shelf, picks a case onto the tray, rides down
-const PK = buildPicker(THREE, PM, {}); PK.position.set(-3.6, 0, -5.85); PK.rotation.y = -Math.PI / 2; scene.add(PK); pickerLift(PK, 0);
+const PK = buildPicker(THREE, PM, {}); PK.position.set(-5.4, 0, -5.85); PK.rotation.y = -Math.PI / 2; scene.add(PK); pickerLift(PK, 0);
 const PKCASE = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.34), MAT.v); paint(PKCASE.geometry, '#a57b52'); scene.add(PKCASE);
 const pkShelf = [-8.0, 2.62 + 0.15, -6.98]; PKCASE.position.set(...pkShelf); let pkOn = false;
 function pkSync() { PK.updateMatrixWorld(true); const p = mWorld(PK, PK.userData.operatorPoint); pkOp.x = p.x; pkOp.y = p.y; pkOp.z = p.z; if (pkOn) { const t = mWorld(PK, PK.userData.trayPoint); PKCASE.position.set(t.x, t.y + 0.15, t.z); } }
 // 2) WALKIE STACKER — operator walks behind at the handle; forks lift a pallet onto the top rack level
-const WS = buildWalkie(THREE, PM, {}); WS.rotation.y = Math.PI; WS.position.set(-2.9, 0, -0.4); scene.add(WS); walkieForks(WS, 0.09); walkieTiller(WS, -0.5);
+const WS = buildWalkie(THREE, PM, {}); WS.rotation.y = Math.PI; WS.position.set(-0.6, 0, -1.4); scene.add(WS); walkieForks(WS, 0.09); walkieTiller(WS, -0.5);
 const wsPal = mPallet(3, 2); let wsOn = true;
 function wsSync(moving) { WS.updateMatrixWorld(true); const h = mWorld(WS, walkieHandle(WS)); wsOp.x = h.x; wsOp.z = h.z + 0.5; wsOp.yaw = Math.PI; wsOp.pose = 'push'; if (moving) wsOp.ph += DT * 3.4;
   if (wsOn) { const f = mWorld(WS, WS.userData.forkPoint); wsPal.position.set(f.x, f.y, f.z); } }
@@ -244,19 +248,19 @@ function ejSync(moving, pulling) { EJ.updateMatrixWorld(true); const h = mWorld(
 
 let pkOp, wsOp, ejOp;
 function initMachines() {
-  PK.position.set(-3.6, 0, -5.85); pickerLift(PK, 0); pkOn = false; PKCASE.position.set(...pkShelf);
-  WS.position.set(-2.9, 0, -0.4); walkieForks(WS, 0.09); wsOn = true;
+  PK.position.set(-5.4, 0, -5.85); pickerLift(PK, 0); pkOn = false; PKCASE.position.set(...pkShelf);
+  WS.position.set(-0.6, 0, -1.4); walkieForks(WS, 0.09); wsOn = true;
   EJ.position.set(-6.5, 0, 7.0); ejackLift(EJ, 0); ejOn = false; { EJ.updateMatrixWorld(true); const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, 0, f.z); }
-  pkOp = role(mkWorker({ x: -3.6, z: -5.85, yaw: -Math.PI / 2, torso: COL.st2 }), 'Stock picker operator');
+  pkOp = role(mkWorker({ x: -5.4, z: -5.85, yaw: -Math.PI / 2, torso: COL.st2 }), 'Stock picker operator');
   brain(pkOp, (function* () { pkSync(); for (let n = 0; ; n++) { yield* wait(pkOp, 6); pkOp.yaw = -Math.PI / 2;
-      yield* tween(3.2, (k) => { PK.position.x = -3.6 - 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK);
+      yield* tween(3.2, (k) => { PK.position.x = -5.4 - 2.6 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK);
       yield* tween(6, (k) => { pickerLift(PK, mEase(k)); pkSync(); pkOp.pose = 'idle'; });
       yield* turnTo(pkOp, Math.PI); yield* wait(pkOp, 0.6, 'reach');
       if (!pkOn) { pkOn = true; pkSync(); } else { pkOn = false; PKCASE.position.set(...pkShelf); }
       yield* wait(pkOp, 0.6, 'reach'); yield* turnTo(pkOp, -Math.PI / 2);
       yield* tween(6, (k) => { pickerLift(PK, 1 - mEase(k)); pkSync(); pkOp.pose = 'idle'; });
-      yield* tween(3.2, (k) => { PK.position.x = -8.0 + 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK); } })());
-  wsOp = role(mkWorker({ x: -2.9, z: 0.8, yaw: Math.PI, torso: COL.st2 }), 'Walkie stacker operator'); wsOp.jack = { g: WS, grip: WS.getObjectByName('handlePoint') };
+      yield* tween(3.2, (k) => { PK.position.x = -8.0 + 2.6 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK); } })());
+  wsOp = role(mkWorker({ x: -0.6, z: -0.2, yaw: Math.PI, torso: COL.st2 }), 'Walkie stacker operator'); wsOp.jack = { g: WS, grip: WS.getObjectByName('handlePoint') };
   brain(wsOp, (function* () { let fh = 0.09; wsSync(); yield* wait(wsOp, 4, 'push'); for (;;) { const fc = wsFc(), z0 = WS.position.z, zA = -2.55 + fc, zB = -4.4 + fc;
       const drive = function* (za, zb, dur) { yield* tween(dur, (k) => { WS.position.z = za + (zb - za) * mEase(k); wsSync(true); }, WS); };
       const forks = function* (a, b, dur) { yield* tween(dur, (k) => { fh = a + (b - a) * mEase(k); walkieForks(WS, fh); wsSync(false); }); };

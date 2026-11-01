@@ -8,8 +8,8 @@ const CAMS = {
   breakdown: [[2.6, 4.4, 2.6], [3.8, 0.8, 11.0]],
   roller: [[5.4, 2.7, 11.0], [8.8, 0.8, -5]],
   sort: [[13.4, 4.3, 5.4], [7.4, 0.4, 0.2]],
-  floor: [[20.5, 2.4, -1.2], [30, 0.8, -5.2], 'Stocking 3 · Dept 46 skid (1 person)', [3.2, 1.7, 1.6]],
-  stock: [[25.4, 1.65, 6.6], [31.5, 1.0, 5.0], 'Stocking 3 · overnight stocking', [-4.4, 3.1, 0.5]],
+  floor: [[-14.2, 3.0, 8.4], [-21.5, 0.9, 3.8], 'Stocking 3 · skid to the sales floor', [4.2, 2.6, 3.2]],
+  stock: [[-31.4, 2.3, -2.6], [-38.0, 1.0, -5.8], 'Stocking 3 · overnight stocking', [4.4, 2.4, 2.4]],
   dsd: [[-19.8, 4.4, 1.6], [-15.4, 0.9, 8.6]],
   bev: [[-11.2, 3.0, 3.4], [-17.4, 0.9, 7.8]],
   milk: [[3.0, 3.0, -12.3], [-4.2, 0.3, -16.3]],
@@ -19,9 +19,9 @@ const CAMS = {
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
-  stockroom: [[-2.4, 3.6, -1.0], [-7.6, 1.4, -6.0]],
+  stockroom: [[22.8, 4.4, 1.6], [32.0, 1.4, -5.6]],
   picker: [[-3.0, 6.5, -2.4], [-6.0, 2.0, -5.9]],
-  stacker: [[1.5, 3.4, 3.2], [-3.2, 1.4, -2.0]],
+  stacker: [[3.8, 3.4, 2.8], [-0.9, 1.4, -2.2]],
   ejack: [[-2.5, 3.6, 9.5], [-6.5, 0.6, 3.0]],
   salesmain: [[-27.5, 7.0, 12.5], [-44, 0.2, -2.5]],
   elevator: [[-12.5, 2.8, -7.5], [-9.6, 1.4, -11.6]],
@@ -32,23 +32,23 @@ const CAMS = {
 };
 const LBL = { // fixed points of interest per step
   hero: [['Cooler', -3.6, 2.6, -11.8], ['Freezer', 3.0, 2.6, -11.8], ['Gravity roller', 8, 1.2, 2], ['Department skids', 5.6, 1.4, 0]],
-  truck: [['Walmart trailer · placard CP', 8, 2.9, 19.5], ['Roller head', 8, 1.15, 14.6]],
+  truck: [['Trailer · placard CP', 8, 2.9, 19.5], ['Roller head', 8, 1.15, 14.6]],
   breakdown: [['Wrapped mixed skid ≈ 1.9 m', -5.0, 2.2, 15.0], ['Breakdown spot', 4.6, 1.9, 9.6]],
   roller: [['Boxes roll by gravity', 8, 1.2, 6]],
   sort: [['Dept 46 · Cosmetics', 5.6, 1.6, 7.5], ['Dept 92 · Dry Grocery', 10.4, 1.6, 7.5], ['Dept 2 · Health & Beauty', 5.6, 1.6, 5]],
-  floor: [['To the sales floor', 24, 1.9, 0]],
-  stock: [['Empty slots get filled', 30, 1.8, 3.6]],
+  floor: [['Through the doors to the sales floor', -23, 2.6, 4.3]],
+  stock: [['Empty slots get filled', -39, 2.2, -7.4]],
   dsd: [['Beverage vendor truck', -16.5, 3.0, 15], ['Receiving desk', -19.3, 1.4, 7.6]],
   snack: [['Snack vendor truck', -11.5, 4.6, 24]],
   pharm: [['McKesson totes · wrapped pallet', -17.6, 1.6, 5.6]],
   baler: [['Baler', -19.4, 3.4, -3.2], ['Compactor', -19.6, 2.6, 1.2], ['Cardboard', -16.9, 1.4, -1.4]],
   omni: [['OGP staging shelves', 15.5, 2.0, 11.4], ['Chill / frozen', 13, 2.0, 6.4]],
   fashion: [['Yellow Z-racks', 15.5, 2.0, -9.7], ['Green racking · cartons above, garments below', 11.4, 3.9, -11.3]],
-  stockroom: [['Backroom stocking area', -7.4, 4.1, -5.85], ['Wrapped pallets on top', -6.0, 3.6, -7.3]],
-  picker: [['Stock picker', -5.8, 4.7, -5.85]],
-  stacker: [['Walkie stacker', -2.9, 3.0, -0.4], ['Top rack level', -2.9, 3.9, -4.4]],
+  stockroom: [['Backroom stocking area', 27.0, 4.8, -5.25], ['Wrapped pallets on top', 31.0, 4.5, -7.0], ['Keep-clear zone', 21.9, 0.8, 0]],
+  picker: [['Stock picker', -5.6, 4.7, -5.85]],
+  stacker: [['Walkie stacker', -0.6, 3.0, -1.4], ['Top rack level', -0.6, 3.9, -4.4]],
   ejack: [['Electric pallet jack', -6.5, 2.0, 3.0]],
-  salesmain: [['Gondola aisles', -46, 2.4, -7.4], ['Produce', -53.3, 1.6, 6.2], ['Meat case', -44.5, 2.2, 13.2], ['Electronics', -31, 2.8, -12.4], ['Checkouts', -41.4, 1.6, 3.6]],
+  salesmain: [['Gondola aisles', -46, 2.4, -7.4], ['Produce', -53.3, 1.6, 6.2], ['Meat case', -44.5, 2.2, 13.2], ['Electronics', -31, 2.8, -12.4], ['Checkouts', -41.4, 1.6, 3.6], ['Pharmacy', -31.2, 3.7, 13.0]],
   elevator: [['Freight elevator', -9.8, 3.0, -11.0], ['Empty pallets', -7.3, 1.6, -10.5]],
   upstairs: [['1st floor (above the backroom)', -10, 9.2, -11.6]],
   floor2: [['2nd floor · coming soon', -10, 17.6, -11.6], ['1st floor', -10, 9.4, 11.6]],
@@ -56,7 +56,7 @@ const LBL = { // fixed points of interest per step
   overview: [],
 };
 const ROLE_STEPS = { picker: ['Stock picker operator'], stacker: ['Walkie stacker operator'], ejack: ['Electric pallet jack operator'], bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
-  floor: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · Dept 92 (big skid, 2 people)'], stock: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · overnight stocking'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
+  floor: ['Stocking 3 · skid to the sales floor'], stock: ['Stocking 3 · overnight stocking', 'Stocking 3 · skid to the sales floor'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
   pharm: ['DSD associate · receiving', 'Pharmacy pallet · jack to pharmacy'], baler: ['Baler & compactor pre-op'], omni: ['OMNI customer fulfillment'], fashion: ['Fashion · hanging apparel'], claims: ['Claims & returns'], overview: [] };
 const labelsEl = document.getElementById('labels');
 const LPOOL = []; for (let i = 0; i < 8; i++) { const d = document.createElement('div'); d.className = 'lbl'; labelsEl.appendChild(d); LPOOL.push(d); }
@@ -96,6 +96,8 @@ function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).m
   for (; n < LPOOL.length; n++) LPOOL[n].style.display = 'none'; }
 // ---------- loop: real elapsed time, clamped dt ----------
 let last = performance.now(), fadeT = -1, frames = 0;
+// dynamic resolution: if the GPU (or a software rasteriser) needs >90 ms per frame, step the pixel ratio down so one heavy view cannot block the page for a second
+let __slow = 0, __dpr = renderer.getPixelRatio(); function __dynRes(ms) { __slow = ms > 90 ? __slow + 1 : Math.max(0, __slow - 1); if (__slow >= 2 && __dpr > 0.6) { __dpr = Math.max(0.6, __dpr * 0.7); renderer.setPixelRatio(__dpr); resize(); __slow = 0; } }
 const fadeEl = document.getElementById('fade');
 function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT < 0) { fadeT = 0; fadeEl.classList.add('on'); } }
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
@@ -104,7 +106,7 @@ function frame(now) { requestAnimationFrame(frame); const dt = (now - last) / 10
   if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
   if (window.__camOverride) { const v = window.__camOverride; camera.position.fromArray(v[0]); camera.up.set(0, v[4] ? 1 : 0, v[4] ? 0 : -1); camera.lookAt(v[1][0], v[1][1], v[1][2]); camera.fov = v[2]; camera.updateProjectionMatrix(); }
-  camLook(); render3d(); renderer.render(scene, camera); updLabels(); frames++;
+  camLook(); render3d(); { const r0 = performance.now(); renderer.render(scene, camera); __dynRes(performance.now() - r0); } updLabels(); frames++;
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
 initSim(); initMachines(); resize(); goStep(0, true); camera.lookAt(camTgt);
 await __yield(); await __compile(1500); await __yield();
@@ -122,5 +124,6 @@ window.__sim.minPair = function (sec = 60, from = 0) { const save = DT; DT = 1 /
     for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) { const p = L[a], q = L[b]; if (Math.abs((p.y || 0) - (q.y || 0)) > 1.5) continue; const d = Math.hypot(p.x - q.x, p.z - q.z); if (d < best) { best = d; who = [nm(p), nm(q)]; at = T; } } }
   DT = save; return { min: +best.toFixed(3), who, at: +at.toFixed(1), n: W.length }; };
 window.__sim.footprint = function () { const r={};const save=DT;DT=1/30;const M=window.__mach;const ops=[M.pkOp,M.wsOp,M.ejOp];for(let i=0;i<150*30;i++){simStep();for(const w of W){if(w.sit||w.hide||ops.includes(w))continue;const nm=(ROLES.find(q=>q.w===w)||{}).text||('w'+W.indexOf(w));
-if(Math.abs(w.x+2.9)<1.4&&Math.abs(w.z+4.4)<0.65){r['rack:'+nm]=r['rack:'+nm]||T.toFixed(1)}
+if(Math.abs(w.x+0.6)<1.4&&Math.abs(w.z+4.4)<0.65){r['rack:'+nm]=r['rack:'+nm]||T.toFixed(1)}
 for(const [k,g] of [['pk',M.PK],['ws',M.WS],['ej',M.EJ]]){if(Math.hypot(w.x-g.position.x,w.z-g.position.z)<0.9){r[k+':'+nm]=r[k+':'+nm]||T.toFixed(1)}}}}DT=save;return r };
+window.__sim.track = function (sec, names, from = 0) { const save = DT; DT = 1 / 30; const out = []; for (let i = 0; i < sec * 30; i++) { simStep(); if (T < from || i % 15) continue; const row = [+T.toFixed(1)]; for (const n of names) { const r = ROLES.find((q) => q.text === n); row.push(r ? [+r.w.x.toFixed(2), +r.w.z.toFixed(2)] : null); } out.push(row); } DT = save; return out; };

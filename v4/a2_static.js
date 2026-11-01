@@ -15,7 +15,7 @@ const WALL = '#efefec', WALL2 = '#e4e4e0', STEEL = '#9aa3ab', DARK = '#2b2f33', 
 // floors
 const floorBR = new THREE.Mesh(new THREE.PlaneGeometry(40, 24).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ map: concreteTex }));
 concreteTex.repeat.set(8, 5); floorBR.position.set(0, 0, 0); floorBR.matrixAutoUpdate = false; floorBR.updateMatrix(); scene.add(floorBR);
-S.add(new THREE.PlaneGeometry(44, 28).rotateX(-Math.PI / 2), '#e9e7e2', 42, 0.001, 0); // sales floor tile
+S.add(new THREE.PlaneGeometry(44, 28).rotateX(-Math.PI / 2), '#c9c9c4', 42, 0.001, 0); // east stocking area: sealed concrete
 for (let x = 21; x < 64; x += 2) S.box(0.02, 0.003, 28, x, 0.003, 0, '#dddad4');
 for (let z = -13; z < 14; z += 2) S.box(44, 0.003, 0.02, 42, 0.003, z, '#dddad4');
 S.add(new THREE.PlaneGeometry(200, 160).rotateX(-Math.PI / 2), '#b9bcc6', -10, GROUND, 60); // yard (light, diorama look)
@@ -95,41 +95,15 @@ coldDoorRails(-3.6); coldDoor(3.0, SIGN.freezer);
 // ---- roller conveyor: Inky's skate-wheel line (parts/v4/skateConveyor.js), runs along z from inside trailer B to the sort area ----
 { const cv = buildConveyor(THREE, PM, { length: ROLLER.zHead - ROLLER.zTail, height: 0.84 }); cv.rotation.y = Math.PI / 2; cv.position.set(ROLLER.x, 0, (ROLLER.zHead + ROLLER.zTail) / 2); scene.add(cv); }
 await __yield();
-// ---- Sales floor gondolas (static stock, with gaps where overnight stockers fill) ----
-const GOND = []; // {x0,x1,z}  double-sided, depth 1.2
-const SHELF_Y = [0.12, 0.55, 0.98, 1.41];
-const prodCols = ['#d64541', '#2e86de', '#f5b041', '#27ae60', '#8e44ad', '#ecf0f1', '#e67e22', '#16a085', '#f1c40f', '#c0392b', '#3498db', '#fdfefe'];
-for (const z of [-10.5, -7, -3.5, 3.5, 7, 10.5]) for (const [x0, x1] of [[25, 37], [41, 53]]) GOND.push({ x0, x1, z });
-const HOLES = []; // empty shelf slots to be filled by stockers: {x,y,z,face,used}
-for (const g of GOND) {
-  const L = g.x1 - g.x0, cx = (g.x0 + g.x1) / 2;
-  S.box(L, 1.8, 0.08, cx, 0.9, g.z, '#c9ccd0'); S.box(L, 0.12, 1.2, cx, 0.06, g.z, '#b5b9bd');
-  for (let x = g.x0; x <= g.x1 + 0.01; x += 1.2) S.box(0.05, 1.9, 1.2, x, 0.95, g.z, '#aeb3b8');
-  for (const y of SHELF_Y.slice(1)) S.box(L, 0.03, 1.15, cx, y - 0.015, g.z, '#d9dcdf');
-  S.box(L, 0.04, 0.04, cx, 1.86, g.z, '#b5b9bd');
-  for (const face of [-1, 1]) for (const y of SHELF_Y) for (let x = g.x0 + 0.1; x < g.x1 - 0.25; x += 0.3) {
-    const zz = g.z + face * 0.33;
-    const isHole = (x > g.x0 + 3 && x < g.x0 + 7.5 && rnd() < 0.55);
-    if (isHole) { HOLES.push({ x: x + 0.14, y, z: zz, face, used: false, gz: g.z }); continue; }
-    const h = 0.22 + rnd() * 0.16, col = prodCols[(rnd() * prodCols.length) | 0];
-    S.box(0.27, h, 0.48, x + 0.14, y + h / 2, zz, col);
-  }
-}
-// Sales-floor department header signs (only verified names next to numbers)
-const AISLE_SIGNS = [
-  { x: 31, z: -5.25, l: ['Dept 46 · Cosmetics', 'Beauty / cosmetics'] }, { x: 31, z: 5.25, l: ['Dept 2 · Health & Beauty', 'Personal care'] },
-  { x: 47, z: -5.25, l: ['Dept 92 · Dry Grocery', 'Grocery'] }, { x: 47, z: 8.75, l: ['Dept 4 · Paper Goods', 'Household paper'] },
-  { x: 31, z: -8.75, l: ['Dept 13 · Household Chemicals', 'Cleaning'] }, { x: 47, z: 5.25, l: ['Dept 1 · Candy & Tobacco', ''] },
-  { x: 31, z: 8.75, l: ['Dept 8 · Pets & Supplies', ''] }, { x: 47, z: -8.75, l: ['Dept 40 · OTC Pharmacy', 'Pharmacy over-the-counter'] },
-];
-for (const a of AISLE_SIGNS) { const c = textSign(a.l[1] ? a.l : [a.l[0]], { w: 768, h: 160, size: 0.4 }); S.box(0.02, 1.2, 0.02, a.x, 3.4, a.z, '#555'); sign(c, 3.0, 0.62, a.x - 0.0, 2.75, a.z + 0.011, 0); sign(c, 3.0, 0.62, a.x, 2.75, a.z - 0.011, Math.PI); }
-// Pharmacy counter (sales floor, far corner)
-S.box(6, 1.1, 1, 59, 0.55, -12.5, '#e8e8e8'); S.box(6, 2.6, 0.1, 59, 2.4, -13.9, '#0071ce');
-sign(textSign(['Pharmacy', 'Dept 38 Rx · Dept 40 OTC'], { w: 768, h: 192 }), 3.2, 0.8, 59, 3.1, -13.84, 0);
-// Fashion floor racks (sales floor east end)
-for (let i = 0; i < 4; i++) { S.cyl(0.6, 0.04, 58 + (i % 2) * 2.5, 1.4, 4 + (i >> 1) * 4, '#9aa0a6', 16); S.cyl(0.03, 1.4, 58 + (i % 2) * 2.5, 0.7, 4 + (i >> 1) * 4, '#9aa0a6', 6); for (let k = 0; k < 18; k++) { const a = k / 18 * Math.PI * 2; S.box(0.05, 0.75, 0.3, 58 + (i % 2) * 2.5 + Math.cos(a) * 0.6, 1.0, 4 + (i >> 1) * 4 + Math.sin(a) * 0.6, ['#2e4053', '#922b21', '#d4ac0d', '#1f618d', '#f0f3f4', '#6c3483'][(k + i) % 6], -a); } }
-sign(textSign(['Fashion', 'Apparel · Depts 23–36'], { w: 768, h: 192 }), 3.2, 0.8, 59.2, 3.4, 13.89, Math.PI);
-
+// ---- East BACKROOM STOCKING AREA (behind the 'Backroom stocking area' door at x=20): dark-green steel shelving, mostly kraft cases, wrapped pallets on top, narrow aisles ----
+const GOND = []; const HOLES = []; // HOLES: empty gondola slots on the MAIN sales floor (filled by overnight stockers), see the main sales floor block
+{ const FX = []; let sd = 11;
+  for (const z of [-10.5, -7, -3.5, 3.5, 7, 10.5]) for (const cx of [31, 47]) { const o = buildBRShelf(THREE, PM, { seed: sd++, bays: 5 }); o.position.set(cx, 0, z); o.rotation.y = z < 0 ? 0 : Math.PI; FX.push(o); }
+  scene.add(bake(FX, 'eastStockShelving'));
+  // yellow-striped floor zone just inside the door (keep clear: staging / walkway)
+  S.boxB(20.2, 0.002, -2.0, 23.6, 0.006, -1.9, '#ffc220'); S.boxB(20.2, 0.002, 1.9, 23.6, 0.006, 2.0, '#ffc220'); S.boxB(23.5, 0.002, -2.0, 23.6, 0.006, 2.0, '#ffc220');
+  for (let z = -1.7; z < 1.8; z += 0.55) S.box(0.9, 0.004, 0.09, 21.9, 0.004, z, '#ffc220', 0.7);
+  sign(textSign(['Backroom stocking area', 'Overstock · keep aisles clear'], { w: 768, h: 192 }), 3.2, 0.8, 39, 4.6, 13.89, Math.PI); }
 // ---- Backroom zones ----
 // Receiving desk (west wall near DSD door)
 S.box(0.8, 0.9, 2.2, -19.4, 0.45, 7.6, '#5d6d7e'); S.box(0.9, 0.04, 2.3, -19.4, 0.92, 7.6, '#d5d8dc');
@@ -163,7 +137,7 @@ sign(textSign(['Chill'], { w: 256, h: 96, bg: '#fff', fg: '#3a6ea5' }), 0.8, 0.3
 const ZR = [{ x: 15.5, z: -10.6 }, { x: 15.5, z: -8.9 }];
 for (const r of ZR) { S.box(2.0, 0.04, 0.04, r.x, 1.75, r.z, '#bdc3c7'); for (const s of [-1, 1]) { S.box(0.04, 1.75, 0.04, r.x + s, 0.88, r.z, '#bdc3c7'); S.box(0.04, 0.04, 0.7, r.x + s, 0.1, r.z, '#bdc3c7'); S.cyl(0.04, 0.05, r.x + s, 0.04, r.z - 0.3, '#222', 8, 0, Math.PI / 2); S.cyl(0.04, 0.05, r.x + s, 0.04, r.z + 0.3, '#222', 8, 0, Math.PI / 2); } }
 sign(textSign(['Fashion processing', 'Hang · tag · size'], { w: 768, h: 192 }), 2.6, 0.65, 15.5, 3.0, -11.92, 0);
-sign(textSign(['Sales floor'], { w: 512, h: 128, size: 0.45 }), 2.0, 0.5, 19.97, 3.6, 0, -Math.PI / 2);
+sign(textSign(['Backroom stocking area'], { w: 768, h: 128, size: 0.42 }), 2.6, 0.43, 19.97, 3.6, 0, -Math.PI / 2);
 // Pallet return stack area marker
 sign(textSign(['Empty pallets'], { w: 512, h: 96, size: 0.45, bg: '#ffffff', fg: '#0b3d91', border: '#0b3d91' }), 1.4, 0.26, -0.5, 1.9, 11.92, Math.PI);
 
@@ -186,7 +160,7 @@ function trailer(B, x, z0, { roof = true, placard = null, docked = true } = {}) 
   B.box(2.0, 0.3, 3.2, x, GROUND + 0.95, z0 + 2.25, '#555');
   B.box(0.1, 1.2, 0.1, x - 0.9, GROUND + 0.6, z0 + 11.5, '#555'); B.box(0.1, 1.2, 0.1, x + 0.9, GROUND + 0.6, z0 + 11.5, '#555');
   B.box(W - 0.2, 0.3, L - 3.5, x, y0 - 0.25, zc + 1.5, '#4a4f54');
-  sign(SIGN.walmart, 9, 2.25, x - W / 2 - 0.03, y0 + 1.45, zc + 0.5, -Math.PI / 2); sign(SIGN.walmart, 9, 2.25, x + W / 2 + 0.03, y0 + 1.45, zc + 0.5, Math.PI / 2);
+  /* plain white trailer, no brand text */
   if (placard) { sign(SIGN['pl_' + placard], 0.8, 0.5, x + W / 2 + 0.031, y0 + 2.35, z0 + 1.2, Math.PI / 2); sign(SIGN['pl_' + placard], 0.8, 0.5, x - W / 2 - 0.031, y0 + 2.35, z0 + 1.2, -Math.PI / 2); sign(SIGN['pl_' + placard], 0.7, 0.44, x + 0.75, y0 + 2.4, z0 + L + 0.03, 0); }
 }
 // day-cab tractor at kingpin (x,zk) facing +z (away from dock)
@@ -200,7 +174,7 @@ function tractorBody(B, x, zk, col = '#0b3d91', ox = 0, oz = 0) { // body in loc
   for (const s of [-1, 1]) { B.box(0.08, 0.15, 0.4, s * 1.3, 1.05, 4.5, '#222'); B.box(0.6, 0.25, 0.4, s * 0.9, -0.5, 1.2, '#999'); B.cyl(0.33, 1.2, s * 1.15, 0.2, 2.2, '#c0c4c8', 10); }
   for (const [az, w] of [[0, 0.9], [4.6, 0.32]]) for (const s of [-1, 1]) B.cyl(0.52, w, s * 1.0, -0.68, az, '#1b1b1b', 14, 0, Math.PI / 2);
   for (let i = g0; i < B.g.length; i++) B.g[i].translate(x + ox, GROUND + 1.2, zk + oz);
-  sign(SIGN.walmartCab, 1.2, 0.3, x + 1.255, GROUND + 1.45, zk + 3.6, Math.PI / 2); sign(SIGN.walmartCab, 1.2, 0.3, x - 1.255, GROUND + 1.45, zk + 3.6, -Math.PI / 2);
+  /* plain cab, no brand text */
 }
 await __yield();
 trailer(S, DOORS.A.x, 12.3, { roof: false, placard: 'FDS' }); tractorBody(S, DOORS.A.x, 12.3 + 15);
@@ -287,7 +261,9 @@ const MSF = { x0: -58, x1: -26, z0: -14, z1: 14 };
   sign(textSign(['Employees only'], { w: 512, h: 128, bg: '#fff', fg: '#041e42', size: 0.42 }), 1.6, 0.4, -26.08, 2.85, 4.3, -Math.PI / 2);
   // gondola runs (≤10 m each) with hanging blue aisle signs
   const AZ = [-11.6, -8.8, -6.0, -3.2]; let k = 0;
-  for (const z of AZ) for (const cx of [-51.6, -41.4]) FX.push(at(buildGondola(THREE, PM, { length: 8, seed: 3 + k++ }), cx, z));
+  const HSEC = { '-8.8,-41.4': [1], '-6,-41.4': [-1, 1], '-3.2,-41.4': [-1] }; // aisle faces with holes (sz) near the stockers' skids
+  for (const z of AZ) for (const cx of [-51.6, -41.4]) { const hs = (HSEC[z + ',' + cx] || []).flatMap((sz) => [4, 5, 6].map((i) => ({ i, sz }))); const gd = buildGondola(THREE, PM, { length: 8, seed: 3 + k++, holeSecs: hs }); FX.push(at(gd, cx, z));
+    const off = gd.userData.offset || [0, 0, 0]; for (const h of gd.userData.holes || []) HOLES.push({ x: cx + h.x + off[0], y: h.y, z: z + h.z + off[2], face: h.sz, used: false, gz: z }); }
   for (let i = 0; i < AZ.length - 1; i++) { const z = (AZ[i] + AZ[i + 1]) / 2; for (const cx of [-51.6, -41.4]) { const c = textSign(['Aisle ' + (i * 2 + (cx < -46 ? 1 : 2))], { w: 512, h: 128, bg: '#0071ce', fg: '#fff', size: 0.5 });
       sign(c, 1.4, 0.36, cx, 2.75, z + 0.01, 0); sign(c, 1.4, 0.36, cx, 2.75, z - 0.01, Math.PI); S.box(0.02, 0.4, 0.02, cx - 0.5, 3.1, z, '#888'); S.box(0.02, 0.4, 0.02, cx + 0.5, 3.1, z, '#888'); } }
   // produce (front left), black price boards are on the tables
@@ -300,6 +276,9 @@ const MSF = { x0: -58, x1: -26, z0: -14, z1: 14 };
   // electronics TV wall + display table (north-east corner)
   FX.push(at(buildTVWall(THREE, PM, { width: 6, seed: 5 }), -31.0, -12.6));
   sign(textSign(['Electronics'], { w: 512, h: 128, bg: '#041e42', fg: '#fff', size: 0.45 }), 2.4, 0.6, -31.0, 2.95, -13.9, 0);
+  // pharmacy counter (south-east corner of the sales floor, by the doors)
+  S.box(6, 1.1, 1, -31.2, 0.55, 12.9, '#e8e8e8'); S.box(6, 2.6, 0.1, -31.2, 1.3, 13.9, '#0071ce');
+  sign(textSign(['Pharmacy', 'Dept 38 Rx · Dept 40 OTC'], { w: 768, h: 192 }), 3.2, 0.8, -31.2, 2.95, 13.84, Math.PI);
   // checkouts (front)
   for (let i = 0; i < 3; i++) FX.push(at(buildCheckout(THREE, PM, { seed: 6 + i }), -46 + i * 4.6, 3.6));
   scene.add(bake(FX, 'mainSalesFloor'));

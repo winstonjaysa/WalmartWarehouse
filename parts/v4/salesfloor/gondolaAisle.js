@@ -5,6 +5,7 @@ export function build(THREE, mats, opts = {}) {
   const g = new THREE.Group(), R = rng(opts.seed ?? 1), M = matsOf(THREE, mats);
   const SEC = 1.22, n = Math.max(1, Math.round((opts.length ?? 8) / SEC)), L = n * SEC;
   const H = opts.height ?? 1.8, D = 0.5, BK = 0.04, gap = opts.gapRate ?? 0.07; // D = shelf depth per side
+  const HS = opts.holeSecs || [], HOLES = []; // holeSecs: [{i, sz}] sections left empty on levels 1-3 (overnight stockers fill them)
   const S = [], P = [], steel = '#9ea3a8', dark = '#6d7277', deckC = '#8d9297';
   const ls = (H - 0.14) / 5, levels = [0, 1, 2, 3, 4].map(i => +(0.14 + i * ls).toFixed(3)); // base deck + 4 shelves (top of deck)
   // spine: backer panels (pegboard grey) + uprights
@@ -24,6 +25,7 @@ export function build(THREE, mats, opts = {}) {
       for (let i = 0; i < n; i++) {
         let x = -L / 2 + i * SEC + 0.03; const xe = x + SEC - 0.06;
         if (R() < 0.35) P.push(slab(THREE, 0.09, 0.03, 0.006, x + 0.2 + R() * 0.7, y - 0.018, sz * (BK / 2 + dd + 0.012), R() < 0.5 ? '#f4d23c' : '#2f6db5', sz > 0 ? 'z' : 'Z'));
+        if (li >= 1 && li <= 3 && HS.some((q) => q.i === i && q.sz === sz)) { for (let hx = x + 0.15; hx < xe - 0.1; hx += 0.3) HOLES.push({ x: hx, y, z: sz * (BK / 2 + dd / 2), sz }); continue; }
         while (x < xe - 0.08) {
           const w = Math.min(xe - x, 0.14 + R() * 0.24);
           if (R() < gap) { x += w; continue; }
@@ -62,5 +64,5 @@ export function build(THREE, mats, opts = {}) {
   P.push(B(THREE, 0.03, 0.5, 0.9, sxp, sy, 0, '#1f5fb8'), B(THREE, 0.034, 0.1, 0.9, sxp, sy + 0.2, 0, '#f2f2ee'));
   for (const sz of [-1, 1]) S.push(rod(THREE, [sxp, sy + 0.25, sz * 0.38], [sxp, 3.4, sz * 0.38], 0.006, 4, '#8a8f94'));
   g.add(mesh(THREE, S, M.vm, 'gondola'), mesh(THREE, P, M.vc, 'products'));
-  return finish(THREE, g, 'gondolaAisle', {}, { height: H, sections: n, length: L, shelfLevels: levels, facing: 'shelves ±z, end caps ±x, sign ±x' });
+  const out = finish(THREE, g, 'gondolaAisle', {}, { height: H, sections: n, length: L, shelfLevels: levels, facing: 'shelves ±z, end caps ±x, sign ±x' }); out.userData.holes = HOLES; return out;
 }
