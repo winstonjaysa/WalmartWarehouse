@@ -13,40 +13,40 @@
       "console": true
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 2089,
-      "simSecondsPerWallSecond": 0.208,
-      "fpsWindowS": 2,
-      "avgFps": 3.5,
-      "drawsPerFrameHookWindow": 104.1,
-      "ttffMs": 4606,
+      "ttffScreenshotNonBlankMs": 1419,
+      "simSecondsPerWallSecond": 0.15,
+      "fpsWindowS": 10,
+      "avgFps": 3.9,
+      "drawsPerFrameHookWindow": 102.2,
+      "ttffMs": 3793,
       "shaders": 46,
       "programsHook": 23,
       "programsPage": 23,
-      "drawsPerFramePage": 105,
-      "drawsPerFrameHook": 132.8,
-      "longestTaskMs": 465,
+      "drawsPerFramePage": 94,
+      "drawsPerFrameHook": 125.5,
+      "longestTaskMs": 364,
       "top3LongTasks": [
-        "465ms @3803ms [hero||y0]",
-        "314ms @963ms [hero||y0]",
-        "303ms @2819ms [hero||y0]"
+        "364ms @3135ms [hero||y0]",
+        "259ms @2290ms [hero||y0]",
+        "224ms @1157ms [hero||y0]"
       ],
-      "longTaskCount": 19,
+      "longTaskCount": 20,
       "frameSpikes": [],
       "loaderTimeline": [
         [
-          197,
+          179,
           "Loading the backroom…",
           0,
           0
         ],
         [
-          2522,
+          1963,
           "(gone)",
           20,
           10
         ]
       ],
-      "loaderGoneMs": 2522,
+      "loaderGoneMs": 1963,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",
@@ -65,7 +65,6 @@
         "__frameSpikes",
         "__mach",
         "__ready",
-        "__warmLeft",
         "__smokePhase"
       ],
       "quality": "high"

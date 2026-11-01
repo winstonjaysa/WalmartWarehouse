@@ -3,15 +3,14 @@ PROFILE v4  URL file:///workspace/gateflow/builds/walmart-store_v4.html
 OUT /workspace/gateflow/qa/smoke_out/v4_desktop_run2
 
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
-desktop  | PASS   | FAIL  | FAIL   | FAIL | PASS    | PASS  | PASS     | PASS     | FAIL
+desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[desktop] TTFF=4585ms loaderGone=2731ms fps=0.15 draws/frame hook=213 page=182 programs page=23 hook=23 shaders=46 longest=408ms top3=[408ms @2321ms [hero||y0], 397ms @2740ms [hero||y0], 384ms @273ms [hero||y0]] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 2731 ms (limit 3000); last text "Loading the backroom…"
-  frame: FAIL - not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))
-  movers: FAIL - not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))
-  nav: FAIL - not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))
+[desktop] TTFF=3725ms loaderGone=2229ms fps=3.8 draws/frame hook=121.9 page=94 programs page=23 hook=23 shaders=46 longest=367ms top3=[367ms @3067ms [hero||y0], 350ms @1781ms [hero||y0], 276ms @2233ms [hero||y0]] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 2229 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":162,"sd":62.96,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.03944,"meanAbs":1.438}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 4/24 moved; sim 1.4->1.717 (0.158 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 9.812; prev:ok caption changed, cam 2.49; dot:ok caption changed, cam 3.793; wheel:ok caption changed, cam 35.462
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 213/frame (window avg n/a), page renderer.info.render.calls 182 (limit <300)
+  draws: PASS - GL hook 121.9/frame (window avg 103), page renderer.info.render.calls 94 (limit <300)
   programs: PASS - renderer.info.programs=23, GL hook linkProgram=23, shaders=46 (limit <25)
-  longtask: PASS - longest 408 ms (limit <500); top3 408ms @2321ms [hero||y0], 397ms @2740ms [hero||y0], 384ms @273ms [hero||y0]; 21 long tasks
-  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+  longtask: PASS - longest 367 ms (limit <500); top3 367ms @3067ms [hero||y0], 350ms @1781ms [hero||y0], 276ms @2233ms [hero||y0]; 20 long tasks

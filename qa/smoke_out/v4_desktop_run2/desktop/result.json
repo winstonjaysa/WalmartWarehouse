@@ -4,12 +4,174 @@
   "url": "file:///workspace/gateflow/builds/walmart-store_v4.html",
   "checks": {
     "frame": {
-      "pass": false,
-      "detail": "not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))"
+      "pass": true,
+      "detail": "stats {\"mean\":162,\"sd\":62.96,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.03944,\"meanAbs\":1.438}"
+    },
+    "movers": {
+      "pass": true,
+      "sources": [
+        "__sim.VEH",
+        "__sim.workers"
+      ],
+      "wall": {
+        "vehicles": "0/3",
+        "workers": "4/24",
+        "any": true,
+        "simT": [
+          1.4,
+          1.717
+        ],
+        "rate": 0.158
+      },
+      "sample": [
+        {
+          "id": "VEH[0]:snack-vendor-tractor-trailer",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "VEH[1]:snack-vendor-trailer",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "VEH[2]:beverage-vendor-box-truck",
+          "kind": "vehicle",
+          "d": 0
+        },
+        {
+          "id": "workers[0]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[1]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[2]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[3]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[4]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[5]:worker",
+          "kind": "worker",
+          "d": 0
+        },
+        {
+          "id": "workers[6]:worker",
+          "kind": "worker",
+          "d": 0
+        }
+      ],
+      "detail": "2 s wall: vehicles 0/3, workers 4/24 moved; sim 1.4->1.717 (0.158 sim-s/wall-s)"
+    },
+    "nav": {
+      "pass": true,
+      "required": [
+        "next",
+        "prev",
+        "wheel"
+      ],
+      "controls": {
+        "next": {
+          "key": "› | Next step | | next | | {\"smoke\":\"next\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"next\"]",
+          "n": 1
+        },
+        "prev": {
+          "key": "‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"prev\"]",
+          "n": 1
+        },
+        "dots": 27,
+        "dotKeys": [
+          "| Steps | | | dots | {\"smokeDot\":\"0\"} |",
+          "| Go to step 1 | | | on | {\"step\":\"0\",\"smokeDot\":\"1\"} |",
+          "| Go to step 2 | | | | {\"step\":\"1\",\"smokeDot\":\"2\"} |"
+        ]
+      },
+      "inputs": [
+        {
+          "input": "next",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 9.812,
+          "imgDiff": 0.9919,
+          "captionBefore": "What happens in the backroom while the store sleeps",
+          "captionAfter": "Unloading the trailer",
+          "scrollY": [
+            0,
+            894
+          ],
+          "err": null
+        },
+        {
+          "input": "prev",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 2.49,
+          "imgDiff": 0.99449,
+          "captionBefore": "Unloading the trailer",
+          "captionAfter": "What happens in the backroom while the store sleeps",
+          "scrollY": [
+            900,
+            45
+          ],
+          "err": null
+        },
+        {
+          "input": "dot",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 3.793,
+          "imgDiff": 0.99215,
+          "captionBefore": "What happens in the backroom while the store sleeps",
+          "captionAfter": "Unloading the trailer",
+          "scrollY": [
+            0,
+            900
+          ],
+          "err": null
+        },
+        {
+          "input": "wheel",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 35.462,
+          "imgDiff": 0,
+          "captionBefore": "Unloading the trailer",
+          "captionAfter": "Mixed skids, stretch-wrapped",
+          "scrollY": [
+            900,
+            2100
+          ],
+          "err": null,
+          "method": "wheel"
+        }
+      ],
+      "detail": "next:ok caption changed, cam 9.812; prev:ok caption changed, cam 2.49; dot:ok caption changed, cam 3.793; wheel:ok caption changed, cam 35.462"
     },
     "loader": {
       "pass": true,
-      "detail": "loader gone at 2731 ms (limit 3000); last text \"Loading the backroom…\""
+      "detail": "loader gone at 2229 ms (limit 3000); last text \"Loading the backroom…\""
     },
     "programs": {
       "pass": true,
@@ -17,57 +179,52 @@
     },
     "draws": {
       "pass": true,
-      "detail": "GL hook 213/frame (window avg n/a), page renderer.info.render.calls 182 (limit <300)"
+      "detail": "GL hook 121.9/frame (window avg 103), page renderer.info.render.calls 94 (limit <300)"
     },
     "longtask": {
       "pass": true,
-      "detail": "longest 408 ms (limit <500); top3 408ms @2321ms [hero||y0], 397ms @2740ms [hero||y0], 384ms @273ms [hero||y0]; 21 long tasks"
+      "detail": "longest 367 ms (limit <500); top3 367ms @3067ms [hero||y0], 350ms @1781ms [hero||y0], 276ms @2233ms [hero||y0]; 20 long tasks"
     },
     "console": {
       "pass": true,
       "detail": "0 console.error, 0 pageerror"
-    },
-    "movers": {
-      "pass": false,
-      "detail": "not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))"
-    },
-    "nav": {
-      "pass": false,
-      "detail": "not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked))"
     }
   },
   "metrics": {
-    "ttffScreenshotNonBlankMs": 1873,
-    "ttffMs": 4585,
+    "ttffScreenshotNonBlankMs": 1549,
+    "simSecondsPerWallSecond": 0.158,
+    "fpsWindowS": 10,
+    "avgFps": 3.8,
+    "drawsPerFrameHookWindow": 103,
+    "ttffMs": 3725,
     "shaders": 46,
     "programsHook": 23,
     "programsPage": 23,
-    "drawsPerFramePage": 182,
-    "drawsPerFrameHook": 213,
-    "avgFps": 0.15,
-    "longestTaskMs": 408,
+    "drawsPerFramePage": 94,
+    "drawsPerFrameHook": 121.9,
+    "longestTaskMs": 367,
     "top3LongTasks": [
-      "408ms @2321ms [hero||y0]",
-      "397ms @2740ms [hero||y0]",
-      "384ms @273ms [hero||y0]"
+      "367ms @3067ms [hero||y0]",
+      "350ms @1781ms [hero||y0]",
+      "276ms @2233ms [hero||y0]"
     ],
-    "longTaskCount": 21,
+    "longTaskCount": 20,
     "frameSpikes": [],
     "loaderTimeline": [
       [
-        134,
+        175,
         "Loading the backroom…",
         0,
         0
       ],
       [
-        2731,
+        2229,
         "(gone)",
         20,
         10
       ]
     ],
-    "loaderGoneMs": 2731,
+    "loaderGoneMs": 2229,
     "loaderSeen": true,
     "globals": {
       "renderer": "__R.renderer",
@@ -86,17 +243,13 @@
       "__frameSpikes",
       "__mach",
       "__ready",
-      "__warmLeft"
+      "__smokePhase"
     ],
     "quality": "low"
   },
   "console": [],
   "pageErrors": [],
-  "notes": [
-    "snap a: timeout: screenshot >10000ms",
-    "FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)",
-    "snap b: timeout: screenshot >10000ms"
-  ],
+  "notes": [],
   "state0": {
     "globals": {
       "renderer": "__R.renderer",
@@ -104,9 +257,9 @@
       "scene": "__R.scene"
     },
     "hooks": {
-      "shaders": 40,
-      "programsLinked": 20,
-      "draws": 65,
+      "shaders": 44,
+      "programsLinked": 22,
+      "draws": 70,
       "framesWithDraws": 0,
       "firstDrawFrameAt": null
     },
@@ -125,12 +278,12 @@
     "ready": false,
     "quality": "low",
     "renderer": {
-      "programs": 20,
+      "programs": 22,
       "calls": 1,
-      "triangles": 744,
-      "frame": 32,
-      "geometries": 52,
-      "textures": 12
+      "triangles": 900,
+      "frame": 37,
+      "geometries": 57,
+      "textures": 17
     },
     "camera": {
       "p": [
@@ -148,7 +301,26 @@
       "fov": 50
     }
   },
-  "fatal": "viewport hard timeout 60000ms (page hang / main thread blocked)",
+  "navControls": {
+    "next": {
+      "key": "› | Next step | | next | | {\"smoke\":\"next\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"next\"]",
+      "n": 1
+    },
+    "prev": {
+      "key": "‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |",
+      "visible": true,
+      "sel": "[data-smoke=\"prev\"]",
+      "n": 1
+    },
+    "dots": 27,
+    "dotKeys": [
+      "| Steps | | | dots | {\"smokeDot\":\"0\"} |",
+      "| Go to step 1 | | | on | {\"step\":\"0\",\"smokeDot\":\"1\"} |",
+      "| Go to step 2 | | | | {\"step\":\"1\",\"smokeDot\":\"2\"} |"
+    ]
+  },
   "stateEnd": {
     "globals": {
       "renderer": "__R.renderer",
@@ -158,9 +330,9 @@
     "hooks": {
       "shaders": 46,
       "programsLinked": 23,
-      "draws": 1957,
-      "framesWithDraws": 9,
-      "firstDrawFrameAt": 4585
+      "draws": 19640,
+      "framesWithDraws": 160,
+      "firstDrawFrameAt": 3725
     },
     "windowGlobals": [
       "__THREE__",
@@ -174,33 +346,33 @@
       "__frameSpikes",
       "__mach",
       "__ready",
-      "__warmLeft"
+      "__smokePhase"
     ],
     "ready": true,
     "quality": "low",
     "renderer": {
       "programs": 23,
-      "calls": 182,
-      "triangles": 1152106,
-      "frame": 291,
-      "geometries": 243,
+      "calls": 94,
+      "triangles": 671458,
+      "frame": 201,
+      "geometries": 197,
       "textures": 17
     },
     "camera": {
       "p": [
-        24.107,
-        31,
-        45
+        2.662,
+        4.4,
+        2.6
       ],
       "q": [
-        -0.2775,
-        0.2794,
-        0.0847,
-        0.9153
+        0.0134,
+        0.9777,
+        0.199,
+        -0.0659
       ],
       "zoom": 1,
-      "fov": 32
+      "fov": 47.939125024999996
     }
   },
-  "pass": false
+  "pass": true
 }

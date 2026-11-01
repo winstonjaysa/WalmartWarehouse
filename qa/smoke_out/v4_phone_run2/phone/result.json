@@ -5,7 +5,7 @@
   "checks": {
     "frame": {
       "pass": true,
-      "detail": "stats {\"mean\":181.1,\"sd\":72.26,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.03767,\"meanAbs\":1.607}"
+      "detail": "stats {\"mean\":181.1,\"sd\":72.26,\"colours\":500,\"blank\":false}; 1 s diff {\"changedFrac\":0.01828,\"meanAbs\":0.646}"
     },
     "movers": {
       "pass": true,
@@ -15,13 +15,13 @@
       ],
       "wall": {
         "vehicles": "0/3",
-        "workers": "3/24",
+        "workers": "4/24",
         "any": true,
         "simT": [
-          0.967,
-          1.1
+          1.917,
+          2.434
         ],
-        "rate": 0.066
+        "rate": 0.258
       },
       "sample": [
         {
@@ -42,7 +42,7 @@
         {
           "id": "workers[0]:worker",
           "kind": "worker",
-          "d": 0
+          "d": 0.286
         },
         {
           "id": "workers[1]:worker",
@@ -52,7 +52,7 @@
         {
           "id": "workers[2]:worker",
           "kind": "worker",
-          "d": 0.166
+          "d": 0.068
         },
         {
           "id": "workers[3]:worker",
@@ -75,11 +75,116 @@
           "d": 0
         }
       ],
-      "detail": "2 s wall: vehicles 0/3, workers 3/24 moved; sim 0.967->1.1 (0.066 sim-s/wall-s)"
+      "detail": "2 s wall: vehicles 0/3, workers 4/24 moved; sim 1.917->2.434 (0.258 sim-s/wall-s)"
+    },
+    "nav": {
+      "pass": true,
+      "required": [
+        "next",
+        "prev",
+        "touch-swipe"
+      ],
+      "controls": {
+        "next": {
+          "key": "› | Next step | | next | | {\"smoke\":\"next\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"next\"]",
+          "n": 1
+        },
+        "prev": {
+          "key": "‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |",
+          "visible": true,
+          "sel": "[data-smoke=\"prev\"]",
+          "n": 1
+        },
+        "dots": 0,
+        "dotKeys": []
+      },
+      "inputs": [
+        {
+          "input": "next",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 22.603,
+          "imgDiff": 0.97502,
+          "captionBefore": "What happens in the backroom while the store sleeps",
+          "captionAfter": "Unloading the trailer",
+          "scrollY": [
+            0,
+            808
+          ],
+          "err": null
+        },
+        {
+          "input": "prev",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 8.973,
+          "imgDiff": 0,
+          "captionBefore": "Mixed skids, stretch-wrapped",
+          "captionAfter": "A gravity roller down the middle",
+          "scrollY": [
+            1684,
+            2524
+          ],
+          "err": null
+        },
+        {
+          "input": "wheel",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 42.517,
+          "imgDiff": 0,
+          "captionBefore": "A gravity roller down the middle",
+          "captionAfter": "Out through the double doors",
+          "scrollY": [
+            2597,
+            4637
+          ],
+          "err": null,
+          "method": "wheel"
+        },
+        {
+          "input": "touch-swipe",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 32.223,
+          "imgDiff": 0,
+          "captionBefore": "Filling the holes",
+          "captionAfter": "Milk and eggs, straight to the cooler",
+          "scrollY": [
+            5477,
+            6317
+          ],
+          "err": null,
+          "method": "touch-swipe"
+        },
+        {
+          "input": "scrollBy",
+          "ok": true,
+          "captionChanged": true,
+          "cameraMoved": true,
+          "camDelta": 37.279,
+          "imgDiff": 0,
+          "captionBefore": "Vendors deliver direct",
+          "captionAfter": "A snack vendor backs in",
+          "scrollY": [
+            7157,
+            8841
+          ],
+          "err": null,
+          "method": "scrollBy"
+        }
+      ],
+      "detail": "next:ok caption changed, cam 22.603; prev:ok caption changed, cam 8.973; wheel:ok caption changed, cam 42.517; touch-swipe:ok caption changed, cam 32.223; scrollBy:ok caption changed, cam 37.279"
     },
     "loader": {
-      "pass": false,
-      "detail": "loader gone at 5024 ms (limit 3000); last text \"Loading the backroom…\""
+      "pass": true,
+      "detail": "loader gone at 2257 ms (limit 3000); last text \"Loading the backroom…\""
     },
     "programs": {
       "pass": true,
@@ -87,69 +192,52 @@
     },
     "draws": {
       "pass": true,
-      "detail": "GL hook 110.8/frame (window avg n/a), page renderer.info.render.calls 69 (limit <300)"
+      "detail": "GL hook 84/frame (window avg 56), page renderer.info.render.calls 63 (limit <300)"
     },
     "longtask": {
-      "pass": false,
-      "detail": "longest 1587 ms (limit <500); top3 1587ms @9803ms [hero||y0], 764ms @1159ms [hero||y0], 564ms @2513ms [hero||y0]; 27 long tasks"
+      "pass": true,
+      "detail": "longest 366 ms (limit <500); top3 366ms @1888ms [hero||y0], 356ms @3060ms [hero||y0], 355ms @1455ms [hero||y0]; 18 long tasks"
     },
     "console": {
       "pass": true,
       "detail": "0 console.error, 0 pageerror"
-    },
-    "nav": {
-      "pass": false,
-      "detail": "not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked)); controls found: {\"next\":{\"key\":\"› | Next step | | next | | {\\\"smoke\\\":\\\"next\\\"} |\",\"visible\":true,\"sel\":\"[data-smoke=\\\"next\\\"]\",\"n\":1},\"prev\":{\"key\":\"‹ | Previous step | | prev | | {\\\"smoke\\\":\\\"prev\\\"} |\",\"visible\":true,\"sel\":\"[data-smoke=\\\"prev\\\"]\",\"n\":1},\"dots\":0,\"dotKeys\":[]}"
     }
   },
   "metrics": {
-    "ttffScreenshotNonBlankMs": 3247,
-    "simSecondsPerWallSecond": 0.066,
-    "ttffMs": 7838,
+    "ttffScreenshotNonBlankMs": 1373,
+    "simSecondsPerWallSecond": 0.258,
+    "fpsWindowS": 10,
+    "avgFps": 11,
+    "drawsPerFrameHookWindow": 56,
+    "ttffMs": 3671,
     "shaders": 46,
     "programsHook": 23,
     "programsPage": 23,
-    "drawsPerFramePage": 69,
-    "drawsPerFrameHook": 110.8,
-    "avgFps": 2.92,
-    "longestTaskMs": 1587,
+    "drawsPerFramePage": 63,
+    "drawsPerFrameHook": 84,
+    "longestTaskMs": 366,
     "top3LongTasks": [
-      "1587ms @9803ms [hero||y0]",
-      "764ms @1159ms [hero||y0]",
-      "564ms @2513ms [hero||y0]"
+      "366ms @1888ms [hero||y0]",
+      "356ms @3060ms [hero||y0]",
+      "355ms @1455ms [hero||y0]"
     ],
-    "longTaskCount": 27,
-    "frameSpikes": [
-      {
-        "at": 9804,
-        "step": "hero",
-        "camT": 1,
-        "sim": 0.3,
-        "adv": 1,
-        "pre": 1573,
-        "render": 10,
-        "lbl": 0,
-        "geoNew": 1,
-        "texNew": 1,
-        "progNew": 1,
-        "calls": 180
-      }
-    ],
+    "longTaskCount": 18,
+    "frameSpikes": [],
     "loaderTimeline": [
       [
-        229,
+        169,
         "Loading the backroom…",
         0,
         0
       ],
       [
-        5024,
+        2257,
         "(gone)",
         20,
         10
       ]
     ],
-    "loaderGoneMs": 5024,
+    "loaderGoneMs": 2257,
     "loaderSeen": true,
     "globals": {
       "renderer": "__R.renderer",
@@ -168,16 +256,13 @@
       "__frameSpikes",
       "__mach",
       "__ready",
-      "__warmLeft",
       "__smokePhase"
     ],
     "quality": "low"
   },
   "console": [],
   "pageErrors": [],
-  "notes": [
-    "FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)"
-  ],
+  "notes": [],
   "state0": {
     "globals": {
       "renderer": "__R.renderer",
@@ -185,11 +270,11 @@
       "scene": "__R.scene"
     },
     "hooks": {
-      "shaders": 28,
-      "programsLinked": 14,
-      "draws": 45,
-      "framesWithDraws": 0,
-      "firstDrawFrameAt": null
+      "shaders": 46,
+      "programsLinked": 23,
+      "draws": 607,
+      "framesWithDraws": 3,
+      "firstDrawFrameAt": 3671
     },
     "windowGlobals": [
       "__THREE__",
@@ -201,32 +286,33 @@
       "__goStep",
       "__step",
       "__frameSpikes",
-      "__mach"
+      "__mach",
+      "__ready"
     ],
-    "ready": false,
+    "ready": true,
     "quality": "low",
     "renderer": {
-      "programs": 14,
-      "calls": 2,
-      "triangles": 384,
-      "frame": 16,
-      "geometries": 35,
-      "textures": 6
+      "programs": 23,
+      "calls": 180,
+      "triangles": 1083310,
+      "frame": 44,
+      "geometries": 179,
+      "textures": 17
     },
     "camera": {
       "p": [
-        37.75,
+        37.845,
         47.5,
         65.5
       ],
       "q": [
-        -0.3329,
-        0.2729,
-        0.1013,
-        0.8969
+        -0.3327,
+        0.2734,
+        0.1014,
+        0.8968
       ],
       "zoom": 1,
-      "fov": 50
+      "fov": 46
     }
   },
   "navControls": {
@@ -245,7 +331,6 @@
     "dots": 0,
     "dotKeys": []
   },
-  "fatal": "viewport hard timeout 60000ms (page hang / main thread blocked)",
   "stateEnd": {
     "globals": {
       "renderer": "__R.renderer",
@@ -255,9 +340,9 @@
     "hooks": {
       "shaders": 46,
       "programsLinked": 23,
-      "draws": 16976,
-      "framesWithDraws": 152,
-      "firstDrawFrameAt": 7838
+      "draws": 24621,
+      "framesWithDraws": 291,
+      "firstDrawFrameAt": 3671
     },
     "windowGlobals": [
       "__THREE__",
@@ -271,34 +356,33 @@
       "__frameSpikes",
       "__mach",
       "__ready",
-      "__warmLeft",
       "__smokePhase"
     ],
     "ready": true,
     "quality": "low",
     "renderer": {
       "programs": 23,
-      "calls": 69,
-      "triangles": 431436,
-      "frame": 425,
-      "geometries": 243,
+      "calls": 63,
+      "triangles": 423666,
+      "frame": 332,
+      "geometries": 188,
       "textures": 17
     },
     "camera": {
       "p": [
-        -17.991,
-        4.184,
-        5.682
+        -23.966,
+        6.5,
+        2
       ],
       "q": [
-        0.1329,
-        0.8432,
-        0.4607,
-        -0.2432
+        -0.0849,
+        0.9151,
+        0.2791,
+        0.2782
       ],
       "zoom": 1,
-      "fov": 62.181136022183935
+      "fov": 58.78736684018528
     }
   },
-  "pass": false
+  "pass": true
 }

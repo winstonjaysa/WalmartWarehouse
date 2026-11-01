@@ -1,7 +1,7 @@
 [
   {
     "viewport": "desktop",
-    "pass": true,
+    "pass": false,
     "checks": {
       "frame": true,
       "movers": true,
@@ -9,44 +9,59 @@
       "loader": true,
       "programs": true,
       "draws": true,
-      "longtask": true,
+      "longtask": false,
       "console": true
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 1500,
-      "simSecondsPerWallSecond": 0.208,
-      "fpsWindowS": 2.5,
-      "avgFps": 4.36,
-      "drawsPerFrameHookWindow": 99.1,
-      "ttffMs": 3853,
+      "ttffScreenshotNonBlankMs": 1387,
+      "simSecondsPerWallSecond": 0.15,
+      "fpsWindowS": 10,
+      "avgFps": 3.6,
+      "drawsPerFrameHookWindow": 102.6,
+      "ttffMs": 3788,
       "shaders": 46,
       "programsHook": 23,
       "programsPage": 23,
-      "drawsPerFramePage": 105,
-      "drawsPerFrameHook": 128.2,
-      "longestTaskMs": 451,
+      "drawsPerFramePage": 94,
+      "drawsPerFrameHook": 127.8,
+      "longestTaskMs": 501,
       "top3LongTasks": [
-        "451ms @944ms [hero||y0]",
-        "394ms @3203ms [hero||y0]",
-        "293ms @1953ms [hero||y0]"
+        "501ms @34360ms [hero|before:dot|y0]",
+        "367ms @1879ms [hero||y0]",
+        "253ms @1546ms [hero||y0]"
       ],
-      "longTaskCount": 22,
-      "frameSpikes": [],
+      "longTaskCount": 23,
+      "frameSpikes": [
+        {
+          "at": 34471,
+          "step": "hero",
+          "camT": 0.83,
+          "sim": 5.4,
+          "adv": 38,
+          "pre": 102,
+          "render": 154,
+          "lbl": 36,
+          "geoNew": 0,
+          "texNew": 0,
+          "progNew": 0,
+          "calls": 178
+        }
+      ],
       "loaderTimeline": [
         [
-          192,
+          170,
           "Loading the backroom…",
           0,
           0
         ],
         [
-          1935,
+          2248,
           "(gone)",
           20,
           10
         ]
       ],
-      "loaderGoneMs": 1935,
+      "loaderGoneMs": 2248,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",
@@ -65,7 +80,6 @@
         "__frameSpikes",
         "__mach",
         "__ready",
-        "__warmLeft",
         "__smokePhase"
       ],
       "quality": "high"

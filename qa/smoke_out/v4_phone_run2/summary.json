@@ -1,65 +1,52 @@
 [
   {
     "viewport": "phone",
-    "pass": false,
+    "pass": true,
     "checks": {
       "frame": true,
       "movers": true,
-      "loader": false,
+      "nav": true,
+      "loader": true,
       "programs": true,
       "draws": true,
-      "longtask": false,
-      "console": true,
-      "nav": false
+      "longtask": true,
+      "console": true
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 3247,
-      "simSecondsPerWallSecond": 0.066,
-      "ttffMs": 7838,
+      "ttffScreenshotNonBlankMs": 1373,
+      "simSecondsPerWallSecond": 0.258,
+      "fpsWindowS": 10,
+      "avgFps": 11,
+      "drawsPerFrameHookWindow": 56,
+      "ttffMs": 3671,
       "shaders": 46,
       "programsHook": 23,
       "programsPage": 23,
-      "drawsPerFramePage": 69,
-      "drawsPerFrameHook": 110.8,
-      "avgFps": 2.92,
-      "longestTaskMs": 1587,
+      "drawsPerFramePage": 63,
+      "drawsPerFrameHook": 84,
+      "longestTaskMs": 366,
       "top3LongTasks": [
-        "1587ms @9803ms [hero||y0]",
-        "764ms @1159ms [hero||y0]",
-        "564ms @2513ms [hero||y0]"
+        "366ms @1888ms [hero||y0]",
+        "356ms @3060ms [hero||y0]",
+        "355ms @1455ms [hero||y0]"
       ],
-      "longTaskCount": 27,
-      "frameSpikes": [
-        {
-          "at": 9804,
-          "step": "hero",
-          "camT": 1,
-          "sim": 0.3,
-          "adv": 1,
-          "pre": 1573,
-          "render": 10,
-          "lbl": 0,
-          "geoNew": 1,
-          "texNew": 1,
-          "progNew": 1,
-          "calls": 180
-        }
-      ],
+      "longTaskCount": 18,
+      "frameSpikes": [],
       "loaderTimeline": [
         [
-          229,
+          169,
           "Loading the backroom…",
           0,
           0
         ],
         [
-          5024,
+          2257,
           "(gone)",
           20,
           10
         ]
       ],
-      "loaderGoneMs": 5024,
+      "loaderGoneMs": 2257,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",
@@ -78,7 +65,6 @@
         "__frameSpikes",
         "__mach",
         "__ready",
-        "__warmLeft",
         "__smokePhase"
       ],
       "quality": "low"

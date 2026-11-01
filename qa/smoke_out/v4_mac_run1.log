@@ -3,15 +3,14 @@ PROFILE v4  URL file:///workspace/gateflow/builds/walmart-store_v4.html?q=high
 OUT /workspace/gateflow/qa/smoke_out/v4_mac_run1
 
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
-desktop  | PASS   | PASS  | PASS   | FAIL | PASS    | PASS  | PASS     | PASS     | FAIL
+desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[desktop] TTFF=4420ms loaderGone=2816ms fps=1.58 draws/frame hook=155.6 page=138 programs page=23 hook=23 shaders=46 longest=476ms top3=[476ms @3599ms [hero||y0], 333ms @2074ms [hero||y0], 315ms @2497ms [hero||y0]] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 2816 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":162,"sd":62.96,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.1028,"meanAbs":4.847}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 3/24 moved; sim 1.317->1.533 (0.108 sim-s/wall-s)
-  nav: FAIL - not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked)); controls found: {"next":{"key":"› | Next step | | next | | {\"smoke\":\"next\"} |","visible":true,"sel":"[data-smoke=\"next\"]","n":1},"prev":{"key":"‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |","visible":true,"sel":"[data-smoke=\"prev\"]","n":1},"dots":27,"dotKeys":["| Steps | | | dots | {\"smo
+[desktop] TTFF=3709ms loaderGone=2244ms fps=3.9 draws/frame hook=126.2 page=94 programs page=23 hook=23 shaders=46 longest=317ms top3=[317ms @3161ms [hero||y0], 243ms @1998ms [hero||y0], 227ms @1201ms [hero||y0]] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 2244 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":162,"sd":62.95,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.06773,"meanAbs":2.591}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 3/24 moved; sim 1.9->2.317 (0.208 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 6.799; prev:ok caption changed, cam 0.075; dot:ok caption changed, cam 5.627; wheel:ok caption changed, cam 36.858
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 155.6/frame (window avg n/a), page renderer.info.render.calls 138 (limit <300)
+  draws: PASS - GL hook 126.2/frame (window avg 103.3), page renderer.info.render.calls 94 (limit <300)
   programs: PASS - renderer.info.programs=23, GL hook linkProgram=23, shaders=46 (limit <25)
-  longtask: PASS - longest 476 ms (limit <500); top3 476ms @3599ms [hero||y0], 333ms @2074ms [hero||y0], 315ms @2497ms [hero||y0]; 24 long tasks
-  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)
+  longtask: PASS - longest 317 ms (limit <500); top3 317ms @3161ms [hero||y0], 243ms @1998ms [hero||y0], 227ms @1201ms [hero||y0]; 19 long tasks
