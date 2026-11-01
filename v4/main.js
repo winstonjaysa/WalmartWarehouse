@@ -1155,7 +1155,11 @@ function setExplore(on) { explore = on; document.body.classList.toggle('explore'
 document.getElementById('explore').onclick = () => setExplore(!explore);
 for (const b of document.querySelectorAll('[data-zoom]')) b.onclick = () => { const f = b.dataset.zoom === 'in' ? 0.8 : 1.25; if (!explore) setExplore(true); const d = camera.position.clone().sub(controls.target).multiplyScalar(f); if (d.length() > 1.5 && d.length() < 90) camera.position.copy(controls.target).add(d); controls.update(); };
 // view offset: keep the subject clear of the caption card
-function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.clearViewOffset(); camera.updateProjectionMatrix(); }
+// resize: assigning canvas.width (even to the same value) reallocates the WebGL drawing buffer, which blocks the main thread until the
+// GPU drains its queue (0.5-1.4 s on software GL). Spurious resize events (screenshots, mobile URL bar) were the nav long task.
+// So: coalesce to one per frame and skip entirely when the backing size is unchanged.
+let __rsKey = '', __rsPending = false; function resize() { if (__rsPending) return; __rsPending = true; requestAnimationFrame(__doResize); }
+function __doResize() { __rsPending = false; const w = innerWidth, h = innerHeight, key = w + 'x' + h + '@' + renderer.getPixelRatio(); if (key === __rsKey) return; __rsKey = key; renderer.setSize(w, h, false); camera.aspect = w / h; camera.clearViewOffset(); camera.updateProjectionMatrix(); }
 let cutaway = null;
 function camLook() { // fov: narrow (iso-like) when high, wide at eye level; cutaway hides walls above 3.4 m + roof
   const y = camera.position.y, k = clamp((y - 3) / 12, 0, 1), base = innerWidth / innerHeight < 0.8 ? 14 : 0;
@@ -1173,18 +1177,29 @@ function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).m
 // ---------- loop: real elapsed time, clamped dt ----------
 let last = performance.now(), fadeT = -1, frames = 0;
 // dynamic resolution: if the GPU (or a software rasteriser) needs >90 ms per frame, step the pixel ratio down so one heavy view cannot block the page for a second
-let __slow = 0, __dpr = renderer.getPixelRatio(); function __dynRes(ms) { __slow = ms > 90 ? __slow + 1 : Math.max(0, __slow - 1); if (__slow >= 2 && __dpr > 0.6) { __dpr = Math.max(0.6, __dpr * 0.7); renderer.setPixelRatio(__dpr); resize(); __slow = 0; } }
+// (no dynamic resolution: changing the pixel ratio reallocates the drawing buffer = the same main-thread GPU stall)
 const fadeEl = document.getElementById('fade');
 function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT < 0) { fadeT = 0; fadeEl.classList.add('on'); } }
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
-function frame(now) { requestAnimationFrame(frame); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt));
+const __FS = window.__frameSpikes = []; let __fsInfo = [0, 0, 0];
+// first-draw warm-up: every drawable (incl. hidden ones: upper walls/roof, lights, late pallets) gets its geometry/textures
+// uploaded in small per-frame slices at a 1x1 scissored viewport, right before the real frame render (no flicker, no long task).
+// (UPPER/LIGHTS_MESH are queued last so they upload before the camera first drops below the cutaway line.)
+const __warmQ = []; scene.traverse((o) => { if (o.isMesh || o.isPoints || o.isLine || o.isSprite) __warmQ.push(o); }); __warmQ.push(LIGHTS_MESH, UPPER); const __vp = new THREE.Vector4();
+function __warmSlice(ms) { if (!__warmQ.length) return; const t0 = performance.now(), vis = []; scene.traverse((o) => { if (o !== scene && !o.isLight) { vis.push(o, o.visible); o.visible = false; } });
+  renderer.getViewport(__vp); renderer.setScissorTest(true); renderer.setScissor(0, 0, 1, 1); renderer.setViewport(0, 0, 1, 1);
+  while (__warmQ.length && performance.now() - t0 < ms) { const o = __warmQ.pop(); const chain = []; for (let q = o; q && q !== scene; q = q.parent) { chain.push(q); q.visible = true; } const fc = o.frustumCulled; o.frustumCulled = false;
+    try { renderer.render(scene, camera); } catch (e) {} o.frustumCulled = fc; for (const q of chain) q.visible = false; }
+  renderer.setScissorTest(false); renderer.setViewport(__vp); for (let i = 0; i < vis.length; i += 2) vis[i].visible = vis[i + 1]; window.__warmLeft = __warmQ.length; }
+function frame(now) { requestAnimationFrame(frame); const _f0 = performance.now(); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt)); const _f1 = performance.now();
   if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); initMachines(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
   if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
   if (window.__camOverride) { const v = window.__camOverride; camera.position.fromArray(v[0]); camera.up.set(0, v[4] ? 1 : 0, v[4] ? 0 : -1); camera.lookAt(v[1][0], v[1][1], v[1][2]); camera.fov = v[2]; camera.updateProjectionMatrix(); }
-  camLook(); render3d(); { const r0 = performance.now(); renderer.render(scene, camera); __dynRes(performance.now() - r0); } updLabels(); frames++;
+  camLook(); const _f2 = performance.now(); render3d(); if (frames > 2) __warmSlice(30); const r0 = performance.now(); renderer.render(scene, camera); const r1 = performance.now();  updLabels(); frames++; const _f3 = performance.now();
+  { const I = renderer.info, inf = [I.memory.geometries, I.memory.textures, I.programs ? I.programs.length : 0]; if (_f3 - _f0 > 200 && __FS.length < 40) __FS.push({ at: Math.round(_f0), step: STEPS[cur].id, camT: +camT.toFixed(2), sim: +T.toFixed(1), adv: Math.round(_f1 - _f0), pre: Math.round(r0 - _f1), render: Math.round(r1 - r0), lbl: Math.round(_f3 - r1), geoNew: inf[0] - __fsInfo[0], texNew: inf[1] - __fsInfo[1], progNew: inf[2] - __fsInfo[2], calls: I.render.calls }); __fsInfo = inf; }
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
-initSim(); initMachines(); resize(); goStep(0, true); camera.lookAt(camTgt);
+initSim(); initMachines(); __doResize(); goStep(0, true); camera.lookAt(camTgt);
 await __yield(); await __compile(1500); await __yield();
 setTimeout(() => { const l = document.getElementById('gfLoad'); if (l) l.remove(); }, 2800);
 requestAnimationFrame(frame);

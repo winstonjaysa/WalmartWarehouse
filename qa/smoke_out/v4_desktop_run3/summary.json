@@ -1,0 +1,74 @@
+[
+  {
+    "viewport": "desktop",
+    "pass": true,
+    "checks": {
+      "frame": true,
+      "movers": true,
+      "nav": true,
+      "loader": true,
+      "programs": true,
+      "draws": true,
+      "longtask": true,
+      "console": true
+    },
+    "metrics": {
+      "ttffScreenshotNonBlankMs": 1409,
+      "simSecondsPerWallSecond": 0.15,
+      "fpsWindowS": 5.1,
+      "avgFps": 3.51,
+      "drawsPerFrameHookWindow": 103.2,
+      "ttffMs": 4076,
+      "shaders": 46,
+      "programsHook": 23,
+      "programsPage": 23,
+      "drawsPerFramePage": 105,
+      "drawsPerFrameHook": 127.5,
+      "longestTaskMs": 399,
+      "top3LongTasks": [
+        "399ms @1961ms [hero||y0]",
+        "370ms @3464ms [hero||y0]",
+        "296ms @1584ms [hero||y0]"
+      ],
+      "longTaskCount": 20,
+      "frameSpikes": [],
+      "loaderTimeline": [
+        [
+          176,
+          "Loading the backroom…",
+          0,
+          0
+        ],
+        [
+          2386,
+          "(gone)",
+          20,
+          10
+        ]
+      ],
+      "loaderGoneMs": 2386,
+      "loaderSeen": true,
+      "globals": {
+        "renderer": "__R.renderer",
+        "camera": "__R.camera",
+        "scene": "__R.scene"
+      },
+      "windowGlobals": [
+        "__THREE__",
+        "__quality",
+        "__yt",
+        "__R",
+        "__stairs",
+        "__sim",
+        "__goStep",
+        "__step",
+        "__frameSpikes",
+        "__mach",
+        "__ready",
+        "__warmLeft",
+        "__smokePhase"
+      ],
+      "quality": "low"
+    }
+  }
+]

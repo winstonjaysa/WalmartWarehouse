@@ -1,0 +1,16 @@
+
+PROFILE v4  URL file:///workspace/gateflow/builds/walmart-store_v4.html
+OUT /workspace/gateflow/qa/smoke_out/v4_phone_run3
+
+viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
+phone    | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
+
+[phone] TTFF=4109ms loaderGone=2587ms fps=5.03 draws/frame hook=102.1 page=94 programs page=23 hook=23 shaders=46 longest=394ms top3=[394ms @2191ms [hero||y0], 349ms @3434ms [hero||y0], 332ms @217ms [hero||y0]] quality=low globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 2587 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":181.1,"sd":72.26,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.02296,"meanAbs":0.81}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 3/24 moved; sim 1.7->2.217 (0.258 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 16.744; prev:ok caption changed, cam 8.167; wheel:ok caption changed, cam 47.69; touch-swipe:ok caption changed, cam 24.212; scrollBy:ok caption changed, cam 43.696
+  console: PASS - 0 console.error, 0 pageerror
+  draws: PASS - GL hook 102.1/frame (window avg 96.7), page renderer.info.render.calls 94 (limit <300)
+  programs: PASS - renderer.info.programs=23, GL hook linkProgram=23, shaders=46 (limit <25)
+  longtask: PASS - longest 394 ms (limit <500); top3 394ms @2191ms [hero||y0], 349ms @3434ms [hero||y0], 332ms @217ms [hero||y0]; 21 long tasks

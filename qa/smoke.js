@@ -79,7 +79,7 @@ const HOOK = (spoof) => {
   }
   const raf = window.requestAnimationFrame.bind(window); let lastDraws = 0;
   window.requestAnimationFrame = (cb) => raf((t) => { const before = H.draws; try { cb(t); } finally { const d = H.draws - before; if (d > 0) { H.raf++; if (H.frames.length < 4000) H.frames.push([+performance.now().toFixed(0), d]); } } });
-  try { new PerformanceObserver((l) => { for (const e of l.getEntries()) if (H.longTasks.length < 500) H.longTasks.push([+e.startTime.toFixed(0), +e.duration.toFixed(0)]); }).observe({ entryTypes: ['longtask'] }); } catch (e) {}
+  try { new PerformanceObserver((l) => { for (const e of l.getEntries()) if (H.longTasks.length < 500) H.longTasks.push([+e.startTime.toFixed(0), +e.duration.toFixed(0), (document.querySelector('.step.on') || { dataset: {} }).dataset.cam || '', window.__smokePhase || '', window.scrollY | 0]); }).observe({ entryTypes: ['longtask'] }); } catch (e) {}
   let lastTxt = null; const LSEL = '#gfLoad,[id*=loader i],[id*=loading i],[class*=loader i],[class*=loading i],[aria-busy=true]';
   const vis = (el) => { if (!el || !el.isConnected) return false; let e = el; while (e && e.nodeType === 1) { const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity <= 0.05) return false; e = e.parentElement; } const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
   setInterval(() => { if (!document.body) return; let el = [...document.querySelectorAll(LSEL)].find(vis);
@@ -212,7 +212,8 @@ async function runViewport(browser, vp) {
       const camDelta = (c0, c1) => c0 && c1 ? +(Math.hypot(...c0.p.map((v, i) => v - c1.p[i])) + Math.abs((c0.zoom || 1) - (c1.zoom || 1)) + 10 * Math.hypot(...c0.q.map((v, i) => v - c1.q[i]))).toFixed(3) : null;
       const tryInput = async (name, act) => {
         if (aborted) throw new Error('aborted (hard timeout)');
-        const k0 = await ev(PROBE_CAPTION, 8000, 'cap').catch(() => null), c0 = await camOf(), i0 = await snap(0.25, `nav_${name}_before.png`).catch(() => null);
+        const k0 = await page.evaluate((n) => { window.__smokePhase = 'before:' + n; }, name).catch(() => {}).then(() => ev(PROBE_CAPTION, 8000, 'cap')).catch(() => null), c0 = await camOf(), i0 = await snap(0.25, `nav_${name}_before.png`).catch(() => null);
+        await page.evaluate((n) => { window.__smokePhase = 'act:' + n; }, name).catch(() => {});
         let err = null; try { await act(); } catch (e) { err = e.message; }
         let k1 = k0; const tEnd = Date.now() + 4000; while (Date.now() < tEnd) { await sleep(400); k1 = await ev(PROBE_CAPTION, 8000, 'cap').catch(() => k1); if (k0 && k1 && k1.sig !== k0.sig) break; }
         await sleep(800); const c1 = await camOf(), i1 = await snap(0.25, `nav_${name}_after.png`).catch(() => null);
@@ -258,12 +259,12 @@ async function runViewport(browser, vp) {
   bodyDone = true; aborted = true; const checksAtAbort = new Set(Object.keys(r.checks));
   // ---- final dump + gates (from in-page data) ----
   try {
-    const d = await ev(() => { const H = window.__smoke; return { shaders: H.shaders, programsLinked: H.programsLinked, draws: H.draws, framesWithDraws: H.raf, frames: H.frames.slice(-300), firstFrame: H.frames.length ? H.frames[0][0] : null, loader: H.loader, longTasks: H.longTasks, now: +performance.now().toFixed(0) }; }, 15000, 'final dump');
+    const d = await ev(() => { const H = window.__smoke; return { shaders: H.shaders, programsLinked: H.programsLinked, draws: H.draws, framesWithDraws: H.raf, frames: H.frames.slice(-300), firstFrame: H.frames.length ? H.frames[0][0] : null, loader: H.loader, longTasks: H.longTasks, fs: (window.__frameSpikes || []).slice().sort((a, b) => (b.adv + b.pre + b.render + b.lbl) - (a.adv + a.pre + a.render + a.lbl)).slice(0, 4), now: +performance.now().toFixed(0) }; }, 15000, 'final dump');
     const st = await ev(PROBE_STATE, 10000, 'state').catch(() => ({})); r.stateEnd = st;
     const m = r.metrics; m.ttffMs = d.firstFrame; m.shaders = d.shaders; m.programsHook = d.programsLinked; m.programsPage = st.renderer ? st.renderer.programs : null; m.drawsPerFramePage = st.renderer ? st.renderer.calls : null;
     const fr = d.frames.slice(1); m.drawsPerFrameHook = fr.length ? +(fr.reduce((s, f) => s + f[1], 0) / fr.length).toFixed(1) : (d.frames[0] ? d.frames[0][1] : null);
     if (m.avgFps == null && d.frames.length > 2) m.avgFps = +((d.frames.length - 1) / ((d.frames[d.frames.length - 1][0] - d.frames[0][0]) / 1000)).toFixed(2);
-    const lt = [...d.longTasks].sort((x, y) => y[1] - x[1]); m.longestTaskMs = lt.length ? lt[0][1] : 0; m.top3LongTasks = lt.slice(0, 3).map(([at, dur]) => `${dur}ms @${at}ms`); m.longTaskCount = lt.length;
+    const lt = [...d.longTasks].sort((x, y) => y[1] - x[1]); m.longestTaskMs = lt.length ? lt[0][1] : 0; m.top3LongTasks = lt.slice(0, 3).map(([at, dur, st, ph, sy]) => `${dur}ms @${at}ms` + (st || ph ? ` [${st}|${ph}|y${sy}]` : '')); m.longTaskCount = lt.length; m.frameSpikes = d.fs;
     m.loaderTimeline = d.loader; const si = d.loader.findIndex((x) => x[1] !== '(gone)'); const g = si >= 0 ? d.loader.slice(si).find((x) => x[1] === '(gone)') : null; m.loaderGoneMs = g ? g[0] : null; m.loaderSeen = si >= 0;
     m.globals = st.globals; m.windowGlobals = st.windowGlobals; m.quality = st.quality;
     r.checks.loader = si < 0 ? { pass: true, detail: 'no loader element ever seen (noted)' } : { pass: !!g && g[0] <= G.loaderMs, detail: g ? `loader gone at ${g[0]} ms (limit ${G.loaderMs}); last text "${d.loader[si][1]}"` : `loader still showing "${d.loader[d.loader.length - 1][1]}" at ${d.now} ms` };

@@ -3,14 +3,15 @@ PROFILE v4  URL file:///workspace/gateflow/builds/walmart-store_v4.html?q=high
 OUT /workspace/gateflow/qa/smoke_out/v4_mac_run1
 
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
-desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
+desktop  | PASS   | PASS  | PASS   | FAIL | PASS    | PASS  | PASS     | PASS     | FAIL
 
-[desktop] TTFF=4063ms loaderGone=2279ms fps=3.78 draws/frame hook=116.5 page=94 programs page=22 hook=22 shaders=44 longest=388ms top3=[388ms @1889ms, 375ms @3234ms, 296ms @2288ms] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 2279 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":168,"sd":60.46,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.0127,"meanAbs":0.558}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 4/21 moved; sim 0.966->1.366 (0.199 sim-s/wall-s)
-  nav: PASS - next:ok caption changed, cam 6.812; prev:ok caption changed, cam 1.662; dot:ok caption changed, cam 3.437; wheel:ok caption changed, cam 40.763
+[desktop] TTFF=4420ms loaderGone=2816ms fps=1.58 draws/frame hook=155.6 page=138 programs page=23 hook=23 shaders=46 longest=476ms top3=[476ms @3599ms [hero||y0], 333ms @2074ms [hero||y0], 315ms @2497ms [hero||y0]] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 2816 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":162,"sd":62.96,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.1028,"meanAbs":4.847}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 3/24 moved; sim 1.317->1.533 (0.108 sim-s/wall-s)
+  nav: FAIL - not reached / unverifiable (viewport hard timeout 60000ms (page hang / main thread blocked)); controls found: {"next":{"key":"› | Next step | | next | | {\"smoke\":\"next\"} |","visible":true,"sel":"[data-smoke=\"next\"]","n":1},"prev":{"key":"‹ | Previous step | | prev | | {\"smoke\":\"prev\"} |","visible":true,"sel":"[data-smoke=\"prev\"]","n":1},"dots":27,"dotKeys":["| Steps | | | dots | {\"smo
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 116.5/frame (window avg 97.6), page renderer.info.render.calls 94 (limit <300)
-  programs: PASS - renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)
-  longtask: PASS - longest 388 ms (limit <500); top3 388ms @1889ms, 375ms @3234ms, 296ms @2288ms; 22 long tasks
+  draws: PASS - GL hook 155.6/frame (window avg n/a), page renderer.info.render.calls 138 (limit <300)
+  programs: PASS - renderer.info.programs=23, GL hook linkProgram=23, shaders=46 (limit <25)
+  longtask: PASS - longest 476 ms (limit <500); top3 476ms @3599ms [hero||y0], 333ms @2074ms [hero||y0], 315ms @2497ms [hero||y0]; 24 long tasks
+  FATAL: viewport hard timeout 60000ms (page hang / main thread blocked)

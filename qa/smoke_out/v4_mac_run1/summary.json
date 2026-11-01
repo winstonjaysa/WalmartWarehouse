@@ -1,51 +1,50 @@
 [
   {
     "viewport": "desktop",
-    "pass": true,
+    "pass": false,
     "checks": {
       "frame": true,
       "movers": true,
-      "nav": true,
       "loader": true,
       "programs": true,
       "draws": true,
       "longtask": true,
-      "console": true
+      "console": true,
+      "nav": false
     },
     "metrics": {
-      "ttffScreenshotNonBlankMs": 1461,
-      "simSecondsPerWallSecond": 0.199,
-      "fpsWindowS": 9.3,
-      "avgFps": 3.78,
-      "drawsPerFrameHookWindow": 97.6,
-      "ttffMs": 4063,
-      "shaders": 44,
-      "programsHook": 22,
-      "programsPage": 22,
-      "drawsPerFramePage": 94,
-      "drawsPerFrameHook": 116.5,
-      "longestTaskMs": 388,
+      "ttffScreenshotNonBlankMs": 1472,
+      "simSecondsPerWallSecond": 0.108,
+      "ttffMs": 4420,
+      "shaders": 46,
+      "programsHook": 23,
+      "programsPage": 23,
+      "drawsPerFramePage": 138,
+      "drawsPerFrameHook": 155.6,
+      "avgFps": 1.58,
+      "longestTaskMs": 476,
       "top3LongTasks": [
-        "388ms @1889ms",
-        "375ms @3234ms",
-        "296ms @2288ms"
+        "476ms @3599ms [hero||y0]",
+        "333ms @2074ms [hero||y0]",
+        "315ms @2497ms [hero||y0]"
       ],
-      "longTaskCount": 22,
+      "longTaskCount": 24,
+      "frameSpikes": [],
       "loaderTimeline": [
         [
-          174,
+          189,
           "Loading the backroom…",
           0,
           0
         ],
         [
-          2279,
+          2816,
           "(gone)",
-          16,
-          8
+          20,
+          10
         ]
       ],
-      "loaderGoneMs": 2279,
+      "loaderGoneMs": 2816,
       "loaderSeen": true,
       "globals": {
         "renderer": "__R.renderer",
@@ -61,7 +60,11 @@
         "__sim",
         "__goStep",
         "__step",
-        "__ready"
+        "__frameSpikes",
+        "__mach",
+        "__ready",
+        "__warmLeft",
+        "__smokePhase"
       ],
       "quality": "high"
     }

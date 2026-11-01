@@ -5,12 +5,12 @@ OUT /workspace/gateflow/qa/smoke_out/v4_mac_run3
 viewport | loader | frame | movers | nav | console | draws | programs | longtask | RESULT
 desktop  | PASS   | PASS  | PASS   | PASS | PASS    | PASS  | PASS     | PASS     | PASS
 
-[desktop] TTFF=3983ms loaderGone=1883ms fps=1.68 draws/frame hook=131.4 page=132 programs page=22 hook=22 shaders=44 longest=379ms top3=[379ms @3398ms, 282ms @1898ms, 183ms @3094ms] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
-  loader: PASS - loader gone at 1883 ms (limit 3000); last text "Loading the backroom…"
-  frame: PASS - stats {"mean":168.4,"sd":60.12,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.05054,"meanAbs":2.026}
-  movers: PASS - 2 s wall: vehicles 0/3, workers 5/21 moved; sim 1.483->1.9 (0.208 sim-s/wall-s)
-  nav: PASS - next:ok caption changed, cam 6.315; prev:ok caption changed, cam 3.69; dot:ok caption changed, cam 3.92; wheel:ok caption changed, cam 32.298
+[desktop] TTFF=3853ms loaderGone=1935ms fps=4.36 draws/frame hook=128.2 page=105 programs page=23 hook=23 shaders=46 longest=451ms top3=[451ms @944ms [hero||y0], 394ms @3203ms [hero||y0], 293ms @1953ms [hero||y0]] quality=high globals={"renderer":"__R.renderer","camera":"__R.camera","scene":"__R.scene"}
+  loader: PASS - loader gone at 1935 ms (limit 3000); last text "Loading the backroom…"
+  frame: PASS - stats {"mean":162,"sd":62.95,"colours":500,"blank":false}; 1 s diff {"changedFrac":0.07163,"meanAbs":2.79}
+  movers: PASS - 2 s wall: vehicles 0/3, workers 4/24 moved; sim 1.533->1.95 (0.208 sim-s/wall-s)
+  nav: PASS - next:ok caption changed, cam 9.804; prev:ok caption changed, cam 4.045; dot:ok caption changed, cam 2.274; wheel:ok caption changed, cam 39.08
   console: PASS - 0 console.error, 0 pageerror
-  draws: PASS - GL hook 131.4/frame (window avg 123.3), page renderer.info.render.calls 132 (limit <300)
-  programs: PASS - renderer.info.programs=22, GL hook linkProgram=22, shaders=44 (limit <25)
-  longtask: PASS - longest 379 ms (limit <500); top3 379ms @3398ms, 282ms @1898ms, 183ms @3094ms; 19 long tasks
+  draws: PASS - GL hook 128.2/frame (window avg 99.1), page renderer.info.render.calls 105 (limit <300)
+  programs: PASS - renderer.info.programs=23, GL hook linkProgram=23, shaders=46 (limit <25)
+  longtask: PASS - longest 451 ms (limit <500); top3 451ms @944ms [hero||y0], 394ms @3203ms [hero||y0], 293ms @1953ms [hero||y0]; 22 long tasks
