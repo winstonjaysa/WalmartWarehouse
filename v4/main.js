@@ -25,6 +25,16 @@ import { build as buildSick } from '../parts/v4/sickRoom.js';
 import { build as buildCleaning } from '../parts/v4/cleaningRoom.js';
 import { build as buildBale } from '../parts/v4/cardboardBale.js';
 import { build as buildStairs } from '../parts/v4/stairs.js';
+import { build as buildGondola } from '../parts/v4/salesfloor/gondolaAisle.js';
+import { build as buildProduce } from '../parts/v4/salesfloor/produceTable.js';
+import { build as buildMeatCase } from '../parts/v4/salesfloor/meatCase.js';
+import { build as buildTVWall } from '../parts/v4/salesfloor/electronicsWall.js';
+import { build as buildCheckout } from '../parts/v4/salesfloor/checkoutLane.js';
+import { build as buildFashionRack } from '../parts/v4/fashionRack.js';
+import { build as buildBRShelf } from '../parts/v4/backroomShelving.js';
+import { build as buildPicker, setLift as pickerLift } from '../parts/v4/stockPicker.js';
+import { build as buildWalkie, setForkHeight as walkieForks, setTiller as walkieTiller, getHandlePoint as walkieHandle } from '../parts/v4/walkieStacker.js';
+import { build as buildEJack, setForkLift as ejackLift, setTiller as ejackTiller, getHandlePoint as ejackHandle } from '../parts/v4/electricPalletJack.js';
 import { build as buildBev, setWrapped as bevSetWrapped } from '../parts/v4/beverageSkid.js';
 
 // ---------------- quality / renderer ----------------
@@ -47,6 +57,7 @@ renderer.toneMappingExposure = 1.12;
 renderer.shadowMap.enabled = false;
 
 const scene = new THREE.Scene();
+window.scene3 = scene;
 // chunked build: yield to the browser between builders so no single task blocks for long
 const __yield = (l) => new Promise((r) => requestAnimationFrame(() => setTimeout(() => { __mark(l || 'y'); r(); }, 0)));
 window.__yt = []; const __mark = (l) => window.__yt.push([l, Math.round(performance.now())]);
@@ -206,7 +217,7 @@ for (let x = -10; x < 3.3; x += 1.15) S.box(0.03, 3.1, 0.02, x, 1.55, -16.86, '#
 S.box(13.8, 0.12, 0.06, -3.6, 0.06, -16.85, '#8e959b'); S.cyl(0.14, 1.2, -9.9, 0.6, -12.6, YEL, 12);
 for (let i = 0; i < 9; i++) S.box(0.24, 2.6, 0.012, -4.75 + 0.18 + i * 0.29, 1.65, -12.06 - (i % 2) * 0.02, i % 2 ? '#dfe9ee' : '#d3e0e7');
 sign(SIGN.cooler, 1.0, 0.25, -3.6, 3.25, -11.89, 0);
-wallC(-20, 12, -20, -12, 0, BR.H, WALL);                         // west
+wallC(-20, 12, -20, 5.2, 0, BR.H, WALL); wallC(-20, 3.4, -20, -12, 0, BR.H, WALL); wallC(-20, 5.2, -20, 3.4, 2.5, BR.H, WALL); // west, double doors z 3.4..5.2 to the main sales floor
 wallC(20, -12, 20, -1.6, 0, BR.H, WALL); wallC(20, 1.6, 20, 12, 0, BR.H, WALL); wallC(20, -1.6, 20, 1.6, 3.2, BR.H, WALL); // east (backroom side)
 wallC(20, 12, 20, 1.6, 0, 5.5, '#f3f1ec'); wallC(20, -1.6, 20, -12, 0, 5.5, '#f3f1ec'); wallC(20, 1.6, 20, -1.6, 3.2, 5.5, '#f3f1ec'); // east wall, sales-floor side
 UP.box(0.05, 0.9, 24, 20.03, 4.6, 0, '#0071ce');
@@ -367,20 +378,31 @@ await __yield();
 trailer(S, DOORS.A.x, 12.3, { roof: false, placard: 'FDS' }); tractorBody(S, DOORS.A.x, 12.3 + 15);
 trailer(S, DOORS.B.x, 12.3, { roof: false, placard: 'CP' }); tractorBody(S, DOORS.B.x, 12.3 + 15);
 // two more Walmart trucks waiting in the yard (ADS, MP), heading west on the yard lane
-function xform(fn, m) { const s0 = signGeos.length, g0 = S.g.length; fn(); for (let i = g0; i < S.g.length; i++) S.g[i].applyMatrix4(m); for (let i = s0; i < signGeos.length; i++) signGeos[i].applyMatrix4(m); }
+function xform(fn, m, B = S) { const s0 = signGeos.length, g0 = B.g.length; fn(); for (let i = g0; i < B.g.length; i++) B.g[i].applyMatrix4(m); for (let i = s0; i < signGeos.length; i++) signGeos[i].applyMatrix4(m); }
 const YARD = [{ x: -22, z: 47, pl: 'ADS' }, { x: 6, z: 47, pl: 'MP' }];
 for (const y of YARD) xform(() => { trailer(S, 0, 0, { roof: true, placard: y.pl }); tractorBody(S, 0, 15); }, new THREE.Matrix4().makeTranslation(y.x, 0, y.z).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)));
 
 // static scene meshes
 // ---------------- 1st floor (upstairs) shell: room walls, labels, simple box placeholders ----------------
 // Inky models: divShelving, officeKit (manager, personnel, upc, storeManager), trainingRoom, lunchRoom, sickRoom, cleaningRoom, stairs (U-turn).
-const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
-{ const F = UPF.y, WC = '#e9e7e2', ROOMS = [];
-  for (const [x, z] of [[-45.6, -11.6], [-22.4, -11.6], [-45.6, 11.6], [-22.4, 11.6], [-34, -11.6], [-34, 11.6], [-45.6, 0], [-22.4, 0]]) S.box(0.35, F, 0.35, x, F / 2, z, '#9aa0a6');
-  S.box(24, 0.25, 24, -34, F - 0.125, 0, '#bfc3c7'); S.box(24, 0.02, 24, -34, F + 0.01, 0, '#d9d6cf');
+// freight elevator: block-wall shaft, grey steel doors with a yellow/black stripe (ref day2/freight_elevator_pallets)
+function freightElevator(B, x0, y, label) { const z0 = 0.2, z1 = 2.6, x1 = x0 + 1.5, H = y > 1 ? 2.8 : 7.4;
+  B.boxB(x0, y, z0 - 0.3, x1, y + H, z0, '#b9b6ae'); B.boxB(x0, y, z1, x1, y + H, z1 + 0.3, '#b9b6ae'); B.boxB(x0, y + 2.5, z0, x1, y + H, z1, '#b9b6ae');
+  B.boxB(x0, y, z0, x1 - 0.06, y + 2.5, z1, '#3a3d40'); B.boxB(x1 - 0.06, y + 0.02, z0 + 0.05, x1, y + 2.45, z1 - 0.05, '#8f969d'); B.boxB(x1, y + 0.02, (z0 + z1) / 2 - 0.015, x1 + 0.01, y + 2.45, (z0 + z1) / 2 + 0.015, '#2b2e31');
+  for (let i = 0; i < 8; i++) B.boxB(x1, y + 0.95, z0 + 0.05 + i * 0.29, x1 + 0.012, y + 1.13, z0 + 0.05 + i * 0.29 + 0.145, i % 2 ? '#1d1f22' : '#f2c200');
+  for (let i = 0; i < 8; i++) B.boxB(x1, y + 0.95, z0 + 0.195 + i * 0.29, x1 + 0.012, y + 1.13, Math.min(z1 - 0.05, z0 + 0.195 + i * 0.29 + 0.145), '#1d1f22');
+  B.boxB(x1, y + 1.2, z1 + 0.05, x1 + 0.04, y + 1.45, z1 + 0.15, '#c8ccd0'); // call buttons
+  if (label) sign(textSign([label], { w: 512, h: 96, bg: '#041e42', fg: '#fff', size: 0.5 }), 1.8, 0.34, x1 + 0.02, y + 2.75, (z0 + z1) / 2, Math.PI / 2); }
+const elevAt = (B, tx, y, label) => xform(() => freightElevator(B, 0, y, label), new THREE.Matrix4().makeTranslation(tx, 0, -12).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)), B); // north wall, doors face +z
+const pallets = (B, x, z, n) => { for (let i = 0; i < n; i++) { const y = i * 0.145; B.boxB(x - 0.6, y + 0.11, z - 0.5, x + 0.6, y + 0.14, z + 0.5, '#b4895a'); for (const dz of [-0.45, 0, 0.45]) B.boxB(x - 0.6, y, z + dz - 0.05, x + 0.6, y + 0.11, z + dz + 0.05, '#9c7347'); } };
+elevAt(S, -8.4, 0, 'Freight elevator'); pallets(S, -7.3, -11.2, 9); pallets(S, -7.3, -9.9, 6); S.boxB(-11.2, 0.004, -10.5, -8.4, 0.012, -9.3, YEL); // elevator landing zone
+const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 7.6, wh: 1.3, dx: 24 }; // built in local x[-46,-22], shifted +24 so it sits ON TOP of the backroom (world x[-22,2])
+const F1B = new Builder(), F1G = new THREE.Group(); F1G.name = 'floor1'; F1G.position.x = UPF.dx; F1G.visible = false; scene.add(F1G);
+const F2B = new Builder(), F2G = new THREE.Group(); F2G.name = 'floor2'; F2G.position.x = UPF.dx; F2G.visible = false; scene.add(F2G);
+{ const S = F1B, scene = F1G, F = UPF.y, WC = '#e9e7e2', ROOMS = []; const s0 = signGeos.length;
+  S.boxB(-43.4, F - 0.25, -12, -22, F, 12, '#bfc3c7'); S.boxB(-46, F - 0.25, -12, -43.4, F, 2.5, '#bfc3c7'); S.boxB(-43.4, F, -12, -22, F + 0.02, 12, '#d9d6cf'); S.boxB(-46, F, -12, -43.4, F + 0.02, 2.5, '#d9d6cf'); // slab with the stair well (west)
   const wall = (x0, z0, x1, z1) => S.wall(x0, z0, x1, z1, F, F + UPF.wh, WC);
-  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 12);
-  wall(-22, -12, -22, 6.4); // stair landing opening on the backroom side
+  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 2.5); wall(-22, -12, -22, 12); // stair well on the west side
   const ROW = [[-46, -38, 'Training room', 'trainingRoom'], [-38, -30, 'Lunch room', 'lunchRoom'], [-30, -26, 'Sick room', 'sickRoom'], [-26, -22, 'Cleaning', 'cleaningRoom']];
   const ROW2 = [[-46, -40.5, 'Store manager', 'officeKit'], [-40.5, -35.5, 'Personnel', 'officeKit'], [-35.5, -31, 'UPC office', 'officeKit'], [-31, -26.5, 'Variants manager', 'officeKit'], [-26.5, -24.6, 'Div shelving', 'divShelving']];
   for (const [rz0, rz1, list] of [[-12, -1, ROW], [1, 12, ROW2]]) { const zc = rz1 > 0 ? 1 : -1; // corridor walls with a door gap per room
@@ -395,8 +417,74 @@ const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
   for (const [name, v, sd] of [['Store manager', 'storeManager', 1], ['Personnel', 'personnel', 2], ['UPC office', 'upc', 3], ['Variants manager', 'manager', 4]]) { const r = ROOMS.find((q) => q[0] === name); put(buildOffice(THREE, PM, { variant: v, seed: sd }), r[1], 7.2); }
   for (const [z, sd] of [[4.0, 11], [8.6, 12]]) put(buildDiv(THREE, PM, { seed: sd, bays: 3, colorRate: 0.1 }), -25.55, z, Math.PI / 2);
   // U-turn stairs from the backroom floor up to the 1st-floor opening (west side)
-  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; scene.add(ST); window.__stairs = ST;
+  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; window.scene3.add(ST); window.__stairs = ST;
   sign(textSign(['1st floor · offices & staff rooms'], { w: 1024, h: 128, bg: '#0071ce', fg: '#fff', size: 0.46 }), 6, 0.75, -34, F + UPF.wh + 1.2, 12.05, 0);
+  elevAt(S, -32.4, F, 'Freight elevator · 1st'); pallets(S, -31.3, -11.2, 4);
+  F1G.add(S.merge(MAT.v, 'floor1')); { const sg = signGeos.splice(s0); const sm = new THREE.Mesh(mergeGeometries(sg, false), MAT.sign); sm.name = 'floor1signs'; sm.matrixAutoUpdate = false; F1G.add(sm); }
+}
+{ const S = F2B, F = UPF.y + 4.4; const s0 = signGeos.length; // 2nd floor: empty shell, coming soon
+  S.boxB(-46, F - 0.25, -12, -22, F, 12, '#bfc3c7'); S.boxB(-46, F, -12, -22, F + 0.02, 12, '#e4e2dc');
+  for (const [x0, z0, x1, z1] of [[-46, -12, -22, -12], [-46, 12, -22, 12], [-46, -12, -46, 12], [-22, -12, -22, 12]]) S.wall(x0, z0, x1, z1, F, F + 1.3, '#e9e7e2');
+  for (let x = -44; x <= -24; x += 4) for (let z = -10; z <= 10; z += 5) S.box(0.3, 1.3, 0.3, x, F + 0.65, z, '#a4a9ae');
+  sign(textSign(['2nd floor · coming soon'], { w: 1024, h: 128, bg: '#ffc220', fg: '#041e42', size: 0.5 }), 8, 1.0, -34, F + 0.03, 0, 0, -Math.PI / 2);
+  sign(textSign(['2nd floor · coming soon'], { w: 1024, h: 128, bg: '#ffc220', fg: '#041e42', size: 0.5 }), 6, 0.75, -34, F + 2.0, 12.05, 0);
+  elevAt(S, -32.4, F, 'Freight elevator · 2nd');
+  F2G.add(S.merge(MAT.v, 'floor2')); { const sg = signGeos.splice(s0); const sm = new THREE.Mesh(mergeGeometries(sg, false), MAT.sign); sm.name = 'floor2signs'; sm.matrixAutoUpdate = false; F2G.add(sm); }
+}
+
+// ===== bake: merge imported fixtures by material so a whole area costs ~1 draw per material =====
+function bake(list, name) { const buckets = new Map();
+  for (const o of list) { o.updateMatrixWorld(true); o.traverse((m) => { if (!m.isMesh || m.isSkinnedMesh) return; let g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g.applyMatrix4(m.matrixWorld);
+    const n = new THREE.BufferGeometry(); n.setAttribute('position', g.attributes.position); n.setAttribute('normal', g.attributes.normal);
+    n.setAttribute('color', g.attributes.color || new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3));
+    if (!buckets.has(m.material)) buckets.set(m.material, []); buckets.get(m.material).push(n); }); }
+  const out = new THREE.Group(); out.name = name; for (const [mat, gs] of buckets) { const m = new THREE.Mesh(mergeGeometries(gs, false), mat); m.name = name; m.matrixAutoUpdate = false; m.updateMatrix(); out.add(m); } return out; }
+const at = (o, x, z, ry = 0, y = 0) => { o.position.set(x, y, z); o.rotation.y = ry; return o; };
+// ===== MAIN SALES FLOOR (west, through the double doors): grey gondolas + blue aisle signs, produce, meat, electronics, checkouts =====
+const MSF = { x0: -58, x1: -26, z0: -14, z1: 14 };
+{ const FX = [], FLC = '#cfd0cc';
+  S.boxB(MSF.x0, GROUND, MSF.z0, MSF.x1, 0, MSF.z1, FLC); S.boxB(-26, GROUND, 3.2, -20, 0, 5.4, FLC); // polished concrete
+  for (let x = MSF.x0 + 2; x < MSF.x1; x += 4) S.boxB(x - 0.02, 0.001, MSF.z0, x + 0.02, 0.004, MSF.z1, '#c2c3bf'); // floor joints
+  for (let x = MSF.x0 + 3; x < MSF.x1 - 1; x += 6) S.boxB(x - 0.9, 0.002, MSF.z0 + 0.5, x + 0.9, 0.005, MSF.z1 - 0.5, '#d9dad6'); // light sheen
+  const wcol = '#f4f5f2', WH = 3.2;
+  for (const [x0, z0, x1, z1] of [[MSF.x0, MSF.z0, MSF.x1, MSF.z0], [MSF.x1, MSF.z1, MSF.x0, MSF.z1], [MSF.x0, MSF.z1, MSF.x0, MSF.z0], [MSF.x1, MSF.z0, MSF.x1, 3.4], [MSF.x1, 5.2, MSF.x1, MSF.z1]]) {
+    S.wall(x0, z0, x1, z1, 0, WH, wcol); }
+  S.boxB(MSF.x0, 2.55, MSF.z0, MSF.x1, 3.0, MSF.z0 + 0.03, '#0071ce'); S.boxB(MSF.x0, 2.55, MSF.z0, MSF.x0 + 0.03, 3.0, MSF.z1, '#0071ce'); // blue perimeter band
+  S.boxB(MSF.x0, 0, MSF.z0, MSF.x1, 0.12, MSF.z0 + 0.04, '#8a8d90'); S.boxB(MSF.x0, 0, MSF.z0, MSF.x0 + 0.04, 0.12, MSF.z1, '#8a8d90');
+  // corridor + double doors (backroom wall x -20 and sales floor wall x -26), propped open
+  S.boxB(-26, 0, 3.15, -20, 2.5, 3.25, WALL2); S.boxB(-26, 0, 5.35, -20, 2.5, 5.45, WALL2);
+  for (const dx of [-20.05, -25.95]) { for (const s of [-1, 1]) { const hz = s < 0 ? 3.4 : 5.2; const ang = s * 1.1; const cx = dx - 0.45 * Math.sin(ang) * (dx < -21 ? -1 : 1), cz = hz - s * 0.45 * Math.cos(ang);
+      S.box(0.05, 2.2, 0.9, cx, 1.1, cz, '#9aa3ab', -ang); S.box(0.06, 0.35, 0.3, cx, 1.55, cz, '#2b2f33', -ang); } S.boxB(dx - 0.06, 2.2, 3.4, dx + 0.06, 2.5, 5.2, '#7c858d'); }
+  sign(textSign(['Sales floor'], { w: 512, h: 128, bg: '#0071ce', fg: '#fff', size: 0.45 }), 1.7, 0.42, -20.1, 2.95, 4.3, -Math.PI / 2);
+  sign(textSign(['Employees only'], { w: 512, h: 128, bg: '#fff', fg: '#041e42', size: 0.42 }), 1.6, 0.4, -26.08, 2.85, 4.3, -Math.PI / 2);
+  // gondola runs (≤10 m each) with hanging blue aisle signs
+  const AZ = [-11.6, -8.8, -6.0, -3.2]; let k = 0;
+  for (const z of AZ) for (const cx of [-51.6, -41.4]) FX.push(at(buildGondola(THREE, PM, { length: 8, seed: 3 + k++ }), cx, z));
+  for (let i = 0; i < AZ.length - 1; i++) { const z = (AZ[i] + AZ[i + 1]) / 2; for (const cx of [-51.6, -41.4]) { const c = textSign(['Aisle ' + (i * 2 + (cx < -46 ? 1 : 2))], { w: 512, h: 128, bg: '#0071ce', fg: '#fff', size: 0.5 });
+      sign(c, 1.4, 0.36, cx, 2.75, z + 0.01, 0); sign(c, 1.4, 0.36, cx, 2.75, z - 0.01, Math.PI); S.box(0.02, 0.4, 0.02, cx - 0.5, 3.1, z, '#888'); S.box(0.02, 0.4, 0.02, cx + 0.5, 3.1, z, '#888'); } }
+  // produce (front left), black price boards are on the tables
+  const VAR = ['orange', 'apple', 'lemon', 'lime', 'melon', 'avocado', 'greenApple', 'apple', 'orange'];
+  for (let i = 0; i < 9; i++) FX.push(at(buildProduce(THREE, PM, { seed: 2 + i, variety: VAR[i] }), -55 + (i % 3) * 1.7, 4.0 + ((i / 3) | 0) * 2.2));
+  sign(textSign(['Fresh produce'], { w: 512, h: 128, bg: '#3b8a3e', fg: '#fff', size: 0.45 }), 2.4, 0.6, -53.3, 2.9, 2.6, 0);
+  // open meat multideck along the south wall (front faces into the store)
+  for (const cx of [-46.5, -42.6]) FX.push(at(buildMeatCase(THREE, PM, { seed: 4 + cx }), cx, 13.35, Math.PI));
+  sign(textSign(['Meat'], { w: 256, h: 96, bg: '#a8302f', fg: '#fff', size: 0.5 }), 1.6, 0.6, -44.55, 2.7, 13.9, Math.PI);
+  // electronics TV wall + display table (north-east corner)
+  FX.push(at(buildTVWall(THREE, PM, { width: 6, seed: 5 }), -31.0, -12.6));
+  sign(textSign(['Electronics'], { w: 512, h: 128, bg: '#041e42', fg: '#fff', size: 0.45 }), 2.4, 0.6, -31.0, 2.95, -13.9, 0);
+  // checkouts (front)
+  for (let i = 0; i < 3; i++) FX.push(at(buildCheckout(THREE, PM, { seed: 6 + i }), -46 + i * 4.6, 3.6));
+  scene.add(bake(FX, 'mainSalesFloor'));
+  // bright strip lights
+  for (let x = MSF.x0 + 3; x < MSF.x1 - 1; x += 4) for (let z = MSF.z0 + 2; z < MSF.z1 - 1; z += 5) tubes.box(0.12, 0.05, 3.2, x, 3.15, z, '#ffffff');
+}
+// ===== BACKROOM STOCKING AREA: tall dark-green steel shelving, mostly kraft cases, wrapped pallets on top =====
+{ const FX = []; FX.push(at(buildBRShelf(THREE, PM, { seed: 2, bays: 2 }), -7.4, -7.3), at(buildBRShelf(THREE, PM, { seed: 5, bays: 2 }), -7.4, -4.4, Math.PI));
+  FX.push(at(buildFashionRack(THREE, PM, { seed: 3, bays: 2 }), 11.4, -11.35)); // backroom fashion: green racking, cartons above, garments below
+  scene.add(bake(FX, 'backroomRacks'));
+  for (let i = 0; i < 12; i++) S.boxB(-10.0 + i * 0.44, 0.004, -2.75, -9.78 + i * 0.44, 0.012, -2.55, i % 2 ? BLK : YEL); // yellow/black striped zone edge
+  S.boxB(-10.0, 0.004, -5.1, -4.8, 0.008, -4.0, '#e9e6d6');
+  sign(textSign(['Backroom stocking area'], { w: 768, h: 128, size: 0.42 }), 3.0, 0.5, -7.4, 4.35, -5.85, 0); sign(textSign(['Backroom stocking area'], { w: 768, h: 128, size: 0.42 }), 3.0, 0.5, -7.4, 4.35, -5.87, Math.PI);
 }
 scene.add(S.merge(MAT.v, 'static'));
 const LIGHTS_MESH = tubes.merge(MAT.e, 'lights'); scene.add(LIGHTS_MESH);
@@ -503,8 +591,26 @@ function* face(w, x, z) { yield* turnTo(w, yawTo(x - w.x, z - w.z)); }
 function* walkTo(w, x, z, sp = 1.25, pose) {
   for (;;) { const dx = x - w.x, dz = z - w.z, d = Math.hypot(dx, dz); if (d < 0.02) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -5 * DT, 5 * DT);
-    const step = Math.min(d, sp * DT * (Math.abs(da) > 1.2 ? 0.25 : 1)); w.x += dx / d * step; w.z += dz / d * step; w.ph += step * 4.2; w.pose = pose || (w.carry ? 'carry' : 'walk'); yield; }
+    const step = Math.min(d, sp * DT * (Math.abs(da) > 1.2 ? 0.25 : 1)); let ux = dx / d, uz = dz / d;
+    // crowd avoidance: separation steering (radius ~0.35 m each) + yield to whoever is already in the way
+    const [ax, az] = avoid(w, ux, uz); if (ax === null) { w.blk = (w.blk || 0) + DT; if (w.blk < 4) { const [qx, qz] = sepOnly(w); w.x += qx * sp * 0.5 * DT; w.z += qz * sp * 0.5 * DT; w.pose = (qx || qz) ? 'walk' : 'idle'; w.ph += DT * 2; yield; continue; } } else { w.blk = 0; ux = ax; uz = az; }
+    w.x += ux * step; w.z += uz * step; w.ph += step * 4.2; w.pose = pose || (w.carry ? 'carry' : 'walk'); yield; }
+  w.blk = 0;
 }
+const AV_R = 0.35, AV_MIN = 0.62;
+function sepOnly(w) { let sx = 0, sz = 0; for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = w.x - o.x, rz = w.z - o.z, d = Math.hypot(rx, rz); if (d > 0.8 || d < 1e-4) continue; sx += rx / d; sz += rz / d; }
+  const n = Math.hypot(sx, sz); return n > 1e-3 ? [sx / n, sz / n] : [0, 0]; }
+function avoid(w, ux, uz) { let sx = 0, sz = 0, blocked = false;
+  for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = w.x - o.x, rz = w.z - o.z, d = Math.hypot(rx, rz); if (d > 1.1 || d < 1e-4) continue;
+    const ahead = -(rx * ux + rz * uz) / d; // >0 when o is in front
+    const k = (1.1 - d) / 1.1; sx += rx / d * k * 1.6; sz += rz / d * k * 1.6;
+    if (ahead > 0.2) { const side = (W.indexOf(w) & 1) ? 1 : -1; sx += -uz * side * k * 1.4; sz += ux * side * k * 1.4; } // pass on one side
+    if (d < AV_MIN + 0.08 && ahead > 0.1 && (o.blk || 0) < 0.5) blocked = true; }
+  if (blocked) return [null, null];
+  let nx = ux + sx, nz = uz + sz; const n = Math.hypot(nx, nz) || 1; nx /= n; nz /= n; if (nx * ux + nz * uz < 0.2) return [null, null]; return [nx, nz]; }
+// a jack operator holds position while someone is right in front (yield), up to 4 s
+function crowdHold(w, ux, uz) { for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = o.x - w.x, rz = o.z - w.z, d = Math.hypot(rx, rz);
+    if (d < AV_MIN + 0.1 && (rx * ux + rz * uz) / (d || 1) > 0.1) { w.blk = (w.blk || 0) + DT; if (w.blk < 4) return true; } } w.blk = 0; return false; }
 function* walkPath(w, pts, sp, pose) { for (const p of pts) yield* walkTo(w, p[0], p[1], sp, pose); }
 function* pick(w, b, take) { // bend or reach depending on height, then the box is in the hands
   const by = b.st === 'skid' ? b.sk.y + PAL_H + b.ly : b.y; const pose = by < 0.7 ? 'bend' : (by > 1.5 ? 'reachHi' : 'reach');
@@ -527,7 +633,7 @@ function* jackPull(w, j, pts, sp = 0.95) { w.jack = j; // worker walks ahead pul
   { const [sx, sz] = jackSteer(j); yield* turnTo(w, yawTo(w.x - sx, w.z - sz)); }
   for (const p of pts) { for (;;) { const dx = p[0] - w.x, dz = p[1] - w.z, d = Math.hypot(dx, dz); if (d < 0.03) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -2.5 * DT, 2.5 * DT); const step = Math.min(d, sp * DT * (Math.abs(da) > 0.8 ? 0.3 : 1));
-    const [fx, fz] = fwd(w.yaw); w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'pull';
+    const [fx, fz] = fwd(w.yaw); if (crowdHold(w, fx, fz)) { w.pose = 'pull'; yield; continue; } w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'pull';
     const [sx, sz] = jackSteer(j); const hx = w.x - fx * 0.35, hz = w.z - fz * 0.35; let ex = hx - sx, ez = hz - sz; const el = Math.hypot(ex, ez) || 1; ex /= el; ez /= el;
     setJackFromSteer(j, hx - ex * (J_REACH - 0.35), hz - ez * (J_REACH - 0.35), yawTo(ex, ez)); j.tilt = -0.82; yield; } }
 }
@@ -542,7 +648,7 @@ function* jackStow(w, j, pts) { yield* jackPull(w, j, pts, 1.0); yield* wait(w, 
 function* jackPushPath(w, j, pts, sp = 0.9) {
   for (const p of pts) { for (;;) { const dx = p[0] - w.x, dz = p[1] - w.z, d = Math.hypot(dx, dz); if (d < 0.03) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -2.2 * DT, 2.2 * DT); const step = Math.min(d, sp * DT * (Math.abs(da) > 0.6 ? 0.25 : 1));
-    const [fx, fz] = fwd(w.yaw); w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'push';
+    const [fx, fz] = fwd(w.yaw); if (crowdHold(w, fx, fz)) { w.pose = 'push'; yield; continue; } w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'push';
     // the jack is ahead of the worker; its steer point trails toward the hands
     const hx = w.x + fx * 0.4, hz = w.z + fz * 0.4; const [sx, sz] = jackSteer(j); let ex = sx - hx, ez = sz - hz; const el = Math.hypot(ex, ez) || 1; ex /= el; ez /= el;
     const nsx = hx + ex * (J_REACH - 0.4 - 0.35), nsz = hz + ez * (J_REACH - 0.4 - 0.35); setJackFromSteer(j, nsx, nsz, yawTo(-ex, -ez)); j.tilt = -0.55; yield; } }
@@ -744,14 +850,14 @@ function initSim() {
     yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
   // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
   const MSK = [[0.6, -16.0], [-0.8, -16.0], [-2.2, -16.0], [-1.6, 2.6], [0.3, 2.6], [-6.4, -16.0]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
-  const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
+  const mk = role(mkWorker({ x: -1.0, z: 11.2, yaw: Math.PI / 2, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
   const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
   const CPARK = [0.6, -0.8, -2.2, -3.6, -5.0, -6.4];
   MILKCUR = MSK[3]; // earlier in the night: 3 milk skids + the egg pallet already parked in the cooler; the last 2 milk skids wait on the dock floor
   brain(mk, (function* () { yield* wait(mk, 40);
     for (const i of [3, 4]) { const sk = MSK[i], px = CPARK[i]; MILKCUR = sk;
-      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-3.0, 8.0], [-3.0, 0.2]] : [[-3.6, -9.0], [-3.6, 0.0]]);
-      yield* jackPull(mk, jMk, [[sk.x, sk.z - 1.0], [-3.6, sk.z - 2.2], [-3.6, -11.2], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
+      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-4.4, 8.0], [-4.4, 3.6]] : [[-3.6, -11.0], [-4.9, -9.0], [-4.9, 3.6]]);
+      yield* jackPull(mk, jMk, [[sk.x, sk.z - 0.4], [-4.9, sk.z - 0.4], [-4.9, -10.6], [-3.6, -11.6], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
       yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -16.1); yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -13.0); yield* walkTo(mk, -3.6, -11.0); }
     yield* jackGrab(mk, jMk); yield* jackStow(mk, jMk, [[-3.6, -12.2], [-3.6, -10.4], [-12.8, -10.6]]); yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
@@ -838,6 +944,71 @@ function updateVehicles() {
 function resetVehicles() { const pv = SNACK.trailer.userData.pivots; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = 0; pv.rearDoor_R.rotation.y = 0; } snackV.lastEk = 0; snackV.lastS = 0; snackV.roll = 0; BALER.userData.pivots.door.rotation.y = 0; }
 VEH.push(snackV, snackTrailerV, { id: 'beverage-vendor-box-truck', type: 'box-truck', obj: BOXT }, { id: 'walmart-trailer-A', type: 'tractor-trailer', placard: 'FDS' }, { id: 'walmart-trailer-B', type: 'tractor-trailer', placard: 'CP' }, ...YARD.map((y) => ({ id: 'yard-' + y.pl, type: 'tractor-trailer', placard: y.pl })));
 function simStep() { updateVehicles(); for (const b of BRAINS) b.g.next(); updateRoller(); T += DT; }
+// ===== 15. MACHINES (stock picker, walkie stacker, electric pallet jack) — kinematic, each with its operator =====
+const _mv = new THREE.Vector3();
+const mWorld = (g, p) => g.localToWorld(_mv.set(p[0], p[1], p[2])).clone();
+function mPallet(seed, h) { const B = new Builder(); B.box(1.0, 0.14, 1.2, 0, 0.07, 0, '#b4895a'); let r = seed * 9301 + 49297; const rn = () => ((r = (r * 9301 + 49297) % 233280) / 233280);
+  for (let ly = 0; ly < h; ly++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) B.box(0.46, 0.3, 0.37, -0.24 + i * 0.48, 0.14 + 0.15 + ly * 0.31, -0.39 + j * 0.39, ['#a57b52', '#9c744c', '#ae8558', '#94704b'][(rn() * 4) | 0]);
+  const m = B.merge(MAT.v, 'mpallet'); m.matrixAutoUpdate = true; scene.add(m); return m; }
+function* tween(dur, fn, g) { let e = 0, h = 0; while (e < dur) { if (g && h < 8 && mNear(g)) { h += DT; yield; continue; } e = Math.min(dur, e + DT); fn(e / dur); yield; } }
+function mNear(g) { for (const o of W) { if (o.sit || o.hide || o === pkOp || o === wsOp || o === ejOp || (o.y || 0) > 1.5) continue; if (Math.hypot(o.x - g.position.x, o.z - g.position.z) < 1.7) return true; } return false; }
+const mEase = (k) => k * k * (3 - 2 * k);
+// rack bay for the stacker (green uprights, empty top level at 2.85 m)
+const MRACK = [];
+{ const G = '#22402e', x = -2.9, z = -4.4; for (const sx of [-1.22, 1.22]) for (const sz of [-0.46, 0.46]) S0box(0.09, 3.6, 0.09, x + sx, 1.8, z + sz, G);
+  for (const y of [1.35, 2.8]) for (const sz of [-0.46, 0.46]) S0box(2.44, 0.1, 0.06, x, y, z + sz, '#e07b1f'); scene.add(bake(MRACK, 'machineRack')); }
+function S0box(w, h, d, x, y, z, c) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), MAT.v); paint(m.geometry, c); m.position.set(x, y, z); MRACK.push(m); }
+// 1) STOCK PICKER — operator rides the platform up to the top shelf, picks a case onto the tray, rides down
+const PK = buildPicker(THREE, PM, {}); PK.position.set(-3.6, 0, -5.85); PK.rotation.y = -Math.PI / 2; scene.add(PK); pickerLift(PK, 0);
+const PKCASE = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.34), MAT.v); paint(PKCASE.geometry, '#a57b52'); scene.add(PKCASE);
+const pkShelf = [-8.0, 2.62 + 0.15, -6.98]; PKCASE.position.set(...pkShelf); let pkOn = false;
+function pkSync() { PK.updateMatrixWorld(true); const p = mWorld(PK, PK.userData.operatorPoint); pkOp.x = p.x; pkOp.y = p.y; pkOp.z = p.z; if (pkOn) { const t = mWorld(PK, PK.userData.trayPoint); PKCASE.position.set(t.x, t.y + 0.15, t.z); } }
+// 2) WALKIE STACKER — operator walks behind at the handle; forks lift a pallet onto the top rack level
+const WS = buildWalkie(THREE, PM, {}); WS.rotation.y = Math.PI; WS.position.set(-2.9, 0, -0.4); scene.add(WS); walkieForks(WS, 0.09); walkieTiller(WS, -0.5);
+const wsPal = mPallet(3, 2); let wsOn = true;
+function wsSync(moving) { WS.updateMatrixWorld(true); const h = mWorld(WS, walkieHandle(WS)); wsOp.x = h.x; wsOp.z = h.z + 0.5; wsOp.yaw = Math.PI; wsOp.pose = 'push'; if (moving) wsOp.ph += DT * 3.4;
+  if (wsOn) { const f = mWorld(WS, WS.userData.forkPoint); wsPal.position.set(f.x, f.y, f.z); } }
+const wsFc = () => { WS.updateMatrixWorld(true); return WS.position.z - mWorld(WS, WS.userData.forkPoint).z; }; // origin-to-fork-centre distance
+// 3) ELECTRIC PALLET JACK — operator holds the tiller; moves a pallet between receiving and the stocking area
+const EJ = buildEJack(THREE, PM, {}); EJ.position.set(-6.5, 0, 7.0); EJ.rotation.y = 0; scene.add(EJ); ejackLift(EJ, 0); ejackTiller(EJ, -0.6);
+const ejPal = mPallet(7, 3); let ejOn = false;
+function ejSync(moving, pulling) { EJ.updateMatrixWorld(true); const h = mWorld(EJ, ejackHandle(EJ)); ejOp.x = h.x; ejOp.z = h.z - (pulling ? 0.3 : 0.5); ejOp.yaw = EJ.rotation.y + (pulling ? Math.PI : 0); ejOp.pose = pulling ? 'pull' : 'push'; if (moving) ejOp.ph += DT * 3.4;
+  if (ejOn) { const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, f.y, f.z); } }
+{ EJ.updateMatrixWorld(true); const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, 0, f.z); }
+
+let pkOp, wsOp, ejOp;
+function initMachines() {
+  PK.position.set(-3.6, 0, -5.85); pickerLift(PK, 0); pkOn = false; PKCASE.position.set(...pkShelf);
+  WS.position.set(-2.9, 0, -0.4); walkieForks(WS, 0.09); wsOn = true;
+  EJ.position.set(-6.5, 0, 7.0); ejackLift(EJ, 0); ejOn = false; { EJ.updateMatrixWorld(true); const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, 0, f.z); }
+  pkOp = role(mkWorker({ x: -3.6, z: -5.85, yaw: -Math.PI / 2, torso: COL.st2 }), 'Stock picker operator');
+  brain(pkOp, (function* () { pkSync(); for (let n = 0; ; n++) { yield* wait(pkOp, 6); pkOp.yaw = -Math.PI / 2;
+      yield* tween(3.2, (k) => { PK.position.x = -3.6 - 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK);
+      yield* tween(6, (k) => { pickerLift(PK, mEase(k)); pkSync(); pkOp.pose = 'idle'; });
+      yield* turnTo(pkOp, Math.PI); yield* wait(pkOp, 0.6, 'reach');
+      if (!pkOn) { pkOn = true; pkSync(); } else { pkOn = false; PKCASE.position.set(...pkShelf); }
+      yield* wait(pkOp, 0.6, 'reach'); yield* turnTo(pkOp, -Math.PI / 2);
+      yield* tween(6, (k) => { pickerLift(PK, 1 - mEase(k)); pkSync(); pkOp.pose = 'idle'; });
+      yield* tween(3.2, (k) => { PK.position.x = -8.0 + 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK); } })());
+  wsOp = role(mkWorker({ x: -2.9, z: 0.8, yaw: Math.PI, torso: COL.st2 }), 'Walkie stacker operator'); wsOp.jack = { g: WS, grip: WS.getObjectByName('handlePoint') };
+  brain(wsOp, (function* () { let fh = 0.09; wsSync(); yield* wait(wsOp, 4, 'push'); for (;;) { const fc = wsFc(), z0 = WS.position.z, zA = -2.55 + fc, zB = -4.4 + fc;
+      const drive = function* (za, zb, dur) { yield* tween(dur, (k) => { WS.position.z = za + (zb - za) * mEase(k); wsSync(true); }, WS); };
+      const forks = function* (a, b, dur) { yield* tween(dur, (k) => { fh = a + (b - a) * mEase(k); walkieForks(WS, fh); wsSync(false); }); };
+      if (wsOn) { yield* drive(z0, zA, 3); yield* forks(0.09, 2.98, 6); yield* drive(zA, zB, 3); yield* forks(2.98, 2.88, 1.2); wsOn = false; wsPal.position.y = 2.85; yield* drive(zB, zA, 3); yield* forks(2.88, 0.09, 5); yield* drive(zA, z0, 3); }
+      else { yield* drive(z0, zA, 3); yield* forks(0.09, 2.86, 5); yield* drive(zA, zB, 3); wsOn = true; yield* forks(2.86, 2.98, 1.2); yield* drive(zB, zA, 3); yield* forks(2.98, 0.09, 6); yield* drive(zA, z0, 3); }
+      yield* wait(wsOp, 8, 'push'); } })());
+  ejOp = role(mkWorker({ x: -6.5, z: 6, yaw: Math.PI, torso: COL.st2 }), 'Electric pallet jack operator'); ejOp.jack = { g: EJ, grip: EJ.getObjectByName('handlePoint') };
+  brain(ejOp, (function* () { ejSync(false, true); yield* wait(ejOp, 3, 'pull'); for (;;) { const zR = EJ.position.z, zS = -1.0;
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * k); ejOn = true; ejSync(false, true); });
+      yield* tween(9, (k) => { EJ.position.z = zR + (zS - zR) * mEase(k); ejSync(true, true); }, EJ); // operator walks ahead, pulling
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * (1 - k)); ejSync(false, true); }); ejOn = false; ejPal.position.y = 0;
+      yield* wait(ejOp, 8, 'pull');
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * k); ejOn = true; ejSync(false, false); });
+      yield* tween(11, (k) => { EJ.position.z = zS + (zR - zS) * mEase(k); ejSync(true, false); }, EJ); // back to receiving, operator behind
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * (1 - k)); ejSync(false, false); }); ejOn = false; ejPal.position.y = 0;
+      yield* wait(ejOp, 8, 'pull'); } })());
+  window.__mach = { PK, WS, EJ, wsPal, ejPal, PKCASE, pkOp, wsOp, ejOp };
+}
 
 await __yield("a5");
 // ======================= RENDER =======================
@@ -941,9 +1112,16 @@ const CAMS = {
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
-  stairs: [[-13.5, 6.5, 16.5], [-21.2, 2.4, 8.6]],
-  upstairs: [[-29, 23, 23], [-34.5, 4.2, 0]],
-  overview: [[-26, 30, 40], [6, -1, 2]],
+  stockroom: [[-2.4, 3.6, -1.0], [-7.6, 1.4, -6.0]],
+  picker: [[-3.0, 6.5, -2.4], [-6.0, 2.0, -5.9]],
+  stacker: [[1.5, 3.4, 3.2], [-3.2, 1.4, -2.0]],
+  ejack: [[-2.5, 3.6, 9.5], [-6.5, 0.6, 3.0]],
+  salesmain: [[-27.5, 7.0, 12.5], [-44, 0.2, -2.5]],
+  elevator: [[-12.5, 2.8, -7.5], [-9.6, 1.4, -11.6]],
+  stairs: [[-24.5, 5.5, 17], [-21.2, 3.0, 8.6]],
+  upstairs: [[-4, 27, 23], [-10, 7.6, 0]],
+  floor2: [[-2, 33, 26], [-10, 13.0, 0]],
+  overview: [[-30, 36, 48], [2, 2, 0]],
 };
 const LBL = { // fixed points of interest per step
   hero: [['Cooler', -3.6, 2.6, -11.8], ['Freezer', 3.0, 2.6, -11.8], ['Gravity roller', 8, 1.2, 2], ['Department skids', 5.6, 1.4, 0]],
@@ -958,11 +1136,19 @@ const LBL = { // fixed points of interest per step
   pharm: [['McKesson totes · wrapped pallet', -17.6, 1.6, 5.6]],
   baler: [['Baler', -19.4, 3.4, -3.2], ['Compactor', -19.6, 2.6, 1.2], ['Cardboard', -16.9, 1.4, -1.4]],
   omni: [['OGP staging shelves', 15.5, 2.0, 11.4], ['Chill / frozen', 13, 2.0, 6.4]],
-  fashion: [['Z-racks', 15.5, 2.0, -9.7]],
+  fashion: [['Yellow Z-racks', 15.5, 2.0, -9.7], ['Green racking · cartons above, garments below', 11.4, 3.9, -11.3]],
+  stockroom: [['Backroom stocking area', -7.4, 4.1, -5.85], ['Wrapped pallets on top', -6.0, 3.6, -7.3]],
+  picker: [['Stock picker', -5.8, 4.7, -5.85]],
+  stacker: [['Walkie stacker', -2.9, 3.0, -0.4], ['Top rack level', -2.9, 3.9, -4.4]],
+  ejack: [['Electric pallet jack', -6.5, 2.0, 3.0]],
+  salesmain: [['Gondola aisles', -46, 2.4, -7.4], ['Produce', -53.3, 1.6, 6.2], ['Meat case', -44.5, 2.2, 13.2], ['Electronics', -31, 2.8, -12.4], ['Checkouts', -41.4, 1.6, 3.6]],
+  elevator: [['Freight elevator', -9.8, 3.0, -11.0], ['Empty pallets', -7.3, 1.6, -10.5]],
+  upstairs: [['1st floor (above the backroom)', -10, 9.2, -11.6]],
+  floor2: [['2nd floor · coming soon', -10, 17.6, -11.6], ['1st floor', -10, 9.4, 11.6]],
   claims: [['Claims cage', -17.2, 2.6, -10.2]],
   overview: [],
 };
-const ROLE_STEPS = { bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
+const ROLE_STEPS = { picker: ['Stock picker operator'], stacker: ['Walkie stacker operator'], ejack: ['Electric pallet jack operator'], bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
   floor: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · Dept 92 (big skid, 2 people)'], stock: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · overnight stocking'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
   pharm: ['DSD associate · receiving', 'Pharmacy pallet · jack to pharmacy'], baler: ['Baler & compactor pre-op'], omni: ['OMNI customer fulfillment'], fashion: ['Fashion · hanging apparel'], claims: ['Claims & returns'], overview: [] };
 const labelsEl = document.getElementById('labels');
@@ -970,8 +1156,10 @@ const LPOOL = []; for (let i = 0; i < 8; i++) { const d = document.createElement
 let cur = 0, camFrom = null, camT = 1, explore = false;
 const camPos = new THREE.Vector3().fromArray(CAMS.hero[0]), camTgt = new THREE.Vector3().fromArray(CAMS.hero[1]);
 const controls = new OrbitControls(camera, canvas); controls.enabled = false; controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 1.5; controls.maxDistance = 90;
-function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : 1.12; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; } return [p, t]; }
-function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
+function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : (c[0][2] < -12 && Math.abs(c[0][0]) < 20 ? 1.0 : 1.12); const inBR = Math.abs(c[0][0]) < 20 && Math.abs(c[0][2]) < 12 && c[0][1] < 7.2; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; if (inBR) { p.x = Math.max(-19.4, Math.min(19.4, p.x)); p.z = Math.max(-11.4, Math.min(11.4, p.z)); } } return [p, t]; }
+function floorsFor(id) { const f1 = ['stairs', 'upstairs', 'floor2', 'overview'].includes(id), f2 = ['floor2', 'overview'].includes(id); F1G.visible = f1; F2G.visible = f2;
+  const ex = id === 'overview' || id === 'floor2'; F1G.position.y = id === 'overview' ? 3.0 : 0; F2G.position.y = ex ? (id === 'overview' ? 7.5 : 4.5) : 0; }
+function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; floorsFor(STEPS[i].id); STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
   camFrom = [camera.position.clone(), camTgt.clone()]; camT = instant ? 1 : 0; const c = CAMS[STEPS[i].id] || CAMS.hero; const cf = camFor(c); camPos.copy(cf[0]); { const fw = followRole(c); if (fw) { camPos.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]); } } if (instant) { camera.position.copy(camPos); camTgt.copy(cf[1]); const fw = followRole(c); if (fw) camTgt.copy(tgtOf(fw, c)); } { const fw = followRole(c); camFrom.push(fw ? tgtOf(fw, c).clone() : cf[1].clone()); } if (explore) setExplore(false); }
 window.__goStep = goStep;
 function stepFromScroll() { const mid = innerHeight * 0.5; let best = 0, bd = 1e9; STEPS.forEach((s, k) => { const r = s.el.getBoundingClientRect(); const d = Math.abs((r.top + r.bottom) / 2 - mid); if (d < bd) { bd = d; best = k; } }); return best; }
@@ -995,7 +1183,7 @@ const _lv = new THREE.Vector3();
 const _cabV = new THREE.Vector3();
 function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; if (c[2] === '@snackcab') { const sp = SNACK.tractor.userData.seatPoint; if (sp && sp.object) return sp.object.getWorldPosition(_cabV); return SNACK.tractor.localToWorld(_cabV.set(0.55, 1.95, 2.2)); } const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
-  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05, z: js ? js.z : r.w.z, k: 'who' }); }
+  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05 + (r.w.y || 0), z: js ? js.z : r.w.z, k: 'who' }); }
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;
   const placed = []; for (const it of items) { if (n >= LPOOL.length) break; _lv.set(it.x, it.y, it.z).project(camera); if (_lv.z > 1 || Math.abs(_lv.x) > 1.05 || Math.abs(_lv.y) > 1.05) continue; const sx = (_lv.x + 1) / 2 * W_, sy = (1 - _lv.y) / 2 * H_; if (cardR && sx > cardR.left - 80 && sx < cardR.right + 80 && sy > cardR.top - 10 && sy < cardR.bottom + 40) continue; const lw = it.t.length * 7.4 + 18, lh = 24; let px = Math.min(W_ - lw / 2 - 8, Math.max(lw / 2 + 8, sx)), py = Math.min(H_ - 40, Math.max(lh + 50, sy)); for (let g = 0; g < 6; g++) { const hit = placed.find((q) => Math.abs(q[0] - px) < (q[2] + lw) / 2 + 4 && Math.abs(q[1] - py) < lh + 2); if (!hit) break; py = hit[1] - lh - 4; if (py < lh + 50) { py = hit[1] + lh + 4; } } placed.push([px, py, lw]); const d = LPOOL[n++]; d.textContent = it.t; d.className = 'lbl ' + it.k; d.style.transform = `translate(${px.toFixed(0)}px,${py.toFixed(0)}px) translate(-50%,-100%)`; d.style.display = 'block'; }
   for (; n < LPOOL.length; n++) LPOOL[n].style.display = 'none'; }
@@ -1005,12 +1193,13 @@ const fadeEl = document.getElementById('fade');
 function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT < 0) { fadeT = 0; fadeEl.classList.add('on'); } }
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
 function frame(now) { requestAnimationFrame(frame); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt));
-  if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
+  if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); initMachines(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
   if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
+  if (window.__camOverride) { const v = window.__camOverride; camera.position.fromArray(v[0]); camera.up.set(0, v[4] ? 1 : 0, v[4] ? 0 : -1); camera.lookAt(v[1][0], v[1][1], v[1][2]); camera.fov = v[2]; camera.updateProjectionMatrix(); }
   camLook(); render3d(); renderer.render(scene, camera); updLabels(); frames++;
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
-initSim(); resize(); goStep(0, true); camera.lookAt(camTgt);
+initSim(); initMachines(); resize(); goStep(0, true); camera.lookAt(camTgt);
 await __yield(); await __compile(1500); await __yield();
 setTimeout(() => { const l = document.getElementById('gfLoad'); if (l) l.remove(); }, 2800);
 requestAnimationFrame(frame);
@@ -1020,5 +1209,13 @@ requestAnimationFrame(frame);
   show(data, false);
   if (location.protocol === 'https:') try { const ctl = new AbortController(); setTimeout(() => ctl.abort(), 5000); fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://news.google.com/rss/search?q=Walmart+Canada&hl=en-CA&gl=CA&ceid=CA:en'), { signal: ctl.signal }).then((r) => r.ok ? r.text() : Promise.reject()).then((x) => { const doc = new DOMParser().parseFromString(x, 'text/xml'); const items = [...doc.querySelectorAll('item')].slice(0, 5).map((i) => ({ title: i.querySelector('title')?.textContent || '', link: i.querySelector('link')?.textContent || '' })).filter((i) => i.title && /^https:\/\//.test(i.link)); if (items.length) show({ items, date: new Date().toISOString().slice(0, 10) }, true); }).catch(() => {}); } catch (e) {}
 })();
+// QA probe: run the sim headless for `sec` seconds and report the minimum pairwise distance between walking/standing associates
+window.__sim.minPair = function (sec = 60, from = 0) { const save = DT; DT = 1 / 30; let best = 1e9, who = null, at = 0; const nm = (w) => { const r = ROLES.find((r) => r.w === w); return r ? r.text : 'w' + W.indexOf(w); };
+  for (let i = 0; i < sec * 30; i++) { simStep(); if (T < from) continue; const L = W.filter((w) => !w.sit && !w.hide);
+    for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) { const p = L[a], q = L[b]; if (Math.abs((p.y || 0) - (q.y || 0)) > 1.5) continue; const d = Math.hypot(p.x - q.x, p.z - q.z); if (d < best) { best = d; who = [nm(p), nm(q)]; at = T; } } }
+  DT = save; return { min: +best.toFixed(3), who, at: +at.toFixed(1), n: W.length }; };
+window.__sim.footprint = function () { const r={};const save=DT;DT=1/30;const M=window.__mach;const ops=[M.pkOp,M.wsOp,M.ejOp];for(let i=0;i<150*30;i++){simStep();for(const w of W){if(w.sit||w.hide||ops.includes(w))continue;const nm=(ROLES.find(q=>q.w===w)||{}).text||('w'+W.indexOf(w));
+if(Math.abs(w.x+2.9)<1.4&&Math.abs(w.z+4.4)<0.65){r['rack:'+nm]=r['rack:'+nm]||T.toFixed(1)}
+for(const [k,g] of [['pk',M.PK],['ws',M.WS],['ej',M.EJ]]){if(Math.hypot(w.x-g.position.x,w.z-g.position.z)<0.9){r[k+':'+nm]=r[k+':'+nm]||T.toFixed(1)}}}}DT=save;return r };
 
 await __yield("a7");

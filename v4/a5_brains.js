@@ -116,14 +116,14 @@ function initSim() {
     yield* walkTo(snv, -11.5, 12.6); yield* walkTo(snv, SNC.x, SNC.z - 0.8); SNC.follow = null; SNC.y = 0; yield* pushCart(snv, SNC, [[-11.5, 9.0], [-12.0, -6.6], [-6.0, -7.9], [18.6, -7.9], [18.6, -1.2], [24.0, 0]]); yield* walkTo(snv, SNC.x - 1.2, SNC.z); for (;;) yield* wait(snv, 5); })());
   // ===== FDS milk: 5 crate skids deep in trailer A, jacked into the walk-in cooler once the wrapped skids are out =====
   const MSK = [[0.6, -16.0], [-0.8, -16.0], [-2.2, -16.0], [-1.6, 2.6], [0.3, 2.6], [-6.4, -16.0]].map(([x, z], i) => mkSkid({ x, z, col: COL.blue, grp: i < 5 ? MILK[i] : EGGS[0], milk: i < 5, eggs: i >= 5 }));
-  const mk = role(mkWorker({ x: -3.0, z: 9.6, yaw: 0, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
+  const mk = role(mkWorker({ x: -1.0, z: 11.2, yaw: Math.PI / 2, torso: COL.st2 }), 'Stocking 2 · milk & eggs to cooler');
   const jMk = mkJack({ x: -2.2, z: 10.6, yaw: 0 });
   const CPARK = [0.6, -0.8, -2.2, -3.6, -5.0, -6.4];
   MILKCUR = MSK[3]; // earlier in the night: 3 milk skids + the egg pallet already parked in the cooler; the last 2 milk skids wait on the dock floor
   brain(mk, (function* () { yield* wait(mk, 40);
     for (const i of [3, 4]) { const sk = MSK[i], px = CPARK[i]; MILKCUR = sk;
-      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-3.0, 8.0], [-3.0, 0.2]] : [[-3.6, -9.0], [-3.6, 0.0]]);
-      yield* jackPull(mk, jMk, [[sk.x, sk.z - 1.0], [-3.6, sk.z - 2.2], [-3.6, -11.2], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
+      yield* jackFetch(mk, jMk, sk, Math.PI, i === 3 ? [[-4.4, 8.0], [-4.4, 3.6]] : [[-3.6, -11.0], [-4.9, -9.0], [-4.9, 3.6]]);
+      yield* jackPull(mk, jMk, [[sk.x, sk.z - 0.4], [-4.9, sk.z - 0.4], [-4.9, -10.6], [-3.6, -11.6], [-3.6, -13.0], [px, -13.3], [px, -16.0]]); yield* jackRelease(mk, jMk); yield* jackBackOut(mk, jMk, 0.3);
       yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -16.1); yield* walkTo(mk, px + (px < -3.6 ? 0.85 : -0.85), -13.0); yield* walkTo(mk, -3.6, -11.0); }
     yield* jackGrab(mk, jMk); yield* jackStow(mk, jMk, [[-3.6, -12.2], [-3.6, -10.4], [-12.8, -10.6]]); yield* walkTo(mk, -3.0, 9.6); for (;;) yield* wait(mk, 5); })());
   // ===== 9. PHARMACY: wrapped McKesson tote pallet (2 or 3 layers, alternating nights). Jacked to the pharmacy, wrap cut, totes counted against the memo, signed =====
@@ -210,3 +210,68 @@ function updateVehicles() {
 function resetVehicles() { const pv = SNACK.trailer.userData.pivots; if (pv.rearDoor_L) { pv.rearDoor_L.rotation.y = 0; pv.rearDoor_R.rotation.y = 0; } snackV.lastEk = 0; snackV.lastS = 0; snackV.roll = 0; BALER.userData.pivots.door.rotation.y = 0; }
 VEH.push(snackV, snackTrailerV, { id: 'beverage-vendor-box-truck', type: 'box-truck', obj: BOXT }, { id: 'walmart-trailer-A', type: 'tractor-trailer', placard: 'FDS' }, { id: 'walmart-trailer-B', type: 'tractor-trailer', placard: 'CP' }, ...YARD.map((y) => ({ id: 'yard-' + y.pl, type: 'tractor-trailer', placard: y.pl })));
 function simStep() { updateVehicles(); for (const b of BRAINS) b.g.next(); updateRoller(); T += DT; }
+// ===== 15. MACHINES (stock picker, walkie stacker, electric pallet jack) — kinematic, each with its operator =====
+const _mv = new THREE.Vector3();
+const mWorld = (g, p) => g.localToWorld(_mv.set(p[0], p[1], p[2])).clone();
+function mPallet(seed, h) { const B = new Builder(); B.box(1.0, 0.14, 1.2, 0, 0.07, 0, '#b4895a'); let r = seed * 9301 + 49297; const rn = () => ((r = (r * 9301 + 49297) % 233280) / 233280);
+  for (let ly = 0; ly < h; ly++) for (let i = 0; i < 2; i++) for (let j = 0; j < 3; j++) B.box(0.46, 0.3, 0.37, -0.24 + i * 0.48, 0.14 + 0.15 + ly * 0.31, -0.39 + j * 0.39, ['#a57b52', '#9c744c', '#ae8558', '#94704b'][(rn() * 4) | 0]);
+  const m = B.merge(MAT.v, 'mpallet'); m.matrixAutoUpdate = true; scene.add(m); return m; }
+function* tween(dur, fn, g) { let e = 0, h = 0; while (e < dur) { if (g && h < 8 && mNear(g)) { h += DT; yield; continue; } e = Math.min(dur, e + DT); fn(e / dur); yield; } }
+function mNear(g) { for (const o of W) { if (o.sit || o.hide || o === pkOp || o === wsOp || o === ejOp || (o.y || 0) > 1.5) continue; if (Math.hypot(o.x - g.position.x, o.z - g.position.z) < 1.7) return true; } return false; }
+const mEase = (k) => k * k * (3 - 2 * k);
+// rack bay for the stacker (green uprights, empty top level at 2.85 m)
+const MRACK = [];
+{ const G = '#22402e', x = -2.9, z = -4.4; for (const sx of [-1.22, 1.22]) for (const sz of [-0.46, 0.46]) S0box(0.09, 3.6, 0.09, x + sx, 1.8, z + sz, G);
+  for (const y of [1.35, 2.8]) for (const sz of [-0.46, 0.46]) S0box(2.44, 0.1, 0.06, x, y, z + sz, '#e07b1f'); scene.add(bake(MRACK, 'machineRack')); }
+function S0box(w, h, d, x, y, z, c) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), MAT.v); paint(m.geometry, c); m.position.set(x, y, z); MRACK.push(m); }
+// 1) STOCK PICKER — operator rides the platform up to the top shelf, picks a case onto the tray, rides down
+const PK = buildPicker(THREE, PM, {}); PK.position.set(-3.6, 0, -5.85); PK.rotation.y = -Math.PI / 2; scene.add(PK); pickerLift(PK, 0);
+const PKCASE = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.34), MAT.v); paint(PKCASE.geometry, '#a57b52'); scene.add(PKCASE);
+const pkShelf = [-8.0, 2.62 + 0.15, -6.98]; PKCASE.position.set(...pkShelf); let pkOn = false;
+function pkSync() { PK.updateMatrixWorld(true); const p = mWorld(PK, PK.userData.operatorPoint); pkOp.x = p.x; pkOp.y = p.y; pkOp.z = p.z; if (pkOn) { const t = mWorld(PK, PK.userData.trayPoint); PKCASE.position.set(t.x, t.y + 0.15, t.z); } }
+// 2) WALKIE STACKER — operator walks behind at the handle; forks lift a pallet onto the top rack level
+const WS = buildWalkie(THREE, PM, {}); WS.rotation.y = Math.PI; WS.position.set(-2.9, 0, -0.4); scene.add(WS); walkieForks(WS, 0.09); walkieTiller(WS, -0.5);
+const wsPal = mPallet(3, 2); let wsOn = true;
+function wsSync(moving) { WS.updateMatrixWorld(true); const h = mWorld(WS, walkieHandle(WS)); wsOp.x = h.x; wsOp.z = h.z + 0.5; wsOp.yaw = Math.PI; wsOp.pose = 'push'; if (moving) wsOp.ph += DT * 3.4;
+  if (wsOn) { const f = mWorld(WS, WS.userData.forkPoint); wsPal.position.set(f.x, f.y, f.z); } }
+const wsFc = () => { WS.updateMatrixWorld(true); return WS.position.z - mWorld(WS, WS.userData.forkPoint).z; }; // origin-to-fork-centre distance
+// 3) ELECTRIC PALLET JACK — operator holds the tiller; moves a pallet between receiving and the stocking area
+const EJ = buildEJack(THREE, PM, {}); EJ.position.set(-6.5, 0, 7.0); EJ.rotation.y = 0; scene.add(EJ); ejackLift(EJ, 0); ejackTiller(EJ, -0.6);
+const ejPal = mPallet(7, 3); let ejOn = false;
+function ejSync(moving, pulling) { EJ.updateMatrixWorld(true); const h = mWorld(EJ, ejackHandle(EJ)); ejOp.x = h.x; ejOp.z = h.z - (pulling ? 0.3 : 0.5); ejOp.yaw = EJ.rotation.y + (pulling ? Math.PI : 0); ejOp.pose = pulling ? 'pull' : 'push'; if (moving) ejOp.ph += DT * 3.4;
+  if (ejOn) { const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, f.y, f.z); } }
+{ EJ.updateMatrixWorld(true); const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, 0, f.z); }
+
+let pkOp, wsOp, ejOp;
+function initMachines() {
+  PK.position.set(-3.6, 0, -5.85); pickerLift(PK, 0); pkOn = false; PKCASE.position.set(...pkShelf);
+  WS.position.set(-2.9, 0, -0.4); walkieForks(WS, 0.09); wsOn = true;
+  EJ.position.set(-6.5, 0, 7.0); ejackLift(EJ, 0); ejOn = false; { EJ.updateMatrixWorld(true); const f = mWorld(EJ, EJ.userData.forkPoint); ejPal.position.set(f.x, 0, f.z); }
+  pkOp = role(mkWorker({ x: -3.6, z: -5.85, yaw: -Math.PI / 2, torso: COL.st2 }), 'Stock picker operator');
+  brain(pkOp, (function* () { pkSync(); for (let n = 0; ; n++) { yield* wait(pkOp, 6); pkOp.yaw = -Math.PI / 2;
+      yield* tween(3.2, (k) => { PK.position.x = -3.6 - 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK);
+      yield* tween(6, (k) => { pickerLift(PK, mEase(k)); pkSync(); pkOp.pose = 'idle'; });
+      yield* turnTo(pkOp, Math.PI); yield* wait(pkOp, 0.6, 'reach');
+      if (!pkOn) { pkOn = true; pkSync(); } else { pkOn = false; PKCASE.position.set(...pkShelf); }
+      yield* wait(pkOp, 0.6, 'reach'); yield* turnTo(pkOp, -Math.PI / 2);
+      yield* tween(6, (k) => { pickerLift(PK, 1 - mEase(k)); pkSync(); pkOp.pose = 'idle'; });
+      yield* tween(3.2, (k) => { PK.position.x = -8.0 + 4.4 * mEase(k); pkSync(); pkOp.pose = 'idle'; }, PK); } })());
+  wsOp = role(mkWorker({ x: -2.9, z: 0.8, yaw: Math.PI, torso: COL.st2 }), 'Walkie stacker operator'); wsOp.jack = { g: WS, grip: WS.getObjectByName('handlePoint') };
+  brain(wsOp, (function* () { let fh = 0.09; wsSync(); yield* wait(wsOp, 4, 'push'); for (;;) { const fc = wsFc(), z0 = WS.position.z, zA = -2.55 + fc, zB = -4.4 + fc;
+      const drive = function* (za, zb, dur) { yield* tween(dur, (k) => { WS.position.z = za + (zb - za) * mEase(k); wsSync(true); }, WS); };
+      const forks = function* (a, b, dur) { yield* tween(dur, (k) => { fh = a + (b - a) * mEase(k); walkieForks(WS, fh); wsSync(false); }); };
+      if (wsOn) { yield* drive(z0, zA, 3); yield* forks(0.09, 2.98, 6); yield* drive(zA, zB, 3); yield* forks(2.98, 2.88, 1.2); wsOn = false; wsPal.position.y = 2.85; yield* drive(zB, zA, 3); yield* forks(2.88, 0.09, 5); yield* drive(zA, z0, 3); }
+      else { yield* drive(z0, zA, 3); yield* forks(0.09, 2.86, 5); yield* drive(zA, zB, 3); wsOn = true; yield* forks(2.86, 2.98, 1.2); yield* drive(zB, zA, 3); yield* forks(2.98, 0.09, 6); yield* drive(zA, z0, 3); }
+      yield* wait(wsOp, 8, 'push'); } })());
+  ejOp = role(mkWorker({ x: -6.5, z: 6, yaw: Math.PI, torso: COL.st2 }), 'Electric pallet jack operator'); ejOp.jack = { g: EJ, grip: EJ.getObjectByName('handlePoint') };
+  brain(ejOp, (function* () { ejSync(false, true); yield* wait(ejOp, 3, 'pull'); for (;;) { const zR = EJ.position.z, zS = -1.0;
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * k); ejOn = true; ejSync(false, true); });
+      yield* tween(9, (k) => { EJ.position.z = zR + (zS - zR) * mEase(k); ejSync(true, true); }, EJ); // operator walks ahead, pulling
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * (1 - k)); ejSync(false, true); }); ejOn = false; ejPal.position.y = 0;
+      yield* wait(ejOp, 8, 'pull');
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * k); ejOn = true; ejSync(false, false); });
+      yield* tween(11, (k) => { EJ.position.z = zS + (zR - zS) * mEase(k); ejSync(true, false); }, EJ); // back to receiving, operator behind
+      yield* tween(1.2, (k) => { ejackLift(EJ, 0.1 * (1 - k)); ejSync(false, false); }); ejOn = false; ejPal.position.y = 0;
+      yield* wait(ejOp, 8, 'pull'); } })());
+  window.__mach = { PK, WS, EJ, wsPal, ejPal, PKCASE, pkOp, wsOp, ejOp };
+}

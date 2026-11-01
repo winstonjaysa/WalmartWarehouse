@@ -44,8 +44,26 @@ function* face(w, x, z) { yield* turnTo(w, yawTo(x - w.x, z - w.z)); }
 function* walkTo(w, x, z, sp = 1.25, pose) {
   for (;;) { const dx = x - w.x, dz = z - w.z, d = Math.hypot(dx, dz); if (d < 0.02) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -5 * DT, 5 * DT);
-    const step = Math.min(d, sp * DT * (Math.abs(da) > 1.2 ? 0.25 : 1)); w.x += dx / d * step; w.z += dz / d * step; w.ph += step * 4.2; w.pose = pose || (w.carry ? 'carry' : 'walk'); yield; }
+    const step = Math.min(d, sp * DT * (Math.abs(da) > 1.2 ? 0.25 : 1)); let ux = dx / d, uz = dz / d;
+    // crowd avoidance: separation steering (radius ~0.35 m each) + yield to whoever is already in the way
+    const [ax, az] = avoid(w, ux, uz); if (ax === null) { w.blk = (w.blk || 0) + DT; if (w.blk < 4) { const [qx, qz] = sepOnly(w); w.x += qx * sp * 0.5 * DT; w.z += qz * sp * 0.5 * DT; w.pose = (qx || qz) ? 'walk' : 'idle'; w.ph += DT * 2; yield; continue; } } else { w.blk = 0; ux = ax; uz = az; }
+    w.x += ux * step; w.z += uz * step; w.ph += step * 4.2; w.pose = pose || (w.carry ? 'carry' : 'walk'); yield; }
+  w.blk = 0;
 }
+const AV_R = 0.35, AV_MIN = 0.62;
+function sepOnly(w) { let sx = 0, sz = 0; for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = w.x - o.x, rz = w.z - o.z, d = Math.hypot(rx, rz); if (d > 0.8 || d < 1e-4) continue; sx += rx / d; sz += rz / d; }
+  const n = Math.hypot(sx, sz); return n > 1e-3 ? [sx / n, sz / n] : [0, 0]; }
+function avoid(w, ux, uz) { let sx = 0, sz = 0, blocked = false;
+  for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = w.x - o.x, rz = w.z - o.z, d = Math.hypot(rx, rz); if (d > 1.1 || d < 1e-4) continue;
+    const ahead = -(rx * ux + rz * uz) / d; // >0 when o is in front
+    const k = (1.1 - d) / 1.1; sx += rx / d * k * 1.6; sz += rz / d * k * 1.6;
+    if (ahead > 0.2) { const side = (W.indexOf(w) & 1) ? 1 : -1; sx += -uz * side * k * 1.4; sz += ux * side * k * 1.4; } // pass on one side
+    if (d < AV_MIN + 0.08 && ahead > 0.1 && (o.blk || 0) < 0.5) blocked = true; }
+  if (blocked) return [null, null];
+  let nx = ux + sx, nz = uz + sz; const n = Math.hypot(nx, nz) || 1; nx /= n; nz /= n; if (nx * ux + nz * uz < 0.2) return [null, null]; return [nx, nz]; }
+// a jack operator holds position while someone is right in front (yield), up to 4 s
+function crowdHold(w, ux, uz) { for (const o of W) { if (o === w || o.sit || o.hide || Math.abs((o.y || 0) - (w.y || 0)) > 1.5) continue; const rx = o.x - w.x, rz = o.z - w.z, d = Math.hypot(rx, rz);
+    if (d < AV_MIN + 0.1 && (rx * ux + rz * uz) / (d || 1) > 0.1) { w.blk = (w.blk || 0) + DT; if (w.blk < 4) return true; } } w.blk = 0; return false; }
 function* walkPath(w, pts, sp, pose) { for (const p of pts) yield* walkTo(w, p[0], p[1], sp, pose); }
 function* pick(w, b, take) { // bend or reach depending on height, then the box is in the hands
   const by = b.st === 'skid' ? b.sk.y + PAL_H + b.ly : b.y; const pose = by < 0.7 ? 'bend' : (by > 1.5 ? 'reachHi' : 'reach');
@@ -68,7 +86,7 @@ function* jackPull(w, j, pts, sp = 0.95) { w.jack = j; // worker walks ahead pul
   { const [sx, sz] = jackSteer(j); yield* turnTo(w, yawTo(w.x - sx, w.z - sz)); }
   for (const p of pts) { for (;;) { const dx = p[0] - w.x, dz = p[1] - w.z, d = Math.hypot(dx, dz); if (d < 0.03) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -2.5 * DT, 2.5 * DT); const step = Math.min(d, sp * DT * (Math.abs(da) > 0.8 ? 0.3 : 1));
-    const [fx, fz] = fwd(w.yaw); w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'pull';
+    const [fx, fz] = fwd(w.yaw); if (crowdHold(w, fx, fz)) { w.pose = 'pull'; yield; continue; } w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'pull';
     const [sx, sz] = jackSteer(j); const hx = w.x - fx * 0.35, hz = w.z - fz * 0.35; let ex = hx - sx, ez = hz - sz; const el = Math.hypot(ex, ez) || 1; ex /= el; ez /= el;
     setJackFromSteer(j, hx - ex * (J_REACH - 0.35), hz - ez * (J_REACH - 0.35), yawTo(ex, ez)); j.tilt = -0.82; yield; } }
 }
@@ -83,7 +101,7 @@ function* jackStow(w, j, pts) { yield* jackPull(w, j, pts, 1.0); yield* wait(w, 
 function* jackPushPath(w, j, pts, sp = 0.9) {
   for (const p of pts) { for (;;) { const dx = p[0] - w.x, dz = p[1] - w.z, d = Math.hypot(dx, dz); if (d < 0.03) break;
     const ty = yawTo(dx, dz), da = angDiff(w.yaw, ty); w.yaw += clamp(da, -2.2 * DT, 2.2 * DT); const step = Math.min(d, sp * DT * (Math.abs(da) > 0.6 ? 0.25 : 1));
-    const [fx, fz] = fwd(w.yaw); w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'push';
+    const [fx, fz] = fwd(w.yaw); if (crowdHold(w, fx, fz)) { w.pose = 'push'; yield; continue; } w.x += fx * step; w.z += fz * step; w.ph += step * 4.2; w.pose = 'push';
     // the jack is ahead of the worker; its steer point trails toward the hands
     const hx = w.x + fx * 0.4, hz = w.z + fz * 0.4; const [sx, sz] = jackSteer(j); let ex = sx - hx, ez = sz - hz; const el = Math.hypot(ex, ez) || 1; ex /= el; ez /= el;
     const nsx = hx + ex * (J_REACH - 0.4 - 0.35), nsz = hz + ez * (J_REACH - 0.4 - 0.35); setJackFromSteer(j, nsx, nsz, yawTo(-ex, -ez)); j.tilt = -0.55; yield; } }

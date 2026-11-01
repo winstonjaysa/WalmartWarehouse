@@ -25,6 +25,16 @@ import { build as buildSick } from '../parts/v4/sickRoom.js';
 import { build as buildCleaning } from '../parts/v4/cleaningRoom.js';
 import { build as buildBale } from '../parts/v4/cardboardBale.js';
 import { build as buildStairs } from '../parts/v4/stairs.js';
+import { build as buildGondola } from '../parts/v4/salesfloor/gondolaAisle.js';
+import { build as buildProduce } from '../parts/v4/salesfloor/produceTable.js';
+import { build as buildMeatCase } from '../parts/v4/salesfloor/meatCase.js';
+import { build as buildTVWall } from '../parts/v4/salesfloor/electronicsWall.js';
+import { build as buildCheckout } from '../parts/v4/salesfloor/checkoutLane.js';
+import { build as buildFashionRack } from '../parts/v4/fashionRack.js';
+import { build as buildBRShelf } from '../parts/v4/backroomShelving.js';
+import { build as buildPicker, setLift as pickerLift } from '../parts/v4/stockPicker.js';
+import { build as buildWalkie, setForkHeight as walkieForks, setTiller as walkieTiller, getHandlePoint as walkieHandle } from '../parts/v4/walkieStacker.js';
+import { build as buildEJack, setForkLift as ejackLift, setTiller as ejackTiller, getHandlePoint as ejackHandle } from '../parts/v4/electricPalletJack.js';
 import { build as buildBev, setWrapped as bevSetWrapped } from '../parts/v4/beverageSkid.js';
 
 // ---------------- quality / renderer ----------------
@@ -47,6 +57,7 @@ renderer.toneMappingExposure = 1.12;
 renderer.shadowMap.enabled = false;
 
 const scene = new THREE.Scene();
+window.scene3 = scene;
 // chunked build: yield to the browser between builders so no single task blocks for long
 const __yield = (l) => new Promise((r) => requestAnimationFrame(() => setTimeout(() => { __mark(l || 'y'); r(); }, 0)));
 window.__yt = []; const __mark = (l) => window.__yt.push([l, Math.round(performance.now())]);

@@ -19,9 +19,16 @@ const CAMS = {
   omni: [[17.6, 1.7, 5.6], [15.2, 0.9, 10.8]],
   fashion: [[11.9, 1.65, -5.6], [15.4, 1.2, -9.8]],
   claims: [[-12.0, 1.8, -5.6], [-17.2, 1.0, -10.8]],
-  stairs: [[-13.5, 6.5, 16.5], [-21.2, 2.4, 8.6]],
-  upstairs: [[-29, 23, 23], [-34.5, 4.2, 0]],
-  overview: [[-26, 30, 40], [6, -1, 2]],
+  stockroom: [[-2.4, 3.6, -1.0], [-7.6, 1.4, -6.0]],
+  picker: [[-3.0, 6.5, -2.4], [-6.0, 2.0, -5.9]],
+  stacker: [[1.5, 3.4, 3.2], [-3.2, 1.4, -2.0]],
+  ejack: [[-2.5, 3.6, 9.5], [-6.5, 0.6, 3.0]],
+  salesmain: [[-27.5, 7.0, 12.5], [-44, 0.2, -2.5]],
+  elevator: [[-12.5, 2.8, -7.5], [-9.6, 1.4, -11.6]],
+  stairs: [[-24.5, 5.5, 17], [-21.2, 3.0, 8.6]],
+  upstairs: [[-4, 27, 23], [-10, 7.6, 0]],
+  floor2: [[-2, 33, 26], [-10, 13.0, 0]],
+  overview: [[-30, 36, 48], [2, 2, 0]],
 };
 const LBL = { // fixed points of interest per step
   hero: [['Cooler', -3.6, 2.6, -11.8], ['Freezer', 3.0, 2.6, -11.8], ['Gravity roller', 8, 1.2, 2], ['Department skids', 5.6, 1.4, 0]],
@@ -36,11 +43,19 @@ const LBL = { // fixed points of interest per step
   pharm: [['McKesson totes · wrapped pallet', -17.6, 1.6, 5.6]],
   baler: [['Baler', -19.4, 3.4, -3.2], ['Compactor', -19.6, 2.6, 1.2], ['Cardboard', -16.9, 1.4, -1.4]],
   omni: [['OGP staging shelves', 15.5, 2.0, 11.4], ['Chill / frozen', 13, 2.0, 6.4]],
-  fashion: [['Z-racks', 15.5, 2.0, -9.7]],
+  fashion: [['Yellow Z-racks', 15.5, 2.0, -9.7], ['Green racking · cartons above, garments below', 11.4, 3.9, -11.3]],
+  stockroom: [['Backroom stocking area', -7.4, 4.1, -5.85], ['Wrapped pallets on top', -6.0, 3.6, -7.3]],
+  picker: [['Stock picker', -5.8, 4.7, -5.85]],
+  stacker: [['Walkie stacker', -2.9, 3.0, -0.4], ['Top rack level', -2.9, 3.9, -4.4]],
+  ejack: [['Electric pallet jack', -6.5, 2.0, 3.0]],
+  salesmain: [['Gondola aisles', -46, 2.4, -7.4], ['Produce', -53.3, 1.6, 6.2], ['Meat case', -44.5, 2.2, 13.2], ['Electronics', -31, 2.8, -12.4], ['Checkouts', -41.4, 1.6, 3.6]],
+  elevator: [['Freight elevator', -9.8, 3.0, -11.0], ['Empty pallets', -7.3, 1.6, -10.5]],
+  upstairs: [['1st floor (above the backroom)', -10, 9.2, -11.6]],
+  floor2: [['2nd floor · coming soon', -10, 17.6, -11.6], ['1st floor', -10, 9.4, 11.6]],
   claims: [['Claims cage', -17.2, 2.6, -10.2]],
   overview: [],
 };
-const ROLE_STEPS = { bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
+const ROLE_STEPS = { picker: ['Stock picker operator'], stacker: ['Walkie stacker operator'], ejack: ['Electric pallet jack operator'], bev: ['DSD associate · receiving', 'Beverage vendor'], milk: ['Stocking 2 · milk & eggs to cooler'], hero: ['Stocking 2 · sorting by dept'], truck: ['Stocking 2 · unloading'], breakdown: ['Stocking 2 · pulling skids', 'Stocking 2 · breaking down'], roller: [], sort: ['Stocking 2 · sorting by dept'],
   floor: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · Dept 92 (big skid, 2 people)'], stock: ['Stocking 3 · Dept 46 skid (1 person)', 'Stocking 3 · overnight stocking'], dsd: ['Beverage vendor', 'DSD associate · receiving'], snack: ['Snack vendor'],
   pharm: ['DSD associate · receiving', 'Pharmacy pallet · jack to pharmacy'], baler: ['Baler & compactor pre-op'], omni: ['OMNI customer fulfillment'], fashion: ['Fashion · hanging apparel'], claims: ['Claims & returns'], overview: [] };
 const labelsEl = document.getElementById('labels');
@@ -48,8 +63,10 @@ const LPOOL = []; for (let i = 0; i < 8; i++) { const d = document.createElement
 let cur = 0, camFrom = null, camT = 1, explore = false;
 const camPos = new THREE.Vector3().fromArray(CAMS.hero[0]), camTgt = new THREE.Vector3().fromArray(CAMS.hero[1]);
 const controls = new OrbitControls(camera, canvas); controls.enabled = false; controls.enableDamping = true; controls.maxPolarAngle = Math.PI * 0.495; controls.minDistance = 1.5; controls.maxDistance = 90;
-function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : 1.12; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; } return [p, t]; }
-function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
+function camFor(c) { const p = new THREE.Vector3().fromArray(c[0]), t = new THREE.Vector3().fromArray(c[1]); if (innerWidth / innerHeight < 0.8) { const d = p.clone().sub(t), m = p.y > 6 ? 1.5 : (c[0][2] < -12 && Math.abs(c[0][0]) < 20 ? 1.0 : 1.12); const inBR = Math.abs(c[0][0]) < 20 && Math.abs(c[0][2]) < 12 && c[0][1] < 7.2; p.copy(t).addScaledVector(d, m); t.y -= d.length() * m * 0.16; if (inBR) { p.x = Math.max(-19.4, Math.min(19.4, p.x)); p.z = Math.max(-11.4, Math.min(11.4, p.z)); } } return [p, t]; }
+function floorsFor(id) { const f1 = ['stairs', 'upstairs', 'floor2', 'overview'].includes(id), f2 = ['floor2', 'overview'].includes(id); F1G.visible = f1; F2G.visible = f2;
+  const ex = id === 'overview' || id === 'floor2'; F1G.position.y = id === 'overview' ? 3.0 : 0; F2G.position.y = ex ? (id === 'overview' ? 7.5 : 4.5) : 0; }
+function goStep(i, instant) { i = clamp(i, 0, STEPS.length - 1); if (i === cur && !instant && camT >= 1) return; cur = i; floorsFor(STEPS[i].id); STEPS.forEach((s, k) => s.el.classList.toggle('on', k === i)); document.querySelectorAll('.dots button').forEach((d, k) => d.classList.toggle('on', k === i));
   camFrom = [camera.position.clone(), camTgt.clone()]; camT = instant ? 1 : 0; const c = CAMS[STEPS[i].id] || CAMS.hero; const cf = camFor(c); camPos.copy(cf[0]); { const fw = followRole(c); if (fw) { camPos.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]); } } if (instant) { camera.position.copy(camPos); camTgt.copy(cf[1]); const fw = followRole(c); if (fw) camTgt.copy(tgtOf(fw, c)); } { const fw = followRole(c); camFrom.push(fw ? tgtOf(fw, c).clone() : cf[1].clone()); } if (explore) setExplore(false); }
 window.__goStep = goStep;
 function stepFromScroll() { const mid = innerHeight * 0.5; let best = 0, bd = 1e9; STEPS.forEach((s, k) => { const r = s.el.getBoundingClientRect(); const d = Math.abs((r.top + r.bottom) / 2 - mid); if (d < bd) { bd = d; best = k; } }); return best; }
@@ -73,7 +90,7 @@ const _lv = new THREE.Vector3();
 const _cabV = new THREE.Vector3();
 function followRole(c) { if (!c[2]) return null; if (c[2] === '@pharm') return PHSK; if (c[2] === '@bev') return BEVCUR; if (c[2] === '@milk') return MILKCUR; if (c[2] === '@snackcab') { const sp = SNACK.tractor.userData.seatPoint; if (sp && sp.object) return sp.object.getWorldPosition(_cabV); return SNACK.tractor.localToWorld(_cabV.set(0.55, 1.95, 2.2)); } const r = ROLES.find((r) => r.text === c[2]); return r ? r.w : null; }
 function updLabels() { const id = STEPS[cur].id; const items = (LBL[id] || []).map((l) => ({ t: l[0], x: l[1], y: l[2], z: l[3], k: 'poi' }));
-  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05, z: js ? js.z : r.w.z, k: 'who' }); }
+  if (!explore) for (const r of ROLES) if (r.text && (ROLE_STEPS[id] || []).includes(r.text)) { const js = r.w.jack && r.w.jack.skid; items.push({ t: r.text, x: js ? js.x : r.w.x, y: 2.05 + (r.w.y || 0), z: js ? js.z : r.w.z, k: 'who' }); }
   const W_ = innerWidth, H_ = innerHeight; let n = 0; const cel = STEPS[cur].el.querySelector('.card'); let cardR = cel && cel.getBoundingClientRect(); if (cardR && (cardR.bottom < 0 || cardR.top > H_)) cardR = null;
   const placed = []; for (const it of items) { if (n >= LPOOL.length) break; _lv.set(it.x, it.y, it.z).project(camera); if (_lv.z > 1 || Math.abs(_lv.x) > 1.05 || Math.abs(_lv.y) > 1.05) continue; const sx = (_lv.x + 1) / 2 * W_, sy = (1 - _lv.y) / 2 * H_; if (cardR && sx > cardR.left - 80 && sx < cardR.right + 80 && sy > cardR.top - 10 && sy < cardR.bottom + 40) continue; const lw = it.t.length * 7.4 + 18, lh = 24; let px = Math.min(W_ - lw / 2 - 8, Math.max(lw / 2 + 8, sx)), py = Math.min(H_ - 40, Math.max(lh + 50, sy)); for (let g = 0; g < 6; g++) { const hit = placed.find((q) => Math.abs(q[0] - px) < (q[2] + lw) / 2 + 4 && Math.abs(q[1] - py) < lh + 2); if (!hit) break; py = hit[1] - lh - 4; if (py < lh + 50) { py = hit[1] + lh + 4; } } placed.push([px, py, lw]); const d = LPOOL[n++]; d.textContent = it.t; d.className = 'lbl ' + it.k; d.style.transform = `translate(${px.toFixed(0)}px,${py.toFixed(0)}px) translate(-50%,-100%)`; d.style.display = 'block'; }
   for (; n < LPOOL.length; n++) LPOOL[n].style.display = 'none'; }
@@ -83,12 +100,13 @@ const fadeEl = document.getElementById('fade');
 function advance(dt) { DT = Math.min(0.1, dt); simStep(); if (T > NIGHT && fadeT < 0) { fadeT = 0; fadeEl.classList.add('on'); } }
 window.__step = (sec) => { let s = sec; while (s > 0) { advance(Math.min(0.1, s)); s -= 0.1; } };
 function frame(now) { requestAnimationFrame(frame); const dt = (now - last) / 1000; last = now; advance(Math.max(0, dt));
-  if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
+  if (fadeT >= 0) { fadeT += Math.min(0.1, dt); if (fadeT > 1.2 && !fadeT._done) { initSim(); initMachines(); resetVehicles(); fadeT = 2.0; fadeEl.classList.remove('on'); fadeT = -1; } }
   if (!explore) { { const c = CAMS[STEPS[cur].id]; const fw = followRole(c); if (fw) { const k = 1 - Math.exp(-Math.min(0.1, dt) * (camT < 1 ? 20 : 2.5)); camPos.lerp(_lv.set(fw.x + c[3][0], c[3][1], fw.z + c[3][2]), k); if (camT < 1) camFrom[2].copy(tgtOf(fw, c)); else camTgt.lerp(tgtOf(fw, c), k); } }
     if (camT < 1) { camT = Math.min(1, camT + Math.min(0.1, dt) / 1.6); const k = ease(camT); camera.position.lerpVectors(camFrom[0], camPos, k); camTgt.lerpVectors(camFrom[1], camFrom[2], k); } else { const sway = Math.sin(now / 4000) * 0.12; camera.position.set(camPos.x + sway, camPos.y, camPos.z); } camera.lookAt(camTgt); } else controls.update();
+  if (window.__camOverride) { const v = window.__camOverride; camera.position.fromArray(v[0]); camera.up.set(0, v[4] ? 1 : 0, v[4] ? 0 : -1); camera.lookAt(v[1][0], v[1][1], v[1][2]); camera.fov = v[2]; camera.updateProjectionMatrix(); }
   camLook(); render3d(); renderer.render(scene, camera); updLabels(); frames++;
   if (frames === 2) { window.__ready = true; const l = document.getElementById('gfLoad'); if (l) l.remove(); } }
-initSim(); resize(); goStep(0, true); camera.lookAt(camTgt);
+initSim(); initMachines(); resize(); goStep(0, true); camera.lookAt(camTgt);
 await __yield(); await __compile(1500); await __yield();
 setTimeout(() => { const l = document.getElementById('gfLoad'); if (l) l.remove(); }, 2800);
 requestAnimationFrame(frame);
@@ -98,3 +116,11 @@ requestAnimationFrame(frame);
   show(data, false);
   if (location.protocol === 'https:') try { const ctl = new AbortController(); setTimeout(() => ctl.abort(), 5000); fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://news.google.com/rss/search?q=Walmart+Canada&hl=en-CA&gl=CA&ceid=CA:en'), { signal: ctl.signal }).then((r) => r.ok ? r.text() : Promise.reject()).then((x) => { const doc = new DOMParser().parseFromString(x, 'text/xml'); const items = [...doc.querySelectorAll('item')].slice(0, 5).map((i) => ({ title: i.querySelector('title')?.textContent || '', link: i.querySelector('link')?.textContent || '' })).filter((i) => i.title && /^https:\/\//.test(i.link)); if (items.length) show({ items, date: new Date().toISOString().slice(0, 10) }, true); }).catch(() => {}); } catch (e) {}
 })();
+// QA probe: run the sim headless for `sec` seconds and report the minimum pairwise distance between walking/standing associates
+window.__sim.minPair = function (sec = 60, from = 0) { const save = DT; DT = 1 / 30; let best = 1e9, who = null, at = 0; const nm = (w) => { const r = ROLES.find((r) => r.w === w); return r ? r.text : 'w' + W.indexOf(w); };
+  for (let i = 0; i < sec * 30; i++) { simStep(); if (T < from) continue; const L = W.filter((w) => !w.sit && !w.hide);
+    for (let a = 0; a < L.length; a++) for (let b = a + 1; b < L.length; b++) { const p = L[a], q = L[b]; if (Math.abs((p.y || 0) - (q.y || 0)) > 1.5) continue; const d = Math.hypot(p.x - q.x, p.z - q.z); if (d < best) { best = d; who = [nm(p), nm(q)]; at = T; } } }
+  DT = save; return { min: +best.toFixed(3), who, at: +at.toFixed(1), n: W.length }; };
+window.__sim.footprint = function () { const r={};const save=DT;DT=1/30;const M=window.__mach;const ops=[M.pkOp,M.wsOp,M.ejOp];for(let i=0;i<150*30;i++){simStep();for(const w of W){if(w.sit||w.hide||ops.includes(w))continue;const nm=(ROLES.find(q=>q.w===w)||{}).text||('w'+W.indexOf(w));
+if(Math.abs(w.x+2.9)<1.4&&Math.abs(w.z+4.4)<0.65){r['rack:'+nm]=r['rack:'+nm]||T.toFixed(1)}
+for(const [k,g] of [['pk',M.PK],['ws',M.WS],['ej',M.EJ]]){if(Math.hypot(w.x-g.position.x,w.z-g.position.z)<0.9){r[k+':'+nm]=r[k+':'+nm]||T.toFixed(1)}}}}DT=save;return r };

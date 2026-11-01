@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#222">
+<script type="importmap">{"imports":{"three":"../../cooker/vendor/three.module.js"}}</script>
+<canvas id="sheet"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { makeMats } from '../materials.js';
+const mods = [['gondolaAisle', { seed: 3 }], ['gondolaAisle', {}], ['produceTable', { seed: 2, variety: 'orange' }], ['meatCase', { seed: 4 }], ['electronicsWall', { seed: 5 }], ['checkoutLane', { seed: 6 }], ['produceTable', { seed: 7, variety: 'melon' }]];
+const TW = 640, TH = 480, cols = 3, rows = Math.ceil(mods.length / cols);
+const sheet = document.getElementById('sheet'); sheet.width = TW * cols; sheet.height = TH * rows; const cx = sheet.getContext('2d');
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(TW, TH); r.shadowMap.enabled = true; r.outputColorSpace = THREE.SRGBColorSpace;
+const mats = makeMats(THREE), results = [];
+for (let i = 0; i < mods.length; i++) {
+  const [name, opts] = mods[i]; const res = { name, opts };
+  try {
+    const m = await import('./' + name + '.js'); const grp = m.build(THREE, mats, opts);
+    let meshes = 0, verts = 0; grp.traverse(o => { if (o.isMesh) { meshes++; verts += o.geometry.attributes.position.count * (o.isInstancedMesh ? o.count : 1); } });
+    Object.assign(res, { meshes, verts, dims: grp.userData.dims, ok: meshes <= 3 && verts <= 15000 && grp.isGroup });
+    const sc = new THREE.Scene(); sc.background = new THREE.Color(0xe9e7e2);
+    sc.add(new THREE.HemisphereLight(0xffffff, 0x8a8478, 1.6));
+    const dl = new THREE.DirectionalLight(0xffffff, 2.2); dl.position.set(5, 9, 7); dl.castShadow = true; dl.shadow.mapSize.set(2048, 2048);
+    const bb = new THREE.Box3().setFromObject(grp), s = bb.getSize(new THREE.Vector3()), rad = s.length() / 2;
+    Object.assign(dl.shadow.camera, { left: -rad, right: rad, top: rad, bottom: -rad, far: 40 }); sc.add(dl);
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: 0xcfcac0, roughness: 0.9 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; sc.add(fl, grp);
+    const c = bb.getCenter(new THREE.Vector3()), cam = new THREE.PerspectiveCamera(35, TW / TH, 0.05, 100), dist = rad / Math.sin(THREE.MathUtils.degToRad(17.5)) * 0.78;
+    const dir = new THREE.Vector3(0.75, 0.55, 1).normalize(); cam.position.copy(c).addScaledVector(dir, dist); cam.lookAt(c);
+    r.render(sc, cam); cx.drawImage(r.domElement, (i % cols) * TW, Math.floor(i / cols) * TH);
+  } catch (e) { res.error = String(e.stack || e); res.ok = false; }
+  const x0 = (i % cols) * TW, y0 = Math.floor(i / cols) * TH;
+  cx.fillStyle = 'rgba(0,0,0,0.65)'; cx.fillRect(x0, y0, TW, 30); cx.fillStyle = res.ok ? '#fff' : '#f66'; cx.font = '16px sans-serif';
+  cx.fillText(`${name} ${JSON.stringify(opts)}  calls ${res.meshes} · verts ${res.verts} · ${res.dims ? res.dims.w + '×' + res.dims.h + '×' + res.dims.d + ' m' : res.error}`, x0 + 8, y0 + 20);
+  results.push(res);
+}
+window.__results = results; window.__png = sheet.toDataURL('image/png'); window.__ready = true;
+</script></body></html>

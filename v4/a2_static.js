@@ -45,7 +45,7 @@ for (let x = -10; x < 3.3; x += 1.15) S.box(0.03, 3.1, 0.02, x, 1.55, -16.86, '#
 S.box(13.8, 0.12, 0.06, -3.6, 0.06, -16.85, '#8e959b'); S.cyl(0.14, 1.2, -9.9, 0.6, -12.6, YEL, 12);
 for (let i = 0; i < 9; i++) S.box(0.24, 2.6, 0.012, -4.75 + 0.18 + i * 0.29, 1.65, -12.06 - (i % 2) * 0.02, i % 2 ? '#dfe9ee' : '#d3e0e7');
 sign(SIGN.cooler, 1.0, 0.25, -3.6, 3.25, -11.89, 0);
-wallC(-20, 12, -20, -12, 0, BR.H, WALL);                         // west
+wallC(-20, 12, -20, 5.2, 0, BR.H, WALL); wallC(-20, 3.4, -20, -12, 0, BR.H, WALL); wallC(-20, 5.2, -20, 3.4, 2.5, BR.H, WALL); // west, double doors z 3.4..5.2 to the main sales floor
 wallC(20, -12, 20, -1.6, 0, BR.H, WALL); wallC(20, 1.6, 20, 12, 0, BR.H, WALL); wallC(20, -1.6, 20, 1.6, 3.2, BR.H, WALL); // east (backroom side)
 wallC(20, 12, 20, 1.6, 0, 5.5, '#f3f1ec'); wallC(20, -1.6, 20, -12, 0, 5.5, '#f3f1ec'); wallC(20, 1.6, 20, -1.6, 3.2, 5.5, '#f3f1ec'); // east wall, sales-floor side
 UP.box(0.05, 0.9, 24, 20.03, 4.6, 0, '#0071ce');
@@ -206,20 +206,31 @@ await __yield();
 trailer(S, DOORS.A.x, 12.3, { roof: false, placard: 'FDS' }); tractorBody(S, DOORS.A.x, 12.3 + 15);
 trailer(S, DOORS.B.x, 12.3, { roof: false, placard: 'CP' }); tractorBody(S, DOORS.B.x, 12.3 + 15);
 // two more Walmart trucks waiting in the yard (ADS, MP), heading west on the yard lane
-function xform(fn, m) { const s0 = signGeos.length, g0 = S.g.length; fn(); for (let i = g0; i < S.g.length; i++) S.g[i].applyMatrix4(m); for (let i = s0; i < signGeos.length; i++) signGeos[i].applyMatrix4(m); }
+function xform(fn, m, B = S) { const s0 = signGeos.length, g0 = B.g.length; fn(); for (let i = g0; i < B.g.length; i++) B.g[i].applyMatrix4(m); for (let i = s0; i < signGeos.length; i++) signGeos[i].applyMatrix4(m); }
 const YARD = [{ x: -22, z: 47, pl: 'ADS' }, { x: 6, z: 47, pl: 'MP' }];
 for (const y of YARD) xform(() => { trailer(S, 0, 0, { roof: true, placard: y.pl }); tractorBody(S, 0, 15); }, new THREE.Matrix4().makeTranslation(y.x, 0, y.z).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)));
 
 // static scene meshes
 // ---------------- 1st floor (upstairs) shell: room walls, labels, simple box placeholders ----------------
 // Inky models: divShelving, officeKit (manager, personnel, upc, storeManager), trainingRoom, lunchRoom, sickRoom, cleaningRoom, stairs (U-turn).
-const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
-{ const F = UPF.y, WC = '#e9e7e2', ROOMS = [];
-  for (const [x, z] of [[-45.6, -11.6], [-22.4, -11.6], [-45.6, 11.6], [-22.4, 11.6], [-34, -11.6], [-34, 11.6], [-45.6, 0], [-22.4, 0]]) S.box(0.35, F, 0.35, x, F / 2, z, '#9aa0a6');
-  S.box(24, 0.25, 24, -34, F - 0.125, 0, '#bfc3c7'); S.box(24, 0.02, 24, -34, F + 0.01, 0, '#d9d6cf');
+// freight elevator: block-wall shaft, grey steel doors with a yellow/black stripe (ref day2/freight_elevator_pallets)
+function freightElevator(B, x0, y, label) { const z0 = 0.2, z1 = 2.6, x1 = x0 + 1.5, H = y > 1 ? 2.8 : 7.4;
+  B.boxB(x0, y, z0 - 0.3, x1, y + H, z0, '#b9b6ae'); B.boxB(x0, y, z1, x1, y + H, z1 + 0.3, '#b9b6ae'); B.boxB(x0, y + 2.5, z0, x1, y + H, z1, '#b9b6ae');
+  B.boxB(x0, y, z0, x1 - 0.06, y + 2.5, z1, '#3a3d40'); B.boxB(x1 - 0.06, y + 0.02, z0 + 0.05, x1, y + 2.45, z1 - 0.05, '#8f969d'); B.boxB(x1, y + 0.02, (z0 + z1) / 2 - 0.015, x1 + 0.01, y + 2.45, (z0 + z1) / 2 + 0.015, '#2b2e31');
+  for (let i = 0; i < 8; i++) B.boxB(x1, y + 0.95, z0 + 0.05 + i * 0.29, x1 + 0.012, y + 1.13, z0 + 0.05 + i * 0.29 + 0.145, i % 2 ? '#1d1f22' : '#f2c200');
+  for (let i = 0; i < 8; i++) B.boxB(x1, y + 0.95, z0 + 0.195 + i * 0.29, x1 + 0.012, y + 1.13, Math.min(z1 - 0.05, z0 + 0.195 + i * 0.29 + 0.145), '#1d1f22');
+  B.boxB(x1, y + 1.2, z1 + 0.05, x1 + 0.04, y + 1.45, z1 + 0.15, '#c8ccd0'); // call buttons
+  if (label) sign(textSign([label], { w: 512, h: 96, bg: '#041e42', fg: '#fff', size: 0.5 }), 1.8, 0.34, x1 + 0.02, y + 2.75, (z0 + z1) / 2, Math.PI / 2); }
+const elevAt = (B, tx, y, label) => xform(() => freightElevator(B, 0, y, label), new THREE.Matrix4().makeTranslation(tx, 0, -12).multiply(new THREE.Matrix4().makeRotationY(-Math.PI / 2)), B); // north wall, doors face +z
+const pallets = (B, x, z, n) => { for (let i = 0; i < n; i++) { const y = i * 0.145; B.boxB(x - 0.6, y + 0.11, z - 0.5, x + 0.6, y + 0.14, z + 0.5, '#b4895a'); for (const dz of [-0.45, 0, 0.45]) B.boxB(x - 0.6, y, z + dz - 0.05, x + 0.6, y + 0.11, z + dz + 0.05, '#9c7347'); } };
+elevAt(S, -8.4, 0, 'Freight elevator'); pallets(S, -7.3, -11.2, 9); pallets(S, -7.3, -9.9, 6); S.boxB(-11.2, 0.004, -10.5, -8.4, 0.012, -9.3, YEL); // elevator landing zone
+const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 7.6, wh: 1.3, dx: 24 }; // built in local x[-46,-22], shifted +24 so it sits ON TOP of the backroom (world x[-22,2])
+const F1B = new Builder(), F1G = new THREE.Group(); F1G.name = 'floor1'; F1G.position.x = UPF.dx; F1G.visible = false; scene.add(F1G);
+const F2B = new Builder(), F2G = new THREE.Group(); F2G.name = 'floor2'; F2G.position.x = UPF.dx; F2G.visible = false; scene.add(F2G);
+{ const S = F1B, scene = F1G, F = UPF.y, WC = '#e9e7e2', ROOMS = []; const s0 = signGeos.length;
+  S.boxB(-43.4, F - 0.25, -12, -22, F, 12, '#bfc3c7'); S.boxB(-46, F - 0.25, -12, -43.4, F, 2.5, '#bfc3c7'); S.boxB(-43.4, F, -12, -22, F + 0.02, 12, '#d9d6cf'); S.boxB(-46, F, -12, -43.4, F + 0.02, 2.5, '#d9d6cf'); // slab with the stair well (west)
   const wall = (x0, z0, x1, z1) => S.wall(x0, z0, x1, z1, F, F + UPF.wh, WC);
-  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 12);
-  wall(-22, -12, -22, 6.4); // stair landing opening on the backroom side
+  wall(-46, -12, -22, -12); wall(-46, 12, -22, 12); wall(-46, -12, -46, 2.5); wall(-22, -12, -22, 12); // stair well on the west side
   const ROW = [[-46, -38, 'Training room', 'trainingRoom'], [-38, -30, 'Lunch room', 'lunchRoom'], [-30, -26, 'Sick room', 'sickRoom'], [-26, -22, 'Cleaning', 'cleaningRoom']];
   const ROW2 = [[-46, -40.5, 'Store manager', 'officeKit'], [-40.5, -35.5, 'Personnel', 'officeKit'], [-35.5, -31, 'UPC office', 'officeKit'], [-31, -26.5, 'Variants manager', 'officeKit'], [-26.5, -24.6, 'Div shelving', 'divShelving']];
   for (const [rz0, rz1, list] of [[-12, -1, ROW], [1, 12, ROW2]]) { const zc = rz1 > 0 ? 1 : -1; // corridor walls with a door gap per room
@@ -234,8 +245,74 @@ const UPF = { x0: -46, x1: -22, z0: -12, z1: 12, y: 4.2, wh: 1.3 };
   for (const [name, v, sd] of [['Store manager', 'storeManager', 1], ['Personnel', 'personnel', 2], ['UPC office', 'upc', 3], ['Variants manager', 'manager', 4]]) { const r = ROOMS.find((q) => q[0] === name); put(buildOffice(THREE, PM, { variant: v, seed: sd }), r[1], 7.2); }
   for (const [z, sd] of [[4.0, 11], [8.6, 12]]) put(buildDiv(THREE, PM, { seed: sd, bays: 3, colorRate: 0.1 }), -25.55, z, Math.PI / 2);
   // U-turn stairs from the backroom floor up to the 1st-floor opening (west side)
-  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; scene.add(ST); window.__stairs = ST;
+  const ST = buildStairs(THREE, PM, { rise: F, landing: true }); ST.position.set(-21.2, 0, 8.6); ST.rotation.y = 0; window.scene3.add(ST); window.__stairs = ST;
   sign(textSign(['1st floor · offices & staff rooms'], { w: 1024, h: 128, bg: '#0071ce', fg: '#fff', size: 0.46 }), 6, 0.75, -34, F + UPF.wh + 1.2, 12.05, 0);
+  elevAt(S, -32.4, F, 'Freight elevator · 1st'); pallets(S, -31.3, -11.2, 4);
+  F1G.add(S.merge(MAT.v, 'floor1')); { const sg = signGeos.splice(s0); const sm = new THREE.Mesh(mergeGeometries(sg, false), MAT.sign); sm.name = 'floor1signs'; sm.matrixAutoUpdate = false; F1G.add(sm); }
+}
+{ const S = F2B, F = UPF.y + 4.4; const s0 = signGeos.length; // 2nd floor: empty shell, coming soon
+  S.boxB(-46, F - 0.25, -12, -22, F, 12, '#bfc3c7'); S.boxB(-46, F, -12, -22, F + 0.02, 12, '#e4e2dc');
+  for (const [x0, z0, x1, z1] of [[-46, -12, -22, -12], [-46, 12, -22, 12], [-46, -12, -46, 12], [-22, -12, -22, 12]]) S.wall(x0, z0, x1, z1, F, F + 1.3, '#e9e7e2');
+  for (let x = -44; x <= -24; x += 4) for (let z = -10; z <= 10; z += 5) S.box(0.3, 1.3, 0.3, x, F + 0.65, z, '#a4a9ae');
+  sign(textSign(['2nd floor · coming soon'], { w: 1024, h: 128, bg: '#ffc220', fg: '#041e42', size: 0.5 }), 8, 1.0, -34, F + 0.03, 0, 0, -Math.PI / 2);
+  sign(textSign(['2nd floor · coming soon'], { w: 1024, h: 128, bg: '#ffc220', fg: '#041e42', size: 0.5 }), 6, 0.75, -34, F + 2.0, 12.05, 0);
+  elevAt(S, -32.4, F, 'Freight elevator · 2nd');
+  F2G.add(S.merge(MAT.v, 'floor2')); { const sg = signGeos.splice(s0); const sm = new THREE.Mesh(mergeGeometries(sg, false), MAT.sign); sm.name = 'floor2signs'; sm.matrixAutoUpdate = false; F2G.add(sm); }
+}
+
+// ===== bake: merge imported fixtures by material so a whole area costs ~1 draw per material =====
+function bake(list, name) { const buckets = new Map();
+  for (const o of list) { o.updateMatrixWorld(true); o.traverse((m) => { if (!m.isMesh || m.isSkinnedMesh) return; let g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); g.applyMatrix4(m.matrixWorld);
+    const n = new THREE.BufferGeometry(); n.setAttribute('position', g.attributes.position); n.setAttribute('normal', g.attributes.normal);
+    n.setAttribute('color', g.attributes.color || new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 3).fill(1), 3));
+    if (!buckets.has(m.material)) buckets.set(m.material, []); buckets.get(m.material).push(n); }); }
+  const out = new THREE.Group(); out.name = name; for (const [mat, gs] of buckets) { const m = new THREE.Mesh(mergeGeometries(gs, false), mat); m.name = name; m.matrixAutoUpdate = false; m.updateMatrix(); out.add(m); } return out; }
+const at = (o, x, z, ry = 0, y = 0) => { o.position.set(x, y, z); o.rotation.y = ry; return o; };
+// ===== MAIN SALES FLOOR (west, through the double doors): grey gondolas + blue aisle signs, produce, meat, electronics, checkouts =====
+const MSF = { x0: -58, x1: -26, z0: -14, z1: 14 };
+{ const FX = [], FLC = '#cfd0cc';
+  S.boxB(MSF.x0, GROUND, MSF.z0, MSF.x1, 0, MSF.z1, FLC); S.boxB(-26, GROUND, 3.2, -20, 0, 5.4, FLC); // polished concrete
+  for (let x = MSF.x0 + 2; x < MSF.x1; x += 4) S.boxB(x - 0.02, 0.001, MSF.z0, x + 0.02, 0.004, MSF.z1, '#c2c3bf'); // floor joints
+  for (let x = MSF.x0 + 3; x < MSF.x1 - 1; x += 6) S.boxB(x - 0.9, 0.002, MSF.z0 + 0.5, x + 0.9, 0.005, MSF.z1 - 0.5, '#d9dad6'); // light sheen
+  const wcol = '#f4f5f2', WH = 3.2;
+  for (const [x0, z0, x1, z1] of [[MSF.x0, MSF.z0, MSF.x1, MSF.z0], [MSF.x1, MSF.z1, MSF.x0, MSF.z1], [MSF.x0, MSF.z1, MSF.x0, MSF.z0], [MSF.x1, MSF.z0, MSF.x1, 3.4], [MSF.x1, 5.2, MSF.x1, MSF.z1]]) {
+    S.wall(x0, z0, x1, z1, 0, WH, wcol); }
+  S.boxB(MSF.x0, 2.55, MSF.z0, MSF.x1, 3.0, MSF.z0 + 0.03, '#0071ce'); S.boxB(MSF.x0, 2.55, MSF.z0, MSF.x0 + 0.03, 3.0, MSF.z1, '#0071ce'); // blue perimeter band
+  S.boxB(MSF.x0, 0, MSF.z0, MSF.x1, 0.12, MSF.z0 + 0.04, '#8a8d90'); S.boxB(MSF.x0, 0, MSF.z0, MSF.x0 + 0.04, 0.12, MSF.z1, '#8a8d90');
+  // corridor + double doors (backroom wall x -20 and sales floor wall x -26), propped open
+  S.boxB(-26, 0, 3.15, -20, 2.5, 3.25, WALL2); S.boxB(-26, 0, 5.35, -20, 2.5, 5.45, WALL2);
+  for (const dx of [-20.05, -25.95]) { for (const s of [-1, 1]) { const hz = s < 0 ? 3.4 : 5.2; const ang = s * 1.1; const cx = dx - 0.45 * Math.sin(ang) * (dx < -21 ? -1 : 1), cz = hz - s * 0.45 * Math.cos(ang);
+      S.box(0.05, 2.2, 0.9, cx, 1.1, cz, '#9aa3ab', -ang); S.box(0.06, 0.35, 0.3, cx, 1.55, cz, '#2b2f33', -ang); } S.boxB(dx - 0.06, 2.2, 3.4, dx + 0.06, 2.5, 5.2, '#7c858d'); }
+  sign(textSign(['Sales floor'], { w: 512, h: 128, bg: '#0071ce', fg: '#fff', size: 0.45 }), 1.7, 0.42, -20.1, 2.95, 4.3, -Math.PI / 2);
+  sign(textSign(['Employees only'], { w: 512, h: 128, bg: '#fff', fg: '#041e42', size: 0.42 }), 1.6, 0.4, -26.08, 2.85, 4.3, -Math.PI / 2);
+  // gondola runs (≤10 m each) with hanging blue aisle signs
+  const AZ = [-11.6, -8.8, -6.0, -3.2]; let k = 0;
+  for (const z of AZ) for (const cx of [-51.6, -41.4]) FX.push(at(buildGondola(THREE, PM, { length: 8, seed: 3 + k++ }), cx, z));
+  for (let i = 0; i < AZ.length - 1; i++) { const z = (AZ[i] + AZ[i + 1]) / 2; for (const cx of [-51.6, -41.4]) { const c = textSign(['Aisle ' + (i * 2 + (cx < -46 ? 1 : 2))], { w: 512, h: 128, bg: '#0071ce', fg: '#fff', size: 0.5 });
+      sign(c, 1.4, 0.36, cx, 2.75, z + 0.01, 0); sign(c, 1.4, 0.36, cx, 2.75, z - 0.01, Math.PI); S.box(0.02, 0.4, 0.02, cx - 0.5, 3.1, z, '#888'); S.box(0.02, 0.4, 0.02, cx + 0.5, 3.1, z, '#888'); } }
+  // produce (front left), black price boards are on the tables
+  const VAR = ['orange', 'apple', 'lemon', 'lime', 'melon', 'avocado', 'greenApple', 'apple', 'orange'];
+  for (let i = 0; i < 9; i++) FX.push(at(buildProduce(THREE, PM, { seed: 2 + i, variety: VAR[i] }), -55 + (i % 3) * 1.7, 4.0 + ((i / 3) | 0) * 2.2));
+  sign(textSign(['Fresh produce'], { w: 512, h: 128, bg: '#3b8a3e', fg: '#fff', size: 0.45 }), 2.4, 0.6, -53.3, 2.9, 2.6, 0);
+  // open meat multideck along the south wall (front faces into the store)
+  for (const cx of [-46.5, -42.6]) FX.push(at(buildMeatCase(THREE, PM, { seed: 4 + cx }), cx, 13.35, Math.PI));
+  sign(textSign(['Meat'], { w: 256, h: 96, bg: '#a8302f', fg: '#fff', size: 0.5 }), 1.6, 0.6, -44.55, 2.7, 13.9, Math.PI);
+  // electronics TV wall + display table (north-east corner)
+  FX.push(at(buildTVWall(THREE, PM, { width: 6, seed: 5 }), -31.0, -12.6));
+  sign(textSign(['Electronics'], { w: 512, h: 128, bg: '#041e42', fg: '#fff', size: 0.45 }), 2.4, 0.6, -31.0, 2.95, -13.9, 0);
+  // checkouts (front)
+  for (let i = 0; i < 3; i++) FX.push(at(buildCheckout(THREE, PM, { seed: 6 + i }), -46 + i * 4.6, 3.6));
+  scene.add(bake(FX, 'mainSalesFloor'));
+  // bright strip lights
+  for (let x = MSF.x0 + 3; x < MSF.x1 - 1; x += 4) for (let z = MSF.z0 + 2; z < MSF.z1 - 1; z += 5) tubes.box(0.12, 0.05, 3.2, x, 3.15, z, '#ffffff');
+}
+// ===== BACKROOM STOCKING AREA: tall dark-green steel shelving, mostly kraft cases, wrapped pallets on top =====
+{ const FX = []; FX.push(at(buildBRShelf(THREE, PM, { seed: 2, bays: 2 }), -7.4, -7.3), at(buildBRShelf(THREE, PM, { seed: 5, bays: 2 }), -7.4, -4.4, Math.PI));
+  FX.push(at(buildFashionRack(THREE, PM, { seed: 3, bays: 2 }), 11.4, -11.35)); // backroom fashion: green racking, cartons above, garments below
+  scene.add(bake(FX, 'backroomRacks'));
+  for (let i = 0; i < 12; i++) S.boxB(-10.0 + i * 0.44, 0.004, -2.75, -9.78 + i * 0.44, 0.012, -2.55, i % 2 ? BLK : YEL); // yellow/black striped zone edge
+  S.boxB(-10.0, 0.004, -5.1, -4.8, 0.008, -4.0, '#e9e6d6');
+  sign(textSign(['Backroom stocking area'], { w: 768, h: 128, size: 0.42 }), 3.0, 0.5, -7.4, 4.35, -5.85, 0); sign(textSign(['Backroom stocking area'], { w: 768, h: 128, size: 0.42 }), 3.0, 0.5, -7.4, 4.35, -5.87, Math.PI);
 }
 scene.add(S.merge(MAT.v, 'static'));
 const LIGHTS_MESH = tubes.merge(MAT.e, 'lights'); scene.add(LIGHTS_MESH);
